@@ -91,6 +91,3 @@ extension StreamResultAccess<T> on Stream<Result<T>> {
     }
   }
 }
-
-Result<T> success<T>(T value) => Result.ok(value);
-Result<T> failure<T>(dynamic error) => Result.error(error);
