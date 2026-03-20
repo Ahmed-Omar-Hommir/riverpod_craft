@@ -1,5 +1,5 @@
-import 'package:riverpod_gen_cli/parameters_converter.dart';
-import 'package:riverpod_gen_cli/provider_info.dart';
+import 'package:riverpod_craft_cli/parameters_converter.dart';
+import 'package:riverpod_craft_cli/provider_info.dart';
 
 class ProviderCodeGenerator {
   final ProviderInfo _info;

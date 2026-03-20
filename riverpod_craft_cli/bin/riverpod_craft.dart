@@ -1,5 +1,5 @@
 // =============================================================================
-// Riverpod Gen CLI - Code Generation Tool
+// Riverpod Craft CLI - Code Generation Tool
 // =============================================================================
 // This tool generates provider files for Riverpod-based Flutter applications
 // It watches for changes in _provider.dart files and generates corresponding .pg.dart files
@@ -7,11 +7,11 @@
 
 import 'dart:io';
 import 'dart:async';
-import 'package:riverpod_gen_cli/file_processor.dart';
+import 'package:riverpod_craft_cli/file_processor.dart';
 import 'package:path/path.dart' as path;
 
-/// Main entry point for the Riverpod Gen CLI tool
-class GenCLI {
+/// Main entry point for the Riverpod Craft CLI tool
+class RiverpodCraftCLI {
   static Future<void> main(List<String> args) async {
     if (args.isEmpty) {
       await _startWatchMode();
@@ -22,7 +22,7 @@ class GenCLI {
 
   /// Starts watch mode to monitor file changes
   static Future<void> _startWatchMode() async {
-    print('🚀 Gen CLI - Starting Watch Mode');
+    print('🚀 Riverpod Craft - Starting Watch Mode');
     print('=' * 50);
 
     final currentDir = Directory.current;
@@ -49,7 +49,7 @@ class GenCLI {
       case 'generate':
         if (args.length < 2) {
           print('❌ Error: Please specify a file path');
-          print('Usage: gen generate <file_path>');
+          print('Usage: riverpod_craft generate <file_path>');
           return;
         }
         final filePath = args[1];
@@ -273,10 +273,10 @@ class GenCLI {
   /// Shows help information
   static void _showHelp() {
     print('''
-🚀 Gen CLI - Code Generation Tool
+🚀 Riverpod Craft - Code Generation Tool
 
 Usage:
-  gen [command] [options]
+  riverpod_craft [command] [options]
 
 Commands:
   watch                 Start watching for file changes (default)
@@ -284,12 +284,13 @@ Commands:
   clean                 Remove all generated .pg.dart files
   init                  Initialize project (install dependencies & VS Code extension)
   help                  Show this help message
+
 Examples:
-  gen                                    # Start watch mode
-  gen watch                              # Start watch mode
-  gen init                               # Initialize project dependencies
-  gen generate lib/features/auth/auth_provider.dart
-  gen clean                              # Clean all generated files
+  riverpod_craft                                    # Start watch mode
+  riverpod_craft watch                              # Start watch mode
+  riverpod_craft init                               # Initialize project dependencies
+  riverpod_craft generate lib/features/auth/auth_provider.dart
+  riverpod_craft clean                              # Clean all generated files
 
 Features:
   • Watches for changes in _provider.dart files
@@ -346,5 +347,5 @@ Features:
 
 /// Main function entry point
 void main(List<String> args) async {
-  await GenCLI.main(args);
+  await RiverpodCraftCLI.main(args);
 }

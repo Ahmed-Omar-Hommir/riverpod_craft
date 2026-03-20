@@ -1,15 +1,15 @@
-# riverpod_gen_cli
+# riverpod_craft_cli
 
-Code generation CLI for [riverpod_gen](../riverpod_gen). Parses Dart source files with `@provider`, `@providerValue`, and `@command` annotations and generates type-safe provider boilerplate.
+Code generation CLI for [riverpod_craft](../riverpod_craft). Parses Dart source files with `@provider`, `@providerValue`, and `@command` annotations and generates type-safe provider boilerplate.
 
 ## Installation
 
-The CLI is included in the `riverpod_gen_cli` package. Add it as a dev dependency or run directly:
+The CLI is included in the `riverpod_craft_cli` package. Add it as a dev dependency or run directly:
 
 ```yaml
 dev_dependencies:
-  riverpod_gen_cli:
-    path: ../riverpod_gen_cli
+  riverpod_craft_cli:
+    path: ../riverpod_craft_cli
 ```
 
 ## Commands
@@ -19,9 +19,9 @@ dev_dependencies:
 Monitors the `lib/` directory and regenerates `.pg.dart` files on save.
 
 ```bash
-dart run riverpod_gen_cli
+dart run riverpod_craft_cli
 # or explicitly:
-dart run riverpod_gen_cli watch
+dart run riverpod_craft_cli watch
 ```
 
 On startup, watch mode:
@@ -34,7 +34,7 @@ On startup, watch mode:
 Generates the `.pg.dart` file for a single source file.
 
 ```bash
-dart run riverpod_gen_cli generate lib/providers/my_provider.dart
+dart run riverpod_craft_cli generate lib/providers/my_provider.dart
 ```
 
 ### `clean`
@@ -42,7 +42,7 @@ dart run riverpod_gen_cli generate lib/providers/my_provider.dart
 Removes all generated `.pg.dart` files from the project.
 
 ```bash
-dart run riverpod_gen_cli clean
+dart run riverpod_craft_cli clean
 ```
 
 ### `init`
@@ -50,7 +50,7 @@ dart run riverpod_gen_cli clean
 Sets up the project — installs Dart dependencies and VS Code extension.
 
 ```bash
-dart run riverpod_gen_cli init
+dart run riverpod_craft_cli init
 ```
 
 ### `help`
@@ -58,7 +58,7 @@ dart run riverpod_gen_cli init
 Shows available commands.
 
 ```bash
-dart run riverpod_gen_cli help
+dart run riverpod_craft_cli help
 ```
 
 ## Generated Files

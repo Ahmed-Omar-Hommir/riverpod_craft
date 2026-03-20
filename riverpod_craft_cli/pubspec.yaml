@@ -1,4 +1,4 @@
-name: riverpod_gen_cli
+name: riverpod_craft_cli
 description: A code generation CLI tool for Riverpod providers.
 version: 1.0.0
 
@@ -17,4 +17,4 @@ dev_dependencies:
   test: ^1.24.0
 
 executables:
-  gen: riverpod_gen_cli
+  riverpod_craft: riverpod_craft

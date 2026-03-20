@@ -1,4 +1,4 @@
-import 'package:riverpod_gen/riverpod_gen.dart';
+import 'package:riverpod_craft/riverpod_craft.dart';
 
 part 'search_query_provider.pg.dart';
 

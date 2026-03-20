@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:riverpod_gen_cli/collect_data.dart';
-import 'package:riverpod_gen_cli/provider_generated_file.dart';
+import 'package:riverpod_craft_cli/collect_data.dart';
+import 'package:riverpod_craft_cli/provider_generated_file.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:dart_style/dart_style.dart';

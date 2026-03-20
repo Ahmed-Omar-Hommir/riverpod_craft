@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_gen/riverpod_gen.dart';
+import 'package:riverpod_craft/riverpod_craft.dart';
 
 import '../models/note.dart';
 import '../providers/note_detail_provider.dart';

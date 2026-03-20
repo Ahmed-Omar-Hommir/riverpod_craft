@@ -1,4 +1,4 @@
-import 'package:riverpod_gen/riverpod_gen.dart';
+import 'package:riverpod_craft/riverpod_craft.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/notes_repository.dart';

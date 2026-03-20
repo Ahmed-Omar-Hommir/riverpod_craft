@@ -1,4 +1,4 @@
-name: riverpod_gen
+name: riverpod_craft
 description: A code generation runtime library for simplified Riverpod state management with commands and data providers.
 version: 1.0.0
 

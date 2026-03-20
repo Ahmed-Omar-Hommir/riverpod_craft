@@ -1,4 +1,3 @@
-import 'package:riverpod_gen/riverpod_gen.dart';
 import 'package:equatable/equatable.dart';
 part 'data_state.dart';
 part 'command_state.dart';

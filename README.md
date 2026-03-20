@@ -1,4 +1,4 @@
-# riverpod_gen
+# riverpod_craft
 
 A code generation toolkit for [Riverpod](https://riverpod.dev) state management in Flutter. Currently in alpha — features and API may change.
 
@@ -11,8 +11,8 @@ Currently available:
 
 | Package | Description |
 |---------|-------------|
-| `riverpod_gen` | Runtime library — annotations, notifiers, state types |
-| `riverpod_gen_cli` | CLI tool — parses your code and generates `.pg.dart` files |
+| `riverpod_craft` | Runtime library — annotations, notifiers, state types |
+| `riverpod_craft_cli` | CLI tool — parses your code and generates `.pg.dart` files |
 
 ## Quick Start
 
@@ -21,15 +21,15 @@ Currently available:
 ```yaml
 # pubspec.yaml
 dependencies:
-  riverpod_gen:
-    path: ../riverpod_gen  # or published package
+  riverpod_craft:
+    path: ../riverpod_craft  # or published package
   flutter_riverpod: ^3.1.0
 ```
 
 ### 2. Write a provider
 
 ```dart
-import 'package:riverpod_gen/riverpod_gen.dart';
+import 'package:riverpod_craft/riverpod_craft.dart';
 
 part 'user_provider.pg.dart';
 
@@ -44,10 +44,10 @@ class User extends _$User {
 
 ```bash
 # Watch mode (auto-generates on save)
-dart run riverpod_gen_cli watch
+dart run riverpod_craft_cli watch
 
 # Or generate a single file
-dart run riverpod_gen_cli generate lib/providers/user_provider.dart
+dart run riverpod_craft_cli generate lib/providers/user_provider.dart
 ```
 
 ### 4. Use in widgets
@@ -73,7 +73,7 @@ class UserPage extends ConsumerWidget {
 
 ### Calling notifier methods without `.notifier`
 
-In vanilla Riverpod, calling a method on a notifier requires `ref.read(provider.notifier).method()`. With `riverpod_gen`, methods are directly accessible:
+In vanilla Riverpod, calling a method on a notifier requires `ref.read(provider.notifier).method()`. With `riverpod_craft`, methods are directly accessible:
 
 **Before (vanilla Riverpod):**
 
@@ -82,7 +82,7 @@ ref.read(todosProvider.notifier).addTodo(newTodo);
 ref.read(todosProvider.notifier).removeTodo(id);
 ```
 
-**After (riverpod_gen):**
+**After (riverpod_craft):**
 
 ```dart
 ref.todosProvider.addTodo(todo: newTodo);
@@ -91,7 +91,7 @@ ref.todosProvider.removeTodo(id: id);
 
 ### Watching/reading async state of a side effect
 
-In vanilla Riverpod, there's no built-in way to watch the loading/error/success state of an individual operation like `addTodo`. The `mutation` API exists but is verbose and limited. See the [Side Effect Solution](#side-effect-solution) section for how `riverpod_gen` solves this.
+In vanilla Riverpod, there's no built-in way to watch the loading/error/success state of an individual operation like `addTodo`. The `mutation` API exists but is verbose and limited. See the [Side Effect Solution](#side-effect-solution) section for how `riverpod_craft` solves this.
 
 ### Updating sync state without `.notifier`
 
@@ -101,7 +101,7 @@ In vanilla Riverpod, there's no built-in way to watch the loading/error/success 
 ref.read(counterProvider.notifier).state = newValue;
 ```
 
-**After (riverpod_gen):**
+**After (riverpod_craft):**
 
 ```dart
 ref.counterProvider.setState(newValue);
@@ -115,7 +115,7 @@ ref.counterProvider.setState(newValue);
 ref.read(todosProvider.notifier).reload();
 ```
 
-**After (riverpod_gen):**
+**After (riverpod_craft):**
 
 ```dart
 ref.todosProvider.reload();
@@ -128,7 +128,7 @@ Everything starts from `ref.` — your IDE autocompletes all available providers
 
 ## Side Effect Solution
 
-The hardest part of Riverpod is handling side effects — API calls like creating, updating, or deleting data. You need loading states, error handling, and concurrency control. `riverpod_gen` solves this with the `@command` annotation.
+The hardest part of Riverpod is handling side effects — API calls like creating, updating, or deleting data. You need loading states, error handling, and concurrency control. `riverpod_craft` solves this with the `@command` annotation.
 
 ### The Problem
 
@@ -445,19 +445,19 @@ err.isError;         // true
 
 ```bash
 # Start watch mode (default) — auto-generates on file save
-dart run riverpod_gen_cli
+dart run riverpod_craft_cli
 
 # Generate a single file
-dart run riverpod_gen_cli generate lib/providers/my_provider.dart
+dart run riverpod_craft_cli generate lib/providers/my_provider.dart
 
 # Remove all generated .pg.dart files
-dart run riverpod_gen_cli clean
+dart run riverpod_craft_cli clean
 
 # Initialize project (install dependencies)
-dart run riverpod_gen_cli init
+dart run riverpod_craft_cli init
 
 # Show help
-dart run riverpod_gen_cli help
+dart run riverpod_craft_cli help
 ```
 
 ### Generated File Convention
@@ -499,7 +499,7 @@ class Note {
 ### Data Provider with Side Effects
 
 ```dart
-import 'package:riverpod_gen/riverpod_gen.dart';
+import 'package:riverpod_craft/riverpod_craft.dart';
 
 part 'notes_provider.pg.dart';
 
@@ -539,7 +539,7 @@ class Notes extends _$Notes {
 ### Sync State Provider
 
 ```dart
-import 'package:riverpod_gen/riverpod_gen.dart';
+import 'package:riverpod_craft/riverpod_craft.dart';
 
 part 'category_filter_provider.pg.dart';
 
@@ -553,7 +553,7 @@ class CategoryFilter extends _$CategoryFilter {
 ### Family Provider
 
 ```dart
-import 'package:riverpod_gen/riverpod_gen.dart';
+import 'package:riverpod_craft/riverpod_craft.dart';
 
 part 'note_detail_provider.pg.dart';
 
