@@ -24,7 +24,6 @@ class ProviderDataCollection {
             isFunctional: p.isFunctional,
             functionName: p.functionName,
             requiresRef: p.requiresRef,
-            isValueProvider: p.isValueProvider,
             isSettable: p.isSettable,
             allProviderVarNames: allVars,
             publicMethods: p.publicMethods,

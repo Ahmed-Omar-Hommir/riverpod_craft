@@ -1,6 +1,6 @@
 # riverpod_craft_cli
 
-Code generation CLI for [riverpod_craft](../riverpod_craft). Parses Dart source files with `@provider`, `@providerValue`, and `@command` annotations and generates type-safe provider boilerplate.
+Code generation CLI for [riverpod_craft](../riverpod_craft). Parses Dart source files with `@provider`, `@command`, and `@settable` annotations and generates type-safe provider boilerplate.
 
 ## Installation
 
@@ -78,7 +78,6 @@ For each annotated provider, the CLI generates:
 | `@provider` class with `Future<T> create()` | `DataNotifier` base class, provider declaration, Ref/WidgetRef facades, extensions |
 | `@provider` class with `T create()` | `StateDataNotifier` base class, provider declaration, facades with `setState()` |
 | `@provider` function | Notifier class, provider declaration, facades, extensions |
-| `@providerValue` function | Simple provider declaration, facades with `setState()` |
 | `@command` methods | `CommandNotifier` subclass, command facades with `run()`/`reset()`/`retry()` |
 | Family parameters | Callable facade classes, `invalidateFamily()` |
 

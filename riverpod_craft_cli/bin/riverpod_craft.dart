@@ -295,7 +295,7 @@ Examples:
 Features:
   • Watches for changes in _provider.dart files
   • Generates corresponding .pg.dart files
-  • Supports @provider, @providerValue, and @command annotations
+  • Supports @provider, @command, @settable, and @keepAlive annotations
   • Handles complex parameter types
   • Real-time code generation
 ''');

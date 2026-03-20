@@ -6,11 +6,6 @@ class ProviderAnnotation {
 }
 
 @protected
-class ProviderValueAnnotation {
-  const ProviderValueAnnotation();
-}
-
-@protected
 class KeepAliveAnnotation {
   const KeepAliveAnnotation();
 }
@@ -23,7 +18,6 @@ class FamilyAnnotation {
 const family = FamilyAnnotation();
 
 const provider = ProviderAnnotation();
-const providerValue = ProviderValueAnnotation();
 const keepAlive = KeepAliveAnnotation();
 
 @protected

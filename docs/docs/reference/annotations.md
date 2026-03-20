@@ -60,19 +60,6 @@ Stream<List<Message>> messages(Ref ref) => api.messagesStream();
 
 ---
 
-## `@providerValue`
-
-For simple functional value providers. Creates a read-only provider with no notifier.
-
-```dart
-part 'theme_mode_provider.pg.dart';
-
-@providerValue
-ThemeMode currentTheme(Ref ref) => ThemeMode.light;
-```
-
----
-
 ## `@command`
 
 Marks an async method inside a `@provider` class as a side effect. Each command gets its own independent state.

@@ -51,7 +51,6 @@ class FileProcessor {
 
       final maybeAnnotated =
           stripped.contains('@provider') ||
-          stripped.contains('@providerValue') ||
           stripped.contains('@command') ||
           stripped.contains('@Command');
 

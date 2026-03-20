@@ -67,21 +67,18 @@ ProviderDataCollection collectData(ParseStringResult content) {
     if (declaration is FunctionDeclaration) {
       final metadata = declaration.metadata;
       final isProvider = _hasAnnotation(metadata, 'provider');
-      final isProviderValue = _hasAnnotation(metadata, 'providerValue');
-      if (!isProvider && !isProviderValue) continue;
+      if (!isProvider) continue;
 
       final functionName = declaration.name.lexeme;
       final isKeepAlive = _hasAnnotation(metadata, 'keepAlive');
       final isSettable = _hasAnnotation(metadata, 'settable');
-      final providerType = isProviderValue
-          ? ProviderType.sync
-          : _getProviderTypeFunction(declaration);
+      final providerType = _getProviderTypeFunction(declaration);
       final dataType = _extractGenericTypeFunction(declaration);
 
       // parameters
       var params = _extractParametersFunction(declaration);
 
-      // For providers (including providerValue), check for Ref ref as first parameter
+      // Check for Ref ref as first parameter
       bool requiresRef = false;
       final firstPositional = params.where((p) => p.isPositional).firstOrNull;
       if (firstPositional != null &&
@@ -102,7 +99,6 @@ ProviderDataCollection collectData(ParseStringResult content) {
           isFunctional: true,
           functionName: functionName,
           requiresRef: requiresRef,
-          isValueProvider: isProviderValue,
           isSettable: isSettable,
           publicMethods: const <PublicMethod>[],
         ),

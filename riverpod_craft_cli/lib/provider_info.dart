@@ -28,7 +28,6 @@ class ProviderInfo {
     this.isFunctional = false,
     this.functionName,
     this.requiresRef = false,
-    this.isValueProvider = false,
     this.isSettable = false,
     this.allProviderVarNames = const [],
     this.publicMethods = const [],
@@ -43,7 +42,6 @@ class ProviderInfo {
   final bool isFunctional;
   final String? functionName;
   final bool requiresRef;
-  final bool isValueProvider;
   final bool isSettable;
   final List<String> allProviderVarNames;
   final List<PublicMethod> publicMethods;

@@ -34,20 +34,6 @@ class ProviderCodeGenerator {
     final controllerType = _controllerType();
 
     if (_info.isFunctional) {
-      if (_info.isValueProvider) {
-        return '''
-${_buildValueProvider()}
-
-${_buildValueFacadeClasses()}
-
-${_buildValueExtensions()}
-''';
-      }
-
-      final dataProviderFacade = _isDataProvider()
-          ? _buildDataProviderFacadeClass()
-          : '';
-
       return '''
     ${_buildProvider(hasFamily: hasFamily, familyRecordType: familyRecordType, nonFamilyRecordType: nonFamilyRecordType, familyCallArgs: familyCallArgs)}
 
@@ -55,15 +41,11 @@ ${_buildFunctionalNotifierClass(controllerType, argType, recordArg, callArgs, ha
 
 ${_buildRefFacadeClass()}
 
-${_isDataProvider() ? dataProviderFacade : _buildWidgetRefFacadeClass()}
+${_buildDataProviderFacadeClass()}
 
 ${_buildExtensions()}
 ''';
     }
-
-    final dataProviderFacade = _isDataProvider()
-        ? _buildDataProviderFacadeClass()
-        : '';
 
     return '''
 ${_buildAbstractClass(controllerType, argType, paramSig, recordArg, callArgs, familyRecordType: familyRecordType)}
@@ -72,7 +54,7 @@ ${_buildAbstractClass(controllerType, argType, paramSig, recordArg, callArgs, fa
 
 ${_buildRefFacadeClass()}
 
-${_isDataProvider() ? dataProviderFacade : _buildWidgetRefFacadeClass()}
+${_buildDataProviderFacadeClass()}
 
 ${_info.commands.map((c) => c.builder(parent: _info).buildCommandClassInsideParent()).join('\n')}
 
@@ -82,105 +64,6 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildFacadeCommandClassWidg
 
 ${_buildExtensions()}
 ''';
-  }
-
-  String _buildValueProvider() {
-    final hasArg = _info.hasArg;
-    final body = _buildValueBodyFunction();
-    if (_info.isKeepAlive && hasArg) {
-      return 'final _${_info.providerVarName} = Provider.family<${_info.dataType}, ${_info.params.toRecordType()}>((ref, arg) => $body);';
-    } else if (_info.isKeepAlive && !hasArg) {
-      return 'final _${_info.providerVarName} = Provider<${_info.dataType}>((ref) => $body);';
-    } else if (!_info.isKeepAlive && hasArg) {
-      return 'final _${_info.providerVarName} = Provider.autoDispose.family<${_info.dataType}, ${_info.params.toRecordType()}>((ref, arg) => $body);';
-    } else {
-      return 'final _${_info.providerVarName} = Provider.autoDispose<${_info.dataType}>((ref) => $body);';
-    }
-  }
-
-  String _buildValueBodyFunction() {
-    final pieces = <String>[];
-    if (_info.requiresRef) pieces.add('ref');
-    if (_info.params.isNotEmpty) {
-      pieces.add(_info.params.fromRecordToFunctionCall());
-    }
-    return '${_info.functionName}(${pieces.join(', ')})';
-  }
-
-  String _buildValueFacadeClasses() {
-    return '''
-class ${_refFacadeClassName()} {
-  ${_refFacadeClassName()}(this._ref${_info.hasArg ? ', this._arg' : ''});
-  final Ref _ref;
-  ${_info.hasArg ? 'final ${_info.params.toRecordType()} _arg;' : ''}
-
-  late final _provider = _${_info.providerVarName}${_info.hasArg ? '(_arg)' : ''};
-
-  ${_info.dataType} read() => _ref.read(_provider);
-  ${_info.dataType} watch() => _ref.watch(_provider);
-
-  void invalidate() => _ref.invalidate(_provider);
-
-  SelectedRefFacade<R> select<R>(R Function(${_info.dataType} state) selector) =>
-      SelectedRefFacade(_ref, _provider.select(selector));
-}
-
-class ${_widgetFacadeClassName()} {
-  ${_widgetFacadeClassName()}(this._ref${_info.hasArg ? ', this._arg' : ''});
-  final WidgetRef _ref;
-  ${_info.hasArg ? 'final ${_info.params.toRecordType()} _arg;' : ''}
-
-  late final _provider = _${_info.providerVarName}${_info.hasArg ? '(_arg)' : ''};
-
-  ${_info.dataType} read() => _ref.read(_provider);
-  ${_info.dataType} watch() => _ref.watch(_provider);
-
-  void invalidate() => _ref.invalidate(_provider);
-
-  SelectedWidgetRefFacade<R> select<R>(R Function(${_info.dataType} state) selector) =>
-      SelectedWidgetRefFacade(_ref, _provider.select(selector));
-}''';
-  }
-
-  String _buildValueExtensions() {
-    if (!_info.hasArg) {
-      return '''
-extension ${_info.name}FacadeRefEx on Ref {
-  ${_refFacadeClassName()} get ${_info.providerVarName} => ${_refFacadeClassName()}(this);
-}
-
-extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
-  ${_widgetFacadeClassName()} get ${_info.providerVarName} => ${_widgetFacadeClassName()}(this);
-}''';
-    } else {
-      // For family providers, use callable class pattern
-      return '''
-class ${_refFacadeClassName()}Callable {
-  ${_refFacadeClassName()}Callable(this._ref);
-  final Ref _ref;
-
-  ${_refFacadeClassName()} call(${_info.params.toParameterSignature()}) => ${_refFacadeClassName()}(_ref, ${_info.params.toRecordValue()});
-
-  void invalidateFamily() => _ref.invalidate(_${_info.providerVarName});
-}
-
-class ${_widgetFacadeClassName()}Callable {
-  ${_widgetFacadeClassName()}Callable(this._ref);
-  final WidgetRef _ref;
-
-  ${_widgetFacadeClassName()} call(${_info.params.toParameterSignature()}) => ${_widgetFacadeClassName()}(_ref, ${_info.params.toRecordValue()});
-
-  void invalidateFamily() => _ref.invalidate(_${_info.providerVarName});
-}
-
-extension ${_info.name}FacadeRefEx on Ref {
-  ${_refFacadeClassName()}Callable get ${_info.providerVarName} => ${_refFacadeClassName()}Callable(this);
-}
-
-extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
-  ${_widgetFacadeClassName()}Callable get ${_info.providerVarName} => ${_widgetFacadeClassName()}Callable(this);
-}''';
-    }
   }
 
   String _buildAbstractClass(
@@ -473,11 +356,6 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
       case ProviderType.sync:
         return 'StateDataNotifier';
     }
-  }
-
-  /// Determines if this provider is a Data Provider (not Value provider)
-  bool _isDataProvider() {
-    return !_info.isValueProvider;
   }
 
   /// Builds the DataProviderFacade class for Data Providers

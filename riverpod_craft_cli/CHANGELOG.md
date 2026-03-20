@@ -1,7 +1,7 @@
 ## 0.1.0
 
 - Initial alpha release
-- Code generation from `@provider`, `@providerValue`, and `@command` annotations
+- Code generation from `@provider`, `@command`, and `@settable` annotations
 - Watch mode for real-time code generation
 - Single file generation
 - Clean command to remove generated files
