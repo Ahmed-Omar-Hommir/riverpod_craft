@@ -1,6 +1,9 @@
 name: riverpod_craft
-description: A code generation runtime library for simplified Riverpod state management with commands and data providers.
-version: 1.0.0
+description: A code generation toolkit for Riverpod state management. Better syntax and side effect solution with commands.
+version: 0.1.0
+homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
+repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
+issue_tracker: https://github.com/Ahmed-Omar-Hommir/riverpod_craft/issues
 
 environment:
   sdk: ^3.8.1
