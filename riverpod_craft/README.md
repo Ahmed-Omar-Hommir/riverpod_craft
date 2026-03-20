@@ -9,58 +9,68 @@ Currently available:
 
 ## Packages
 
-| Package | Description |
-|---------|-------------|
-| `riverpod_craft` | Runtime library — annotations, notifiers, state types |
+| Package              | Description                                                |
+| -------------------- | ---------------------------------------------------------- |
+| `riverpod_craft`     | Runtime library — annotations, notifiers, state types      |
 | `riverpod_craft_cli` | CLI tool — parses your code and generates `.pg.dart` files |
 
 ## Quick Start
 
-### 1. Add dependencies
+### 1. Install the CLI
+
+```bash
+dart pub global activate riverpod_craft_cli
+```
+
+### 2. Run the generator
+
+Run this in your project root and keep it running — it watches your files and auto-generates code on save:
+
+```bash
+riverpod_craft watch
+```
+
+### 3. Add the runtime dependency
 
 ```yaml
 # pubspec.yaml
 dependencies:
-  riverpod_craft:
-    path: ../riverpod_craft  # or published package
-  flutter_riverpod: ^3.1.0
+  riverpod_craft: ^0.1.0
 ```
 
-### 2. Write a provider
+### 4. Write a provider
+
+Create a file ending with `_provider.dart` (e.g. `todos_provider.dart`):
 
 ```dart
+// lib/providers/todos_provider.dart
 import 'package:riverpod_craft/riverpod_craft.dart';
+import 'package:http/http.dart' as http;
 
-part 'user_provider.pg.dart';
+part 'todos_provider.pg.dart';
 
 @provider
-class User extends _$User {
-  @override
-  Future<UserData> create() => fetchUser();
+Future<List<Todo>> todos(Ref ref) async {
+  final json = await http.get(Uri.parse('https://api.example.com/todos'));
+  return [...json.map(Todo.fromJson)];
 }
 ```
 
-### 3. Generate code
+> **⚠️ Important:** Provider files must end with `_provider.dart` (e.g. `todos_provider.dart`, `auth_provider.dart`). The generator only watches files matching this pattern.
 
-```bash
-# Watch mode (auto-generates on save)
-dart run riverpod_craft_cli watch
-
-# Or generate a single file
-dart run riverpod_craft_cli generate lib/providers/user_provider.dart
-```
-
-### 4. Use in widgets
+### 5. Use in widgets
 
 ```dart
-class UserPage extends ConsumerWidget {
+class TodosPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.userProvider.watch();
+    final state = ref.todosProvider.watch();
 
     return state.when(
       loading: () => CircularProgressIndicator(),
-      data: (user) => Text(user.name),
+      data: (todos) => ListView(
+        children: todos.map((t) => Text(t.title)).toList(),
+      ),
       error: (error) => Text('Error: $error'),
     );
   }
@@ -224,12 +234,12 @@ state.whereArg((arg) => arg.id == noteId)?.whenOrNull(
 
 Control what happens when a command is called while already running:
 
-| Annotation | Behavior |
-|------------|----------|
-| `@droppable` | Ignores new calls while busy |
+| Annotation     | Behavior                                          |
+| -------------- | ------------------------------------------------- |
+| `@droppable`   | Ignores new calls while busy                      |
 | `@restartable` | Cancels the current execution, starts the new one |
-| `@sequential` | Queues calls, processes one at a time |
-| `@concurrent` | Allows multiple simultaneous executions |
+| `@sequential`  | Queues calls, processes one at a time             |
+| `@concurrent`  | Allows multiple simultaneous executions           |
 
 ```dart
 @override
@@ -289,6 +299,7 @@ Stream<List<Message>> messages(Ref ref) => api.messagesStream();
 ```
 
 The `create()` return type determines the provider type:
+
 - `T` → sync provider (uses `StateDataNotifier`)
 - `Future<T>` → async provider (uses `DataNotifier`)
 - `Stream<T>` → stream provider (uses `DataNotifier`)
@@ -444,20 +455,23 @@ err.isError;         // true
 ## CLI Usage
 
 ```bash
+# Install globally (one time)
+dart pub global activate riverpod_craft_cli
+
 # Start watch mode (default) — auto-generates on file save
-dart run riverpod_craft_cli
+riverpod_craft watch
 
 # Generate a single file
-dart run riverpod_craft_cli generate lib/providers/my_provider.dart
+riverpod_craft generate lib/providers/my_provider.dart
 
 # Remove all generated .pg.dart files
-dart run riverpod_craft_cli clean
+riverpod_craft clean
 
 # Initialize project (install dependencies)
-dart run riverpod_craft_cli init
+riverpod_craft init
 
 # Show help
-dart run riverpod_craft_cli help
+riverpod_craft help
 ```
 
 ### Generated File Convention

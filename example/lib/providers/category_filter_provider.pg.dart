@@ -25,9 +25,6 @@ class $CategoryFilterFacadeRef {
 
   void invalidate() => _ref.invalidate(_provider);
 
-  void setState(NoteCategory value) =>
-      _ref.read(_provider.notifier).updateState(value);
-
   void listen(
     void Function(NoteCategory? previous, NoteCategory next) listener, {
     void Function(Object, StackTrace)? onError,
@@ -49,9 +46,6 @@ class $CategoryFilterFacadeWidget {
   SelectedWidgetRefFacade<R> select<R>(
     R Function(NoteCategory state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
-
-  void setState(NoteCategory value) =>
-      _ref.read(_provider.notifier).updateState(value);
 
   void listen(
     void Function(NoteCategory? previous, NoteCategory next) listener, {

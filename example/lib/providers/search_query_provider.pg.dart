@@ -25,9 +25,6 @@ class $SearchQueryFacadeRef {
 
   void invalidate() => _ref.invalidate(_provider);
 
-  void setState(String value) =>
-      _ref.read(_provider.notifier).updateState(value);
-
   void listen(
     void Function(String? previous, String next) listener, {
     void Function(Object, StackTrace)? onError,
@@ -48,9 +45,6 @@ class $SearchQueryFacadeWidget {
 
   SelectedWidgetRefFacade<R> select<R>(R Function(String state) selector) =>
       SelectedWidgetRefFacade(_ref, _provider.select(selector));
-
-  void setState(String value) =>
-      _ref.read(_provider.notifier).updateState(value);
 
   void listen(
     void Function(String? previous, String next) listener, {

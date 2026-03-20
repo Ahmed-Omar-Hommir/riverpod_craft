@@ -37,3 +37,10 @@ const droppable = CommandAnnotation();
 const restartable = CommandAnnotation();
 const concurrent = CommandAnnotation();
 const sequential = CommandAnnotation();
+
+@protected
+class SettableAnnotation {
+  const SettableAnnotation();
+}
+
+const settable = SettableAnnotation();

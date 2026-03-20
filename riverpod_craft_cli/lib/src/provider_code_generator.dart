@@ -343,8 +343,9 @@ class ${_info.notifierType} extends $controllerType<${_info.dataType}, $syncArgT
   String _buildRefFacadeClass() {
     final commandsGetters = _buildCommandGettersRef();
 
-    // Add setState for sync providers
-    final setStateMethod = _info.type == ProviderType.sync
+    // Add setState for sync providers only with @settable
+    final hasSetState = _info.type == ProviderType.sync && _info.isSettable;
+    final setStateMethod = hasSetState
         ? 'void setState(${_info.dataType} value) => _ref.read(_provider.notifier).updateState(value);'
         : '';
 
@@ -382,8 +383,9 @@ class ${_refFacadeClassName()} {
   String _buildWidgetRefFacadeClass() {
     final commandsGetters = _buildCommandGettersWidgetRef();
 
-    // Add setState for sync providers
-    final setStateMethod = _info.type == ProviderType.sync
+    // Add setState for sync providers only with @settable
+    final hasSetState = _info.type == ProviderType.sync && _info.isSettable;
+    final setStateMethod = hasSetState
         ? 'void setState(${_info.dataType} value) => _ref.read(_provider.notifier).updateState(value);'
         : '';
 
@@ -493,8 +495,8 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
   Future<void> silentReload() =>
       _ref.watch(_provider.notifier).silentReload();''';
 
-    // Add setState for sync providers
-    final setStateMethod = _info.type == ProviderType.sync
+    // Add setState for sync providers only with @settable
+    final setStateMethod = _info.type == ProviderType.sync && _info.isSettable
         ? 'void setState(${_info.dataType} value) => _ref.read(_provider.notifier).updateState(value);'
         : '';
 

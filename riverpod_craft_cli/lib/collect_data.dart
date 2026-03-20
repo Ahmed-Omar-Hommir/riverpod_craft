@@ -47,6 +47,7 @@ ProviderDataCollection collectData(ParseStringResult content) {
           )
           .toList();
 
+      // @settable is ignored on class-based providers — only functional providers support it
       providers.add(
         ProviderInfo(
           name: className,
@@ -71,6 +72,7 @@ ProviderDataCollection collectData(ParseStringResult content) {
 
       final functionName = declaration.name.lexeme;
       final isKeepAlive = _hasAnnotation(metadata, 'keepAlive');
+      final isSettable = _hasAnnotation(metadata, 'settable');
       final providerType = isProviderValue
           ? ProviderType.sync
           : _getProviderTypeFunction(declaration);
@@ -101,6 +103,7 @@ ProviderDataCollection collectData(ParseStringResult content) {
           functionName: functionName,
           requiresRef: requiresRef,
           isValueProvider: isProviderValue,
+          isSettable: isSettable,
           publicMethods: const <PublicMethod>[],
         ),
       );
