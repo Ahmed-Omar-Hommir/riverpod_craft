@@ -35,14 +35,14 @@ class _NotesListPageState extends ConsumerState<NotesListPage> {
     ref.notesProvider.deleteNoteCommand.listen((prev, next) {
       next.whenOrNull(
         data: (arg, _) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Note deleted')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Note deleted')));
         },
         error: (arg, error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Delete failed: $error')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Delete failed: $error')));
         },
       );
     });
@@ -69,7 +69,9 @@ class _NotesListPageState extends ConsumerState<NotesListPage> {
                       )
                     : null,
                 filled: true,
-                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                fillColor: Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerHighest,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -110,7 +112,8 @@ class _NotesListPageState extends ConsumerState<NotesListPage> {
                           searchQuery.isNotEmpty
                               ? 'No notes match your search'
                               : 'No notes yet',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
                                 color: Theme.of(context).colorScheme.outline,
                               ),
                         ),
@@ -118,7 +121,8 @@ class _NotesListPageState extends ConsumerState<NotesListPage> {
                           const SizedBox(height: 8),
                           Text(
                             'Tap + to create one',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
                                   color: Theme.of(context).colorScheme.outline,
                                 ),
                           ),

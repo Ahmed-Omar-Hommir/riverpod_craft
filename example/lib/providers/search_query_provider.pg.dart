@@ -1,15 +1,14 @@
 part of 'search_query_provider.dart';
 
-abstract class _$SearchQuery extends StateDataNotifier<String, ()> {
-  String create();
-  @override
-  String buildData(() arg) => create();
-}
-
 final _searchQueryProvider = NotifierProvider(
-  () => SearchQuery()..arg = (),
+  () => $$SearchQuery()..arg = (),
   isAutoDispose: true,
 );
+
+class $$SearchQuery extends StateDataNotifier<String, ()> {
+  @override
+  String buildData(() arg) => searchQuery(ref);
+}
 
 class $SearchQueryFacadeRef {
   $SearchQueryFacadeRef(this._ref);
@@ -24,6 +23,9 @@ class $SearchQueryFacadeRef {
       SelectedRefFacade(_ref, _provider.select(selector));
 
   void invalidate() => _ref.invalidate(_provider);
+
+  void setState(String value) =>
+      _ref.read(_provider.notifier).updateState(value);
 
   void listen(
     void Function(String? previous, String next) listener, {
@@ -45,6 +47,9 @@ class $SearchQueryFacadeWidget {
 
   SelectedWidgetRefFacade<R> select<R>(R Function(String state) selector) =>
       SelectedWidgetRefFacade(_ref, _provider.select(selector));
+
+  void setState(String value) =>
+      _ref.read(_provider.notifier).updateState(value);
 
   void listen(
     void Function(String? previous, String next) listener, {

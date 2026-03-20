@@ -1,15 +1,14 @@
 part of 'category_filter_provider.dart';
 
-abstract class _$CategoryFilter extends StateDataNotifier<NoteCategory, ()> {
-  NoteCategory create();
-  @override
-  NoteCategory buildData(() arg) => create();
-}
-
 final _categoryFilterProvider = NotifierProvider(
-  () => CategoryFilter()..arg = (),
+  () => $$CategoryFilter()..arg = (),
   isAutoDispose: true,
 );
+
+class $$CategoryFilter extends StateDataNotifier<NoteCategory, ()> {
+  @override
+  NoteCategory buildData(() arg) => categoryFilter(ref);
+}
 
 class $CategoryFilterFacadeRef {
   $CategoryFilterFacadeRef(this._ref);
@@ -24,6 +23,9 @@ class $CategoryFilterFacadeRef {
       SelectedRefFacade(_ref, _provider.select(selector));
 
   void invalidate() => _ref.invalidate(_provider);
+
+  void setState(NoteCategory value) =>
+      _ref.read(_provider.notifier).updateState(value);
 
   void listen(
     void Function(NoteCategory? previous, NoteCategory next) listener, {
@@ -46,6 +48,9 @@ class $CategoryFilterFacadeWidget {
   SelectedWidgetRefFacade<R> select<R>(
     R Function(NoteCategory state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
+
+  void setState(NoteCategory value) =>
+      _ref.read(_provider.notifier).updateState(value);
 
   void listen(
     void Function(NoteCategory? previous, NoteCategory next) listener, {
