@@ -1,3 +1,4 @@
+import 'package:example/providers/paginated_notes_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_craft/riverpod_craft.dart';
