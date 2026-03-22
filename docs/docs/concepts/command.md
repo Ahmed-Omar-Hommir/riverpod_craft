@@ -98,7 +98,6 @@ Widget build(BuildContext context, WidgetRef ref) {
 }
 ```
 
-
 ## Triggering a Command
 
 Call `.run()` with the same parameters as the original function — fully type-safe with IDE autocomplete:
@@ -165,7 +164,51 @@ ref.notesProvider.addNoteCommand.listen((prev, next) {
 });
 ```
 
+## Family
 
+Mark a parameter with `@family` to create a scoped command — each unique value gets its own independent state. This is useful when you have a list of items and each item has its own action (like a delete button per row).
+
+### Define
+
+```dart
+@command
+@droppable
+Future<void> deleteNote(Ref ref, {@family required String noteId}) async {
+  await http.delete(
+    Uri.parse('https://api.example.com/notes/$noteId'),
+  );
+}
+```
+
+### Use in widget
+
+Each item in the list gets its own command state — only the item being deleted shows a spinner:
+
+```dart
+@override
+Widget build(BuildContext context, WidgetRef ref) {
+  final deleteState = ref.deleteNoteCommand(noteId: note.id).watch();
+  final isDeleting = deleteState.isLoading;
+
+  return ListTile(
+    title: Text(note.title),
+    trailing: isDeleting
+        ? const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              ref.deleteNoteCommand(noteId: note.id).run();
+            },
+          ),
+  );
+}
+```
+
+Without `@family`, all items would share the same command state — tapping delete on one note would show a spinner on every note.
 
 ## Filtering by Argument
 
@@ -242,7 +285,6 @@ Future<List<Note>> search(Ref ref, {required String query}) async {
 }
 ```
 
-
 :::info
 Most use cases only need `@droppable` — it prevents duplicate executions when a user taps a button multiple times. It is also the default behavior, so if you don't add any concurrency annotation, your command automatically behaves as `@droppable`. Use `@restartable` when you want the latest call to always win, like search-as-you-type.
 :::
@@ -263,49 +305,3 @@ ref.notesProvider.addNoteCommand.reset();
 ### How does a command reset to idle?
 
 The state stays at `data` or `error` until you explicitly call `.reset()` or trigger a new `.run()`. This is intentional — it prevents accidental state loss. You always know when the state will change.
-
-## Family
-
-Mark a parameter with `@family` to create a scoped command — each unique value gets its own independent state. This is useful when you have a list of items and each item has its own action (like a delete button per row).
-
-### Define
-
-```dart
-@command
-@droppable
-Future<void> deleteNote(Ref ref, {@family required String noteId}) async {
-  await http.delete(
-    Uri.parse('https://api.example.com/notes/$noteId'),
-  );
-}
-```
-
-### Use in widget
-
-Each item in the list gets its own command state — only the item being deleted shows a spinner:
-
-```dart
-@override
-Widget build(BuildContext context, WidgetRef ref) {
-  final deleteState = ref.deleteNoteCommand(noteId: note.id).watch();
-  final isDeleting = deleteState.isLoading;
-
-  return ListTile(
-    title: Text(note.title),
-    trailing: isDeleting
-        ? const SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          )
-        : IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () {
-              ref.deleteNoteCommand(noteId: note.id).run();
-            },
-          ),
-  );
-}
-```
-
-Without `@family`, all items would share the same command state — tapping delete on one note would show a spinner on every note.
