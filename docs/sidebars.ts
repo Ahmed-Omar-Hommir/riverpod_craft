@@ -13,6 +13,7 @@ const sidebars: SidebarsConfig = {
         'concepts/side-effects',
         'concepts/command',
         'concepts/settable-providers',
+        'concepts/pagination',
       ],
     },
     {
