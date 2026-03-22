@@ -1,0 +1,116 @@
+part of 'mapped_notes_provider.dart';
+
+abstract class _$MappedNotes
+    extends PagedDataNotifier<Note, ({String? category})> {
+  Future<dynamic> create(int page, {required String? category});
+  @override
+  Future<PaginatedResponse<Note>> buildPagedData(int page) async =>
+      pagedMapper(await create(page, category: arg.category));
+}
+
+final _mappedNotesProvider =
+    NotifierProvider.family<
+      MappedNotes,
+      PagedDataState<Note>,
+      ({String? category})
+    >(
+      (({String? category}) arg) => MappedNotes()..arg = arg,
+      isAutoDispose: true,
+    );
+
+class $MappedNotesFacadeRef {
+  $MappedNotesFacadeRef(this._ref, this._arg);
+  final Ref _ref;
+  final ({String? category}) _arg;
+
+  late final _provider = _mappedNotesProvider(_arg);
+
+  PagedDataState<Note> read() => _ref.read(_provider);
+  PagedDataState<Note> watch() => _ref.watch(_provider);
+
+  SelectedRefFacade<R> select<R>(
+    R Function(PagedDataState<Note> state) selector,
+  ) => SelectedRefFacade(_ref, _provider.select(selector));
+
+  void invalidate() => _ref.invalidate(_provider);
+
+  void fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
+  Future<void> reload() => _ref.read(_provider.notifier).reload();
+
+  void listen(
+    void Function(PagedDataState<Note>? previous, PagedDataState<Note> next)
+    listener, {
+    void Function(Object, StackTrace)? onError,
+    bool fireImmediately = false,
+  }) {
+    _ref.listen<PagedDataState<Note>>(_provider, listener, onError: onError);
+  }
+}
+
+class $MappedNotesFacadeWidget
+    implements PagedDataProviderFacade<Note>, PagedProviderValue<Note> {
+  $MappedNotesFacadeWidget(this._ref, this._arg);
+  final WidgetRef _ref;
+  final ({String? category}) _arg;
+
+  late final _provider = _mappedNotesProvider(_arg);
+
+  @override
+  PagedDataState<Note> read() => _ref.read(_provider);
+  @override
+  PagedDataState<Note> watch() => _ref.watch(_provider);
+
+  SelectedWidgetRefFacade<R> select<R>(
+    R Function(PagedDataState<Note> state) selector,
+  ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
+  @override
+  void invalidate() => _ref.invalidate(_provider);
+
+  @override
+  void fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
+
+  Future<void> reload() => _ref.read(_provider.notifier).reload();
+
+  void listen(
+    void Function(PagedDataState<Note>? previous, PagedDataState<Note> next)
+    listener, {
+    void Function(Object, StackTrace)? onError,
+    bool fireImmediately = false,
+  }) {
+    _ref.listen<PagedDataState<Note>>(_provider, listener, onError: onError);
+  }
+
+  @override
+  PagedDataProviderFacade<Note> of(WidgetRef ref) =>
+      $MappedNotesFacadeWidget(ref, _arg);
+}
+
+class $MappedNotesFacadeRefCallable {
+  $MappedNotesFacadeRefCallable(this._ref);
+  final Ref _ref;
+
+  $MappedNotesFacadeRef call({required String? category}) =>
+      $MappedNotesFacadeRef(_ref, (category: category));
+
+  void invalidateFamily() => _ref.invalidate(_mappedNotesProvider);
+}
+
+class $MappedNotesFacadeWidgetCallable {
+  $MappedNotesFacadeWidgetCallable(this._ref);
+  final WidgetRef _ref;
+
+  $MappedNotesFacadeWidget call({required String? category}) =>
+      $MappedNotesFacadeWidget(_ref, (category: category));
+
+  void invalidateFamily() => _ref.invalidate(_mappedNotesProvider);
+}
+
+extension MappedNotesFacadeRefEx on Ref {
+  $MappedNotesFacadeRefCallable get mappedNotesProvider =>
+      $MappedNotesFacadeRefCallable(this);
+}
+
+extension MappedNotesFacadeWidgetRefEx on WidgetRef {
+  $MappedNotesFacadeWidgetCallable get mappedNotesProvider =>
+      $MappedNotesFacadeWidgetCallable(this);
+}

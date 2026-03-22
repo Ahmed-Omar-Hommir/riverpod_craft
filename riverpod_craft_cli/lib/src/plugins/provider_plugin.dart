@@ -42,8 +42,11 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
     final createMethod = classInfo.findMethod('create');
     if (createMethod == null) return null;
 
-    final dataType = extractGenericType(createMethod.returnType);
-    final providerType = getProviderType(createMethod.returnType);
+    final hasPageParam = createMethod.params.any((p) =>
+      p.isPositional && p.type == 'int' && p.name == 'page',
+    );
+    final providerType = getProviderType(createMethod.returnType, hasPageParam: hasPageParam);
+    final dataType = extractGenericType(createMethod.returnType, isPaged: providerType == ProviderType.paged);
 
     // Create method params become family params
     var familyParams = createMethod.params
@@ -92,9 +95,6 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
   ProviderInfo? collectFunction(DartFunctionInfo functionInfo) {
     if (!functionInfo.hasAnnotation('provider')) return null;
 
-    final providerType = getProviderType(functionInfo.returnType);
-    final dataType = extractGenericType(functionInfo.returnType);
-
     var params = List<ParameterInfo>.from(functionInfo.params);
 
     // Check for Ref ref as first parameter
@@ -106,6 +106,12 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
       requiresRef = true;
       params.remove(firstPositional);
     }
+
+    final hasPageParam = params.any((p) =>
+      p.isPositional && p.type == 'int' && p.name == 'page',
+    );
+    final providerType = getProviderType(functionInfo.returnType, hasPageParam: hasPageParam);
+    final dataType = extractGenericType(functionInfo.returnType, isPaged: providerType == ProviderType.paged);
 
     // For paged providers, strip the `int page` param — managed internally
     if (providerType == ProviderType.paged) {
@@ -139,7 +145,10 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
 
   /// Extracts the generic type from `Future<T>`, `Stream<T>`, `Paged<T>`,
   /// `Future<PaginatedResponse<T>>`, or returns as-is.
-  String extractGenericType(String returnType) {
+  ///
+  /// When [isPaged] is true (mapper mode), extracts the innermost generic:
+  /// `Future<ApiPagedResponse<Note>>` → `Note`
+  String extractGenericType(String returnType, {bool isPaged = false}) {
     // Paged<T> → T
     final pagedMatch = RegExp(r'^Paged<(.+)>$').firstMatch(returnType);
     if (pagedMatch != null) return pagedMatch.group(1)!;
@@ -147,6 +156,12 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
     // Future<PaginatedResponse<T>> → T
     final paginatedMatch = RegExp(r'^Future<PaginatedResponse<(.+)>>\??$').firstMatch(returnType);
     if (paginatedMatch != null) return paginatedMatch.group(1)!;
+
+    // With paged mapper: Future<Wrapper<T>> → T (extract innermost generic)
+    if (isPaged) {
+      final nestedMatch = RegExp(r'^Future<\w+<(.+)>>\??$').firstMatch(returnType);
+      if (nestedMatch != null) return nestedMatch.group(1)!;
+    }
 
     final futureMatch = RegExp(r'^Future<(.+)>\??$').firstMatch(returnType);
     if (futureMatch != null) return futureMatch.group(1)!;
@@ -158,10 +173,17 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
   }
 
   /// Determines ProviderType from a return type string.
-  ProviderType getProviderType(String returnType) {
+  ///
+  /// When [hasPageParam] is true and mapper is configured,
+  /// `Future<Wrapper<T>>` with `int page` first param → paged.
+  ProviderType getProviderType(String returnType, {bool hasPageParam = false}) {
     // Paged<T> or Future<PaginatedResponse<T>> → paged
     if (returnType.startsWith('Paged<') ||
         returnType.contains('PaginatedResponse<')) {
+      return ProviderType.paged;
+    }
+    // With paged mapper: Future<Wrapper<T>> + int page param → paged
+    if (hasPageParam && CraftConfig.hasPagedMapper && returnType.startsWith('Future<')) {
       return ProviderType.paged;
     }
     if (returnType.startsWith('Future<')) return ProviderType.future;
