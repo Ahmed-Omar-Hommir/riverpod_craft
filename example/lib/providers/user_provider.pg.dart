@@ -9,7 +9,7 @@ abstract class _$User extends DataNotifier<UserModel, ()> {
   Future<UserModel> buildDataWithFuture() => create();
 }
 
-final _userProvider = NotifierProvider(
+final _userProvider = NotifierProvider<User, DataState<UserModel>>(
   () => User()..arg = (),
   isAutoDispose: true,
 );

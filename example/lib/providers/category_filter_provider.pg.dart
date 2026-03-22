@@ -1,9 +1,10 @@
 part of 'category_filter_provider.dart';
 
-final _categoryFilterProvider = NotifierProvider(
-  () => $$CategoryFilter()..arg = (),
-  isAutoDispose: true,
-);
+final _categoryFilterProvider =
+    NotifierProvider<$$CategoryFilter, NoteCategory>(
+      () => $$CategoryFilter()..arg = (),
+      isAutoDispose: true,
+    );
 
 class $$CategoryFilter extends StateDataNotifier<NoteCategory, ()> {
   @override

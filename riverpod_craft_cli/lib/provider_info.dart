@@ -3,7 +3,7 @@ import 'package:riverpod_craft_cli/src/provider_code_generator.dart';
 import 'command_info.dart';
 import 'parameter_info.dart';
 
-enum ProviderType { sync, future, stream }
+enum ProviderType { sync, future, stream, paged }
 
 class PublicMethod {
   const PublicMethod({
@@ -54,12 +54,15 @@ class ProviderInfo {
     if (type == ProviderType.sync) return dataType;
     if (type == ProviderType.future) return 'Future<$dataType>';
     if (type == ProviderType.stream) return 'Stream<$dataType>';
+    if (type == ProviderType.paged) return 'Future<PaginatedResponse<$dataType>>';
     return '';
   }
 
   String get stateType {
     if (type == ProviderType.sync) {
       return dataType;
+    } else if (type == ProviderType.paged) {
+      return 'PagedDataState<$dataType>';
     } else {
       return 'DataState<$dataType>';
     }

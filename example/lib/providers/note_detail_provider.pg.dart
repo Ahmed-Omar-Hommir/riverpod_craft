@@ -1,9 +1,10 @@
 part of 'note_detail_provider.dart';
 
-final _noteDetailProvider = NotifierProvider.family(
-  (({String id}) arg) => $$NoteDetail()..arg = arg,
-  isAutoDispose: true,
-);
+final _noteDetailProvider =
+    NotifierProvider.family<$$NoteDetail, DataState<Note>, ({String id})>(
+      (({String id}) arg) => $$NoteDetail()..arg = arg,
+      isAutoDispose: true,
+    );
 
 class $$NoteDetail extends DataNotifier<Note, ({String id})> {
   @override

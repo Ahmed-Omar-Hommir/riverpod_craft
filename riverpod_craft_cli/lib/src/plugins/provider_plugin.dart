@@ -45,7 +45,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
     final providerType = getProviderType(createMethod.returnType);
 
     // Create method params become family params
-    final familyParams = createMethod.params
+    var familyParams = createMethod.params
         .map(
           (p) => ParameterInfo(
             name: p.name,
@@ -57,6 +57,14 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
           ),
         )
         .toList();
+
+    // For paged providers, strip the first positional `int page` param
+    // — it's managed internally by PagedDataNotifier
+    if (providerType == ProviderType.paged) {
+      familyParams = familyParams.where((p) =>
+        !(p.isPositional && p.type == 'int' && p.name == 'page'),
+      ).toList();
+    }
 
     final commands = extractCommands(classInfo);
     final publicMethods = extractPublicMethods(classInfo);
@@ -97,6 +105,14 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
       params.remove(firstPositional);
     }
 
+    // For paged providers, strip the `int page` param — managed internally
+    if (providerType == ProviderType.paged) {
+      final pageParam = params.where((p) =>
+        p.isPositional && p.type == 'int' && p.name == 'page',
+      ).firstOrNull;
+      if (pageParam != null) params.remove(pageParam);
+    }
+
     final functionName = functionInfo.name;
 
     return ProviderInfo(
@@ -118,8 +134,17 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
   // Helpers
   // ---------------------------------------------------------------------------
 
-  /// Extracts the generic type from `Future<T>`, `Stream<T>`, or returns as-is.
+  /// Extracts the generic type from `Future<T>`, `Stream<T>`, `Paged<T>`,
+  /// `Future<PaginatedResponse<T>>`, or returns as-is.
   String extractGenericType(String returnType) {
+    // Paged<T> → T
+    final pagedMatch = RegExp(r'^Paged<(.+)>$').firstMatch(returnType);
+    if (pagedMatch != null) return pagedMatch.group(1)!;
+
+    // Future<PaginatedResponse<T>> → T
+    final paginatedMatch = RegExp(r'^Future<PaginatedResponse<(.+)>>\??$').firstMatch(returnType);
+    if (paginatedMatch != null) return paginatedMatch.group(1)!;
+
     final futureMatch = RegExp(r'^Future<(.+)>\??$').firstMatch(returnType);
     if (futureMatch != null) return futureMatch.group(1)!;
 
@@ -129,8 +154,13 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
     return returnType == 'dynamic' ? 'dynamic' : returnType;
   }
 
-  /// Determines ProviderType (sync/future/stream) from a return type string.
+  /// Determines ProviderType from a return type string.
   ProviderType getProviderType(String returnType) {
+    // Paged<T> or Future<PaginatedResponse<T>> → paged
+    if (returnType.startsWith('Paged<') ||
+        returnType.contains('PaginatedResponse<')) {
+      return ProviderType.paged;
+    }
     if (returnType.startsWith('Future<')) return ProviderType.future;
     if (returnType.startsWith('Stream<')) return ProviderType.stream;
     return ProviderType.sync;
