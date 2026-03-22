@@ -46,11 +46,3 @@ class PaginatedResponse<T> {
   /// Whether more pages are available after this one.
   bool get hasMorePages => currentPage < lastPage;
 }
-
-/// Shorthand for a Future returning a paginated response.
-///
-/// Use this as the return type of your `create()` method:
-/// ```dart
-/// Paged<Note> create(int page) async { ... }
-/// ```
-typedef Paged<T> = Future<PaginatedResponse<T>>;

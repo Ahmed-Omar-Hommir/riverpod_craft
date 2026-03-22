@@ -1,8 +1,10 @@
 part of 'paginated_notes_provider.dart';
 
+typedef Paged<T> = Future<ApiPagedResponse<T>>;
+
 abstract class _$PaginatedNotes
     extends PagedDataNotifier<Note, ({String? category})> {
-  Future<dynamic> create(int page, {required String? category});
+  Paged<Note> create(int page, {required String? category});
   @override
   Future<PaginatedResponse<Note>> buildPagedData(int page) async =>
       pagedMapper(await create(page, category: arg.category));

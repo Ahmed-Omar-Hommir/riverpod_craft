@@ -1,8 +1,10 @@
 part of 'mapped_notes_provider.dart';
 
+typedef Paged<T> = Future<ApiPagedResponse<T>>;
+
 abstract class _$MappedNotes
     extends PagedDataNotifier<Note, ({String? category})> {
-  Future<dynamic> create(int page, {required String? category});
+  Paged<Note> create(int page, {required String? category});
   @override
   Future<PaginatedResponse<Note>> buildPagedData(int page) async =>
       pagedMapper(await create(page, category: arg.category));
@@ -117,7 +119,7 @@ extension MappedNotesFacadeWidgetRefEx on WidgetRef {
 
 abstract class _$XMappedNotes
     extends PagedDataNotifier<Note, ({String? category})> {
-  Future<dynamic> create(int page, {required String? category});
+  Paged<Note> create(int page, {required String? category});
   @override
   Future<PaginatedResponse<Note>> buildPagedData(int page) async =>
       pagedMapper(await create(page, category: arg.category));

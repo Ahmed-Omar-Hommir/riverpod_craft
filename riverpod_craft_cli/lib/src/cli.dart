@@ -21,8 +21,9 @@ class RiverpodCraftCLI {
   static void _loadConfig() {
     if (!PluginLoader.hasConfig()) return;
 
-    // Load paged mapper config
+    // Load paged mapper config and parse mapper file
     CraftConfig.pagedMapperPath = PluginLoader.loadPagedMapperPath();
+    CraftConfig.parseMapperFile();
 
     // Load community plugins
     final pluginPaths = PluginLoader.loadPluginPaths();

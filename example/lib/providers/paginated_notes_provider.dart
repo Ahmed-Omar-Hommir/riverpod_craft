@@ -1,5 +1,7 @@
 import 'package:riverpod_craft/riverpod_craft.dart';
 import '../models/note.dart';
+import '../models/api_paged_response.dart';
+import '../paged_mapper.dart';
 
 part 'paginated_notes_provider.pg.dart';
 
@@ -7,13 +9,7 @@ part 'paginated_notes_provider.pg.dart';
 class PaginatedNotes extends _$PaginatedNotes {
   @override
   Paged<Note> create(int page, {required String? category}) async {
-    // Simulated API call
-    return PaginatedResponse(
-      results: [],
-      currentPage: page,
-      total: 100,
-      lastPage: 5,
-    );
+    throw Exception();
   }
 
   @override

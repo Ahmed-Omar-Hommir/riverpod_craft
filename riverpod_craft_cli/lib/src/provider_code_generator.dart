@@ -90,15 +90,12 @@ ${_buildExtensions()}
       final pagedCreateCall = familyParams.isEmpty
           ? ''
           : ', ${createCallArgs}';
-      final createReturnType = _info.hasPagedMapper
-          ? 'Future<dynamic>'
-          : 'Future<PaginatedResponse<${_info.dataType}>>';
       final buildPagedLine = _info.hasPagedMapper
           ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await create(page$pagedCreateCall));'
           : 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => create(page$pagedCreateCall);';
       return '''
 abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, $classArgType> {
-  $createReturnType create(int page${familyParams.isEmpty ? '' : ', $createParamSig'});
+  Paged<${_info.dataType}> create(int page${familyParams.isEmpty ? '' : ', $createParamSig'});
   @override
   $buildPagedLine
 

@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:riverpod_craft/riverpod_craft.dart';
 import '../models/note.dart';
 import '../models/api_paged_response.dart';
-// ignore: unused_import
 import '../paged_mapper.dart';
 
 part 'mapped_notes_provider.pg.dart';
@@ -25,10 +24,7 @@ class MappedNotes extends _$MappedNotes {
   /// Override returns the raw API model.
   /// The generated code passes the result to pagedMapper() automatically.
   @override
-  Future<ApiPagedResponse<Note>> create(
-    int page, {
-    required String? category,
-  }) async {
+  Paged<Note> create(int page, {required String? category}) async {
     final response = await http.get(
       Uri.parse('https://api.example.com/notes?page=$page&category=$category'),
     );
