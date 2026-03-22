@@ -98,9 +98,6 @@ Widget build(BuildContext context, WidgetRef ref) {
 }
 ```
 
-:::caution
-Command state does **not** auto-reset after success or error. If you handle `data` or `error` in `.watch().when()`, your UI will stay in that state permanently. Use `.listen()` for one-time reactions like snackbars and navigation. See [Reacting to Results](#reacting-to-results).
-:::
 
 ## Triggering a Command
 
@@ -151,12 +148,13 @@ Use `.listen()` for one-time reactions — showing a snackbar, navigating, or di
 ```dart
 ref.notesProvider.addNoteCommand.listen((prev, next) {
   next.whenOrNull(
-    data: (arg, note) {
-      Navigator.of(context).pop();
+    data: (arg, result) {
+      // show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Created "${note.title}"')),
+        const SnackBar(content: Text('Note saved!')),
       );
-      ref.notesProvider.addNoteCommand.reset();
+      // navigate back to the previous screen
+      Navigator.of(context).pop();
     },
     error: (arg, error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -167,54 +165,7 @@ ref.notesProvider.addNoteCommand.listen((prev, next) {
 });
 ```
 
-:::tip
-Call `.reset()` inside your `data` handler if you want the command ready for another run. This is common in dialogs and forms.
-:::
 
-## The watch/listen Pattern
-
-This is the core pattern for using commands in your UI:
-
-| Method | Purpose | Handle these states |
-|--------|---------|-------------------|
-| `.watch()` | UI state (spinners, disabled buttons) | `init`, `loading` |
-| `.listen()` | One-time reactions (snackbars, navigation) | `data`, `error` |
-
-Here's both together in a `build` method:
-
-```dart
-@override
-Widget build(BuildContext context, WidgetRef ref) {
-  // 1. Watch for UI state
-  final state = ref.notesProvider.addNoteCommand.watch();
-  final isLoading = state.isLoading;
-
-  // 2. Listen for one-time reactions
-  ref.notesProvider.addNoteCommand.listen((prev, next) {
-    next.whenOrNull(
-      data: (arg, note) {
-        Navigator.of(context).pop();
-        showSnackbar('Note added!');
-        ref.notesProvider.addNoteCommand.reset();
-      },
-      error: (arg, error) => showSnackbar('Error: $error'),
-    );
-  });
-
-  // 3. Run on user action
-  return FilledButton(
-    onPressed: isLoading ? null : () {
-      ref.notesProvider.addNoteCommand.run(
-        title: titleController.text,
-        body: bodyController.text,
-      );
-    },
-    child: isLoading
-        ? const CircularProgressIndicator(strokeWidth: 2)
-        : const Text('Save'),
-  );
-}
-```
 
 ## Filtering by Argument
 
@@ -313,101 +264,48 @@ ref.notesProvider.addNoteCommand.reset();
 
 The state stays at `data` or `error` until you explicitly call `.reset()` or trigger a new `.run()`. This is intentional — it prevents accidental state loss. You always know when the state will change.
 
-### Command State Lifecycle
+## Family
 
-```
-init  →  loading(arg)  →  data(arg, result)
-                        →  error(arg, error)
-```
+Mark a parameter with `@family` to create a scoped command — each unique value gets its own independent state. This is useful when you have a list of items and each item has its own action (like a delete button per row).
 
-## Full Example
-
-Putting it all together — a provider with a command, and a widget that uses watch, listen, and run:
-
-### Provider
+### Define
 
 ```dart
-@provider
-class Notes extends _$Notes {
-  @override
-  Future<List<Note>> create() async {
-    final response = await http.get(
-      Uri.parse('https://api.example.com/notes'),
-    );
-    return (jsonDecode(response.body) as List)
-        .map((e) => Note.fromJson(e))
-        .toList();
-  }
-
-  @override
-  @command
-  @droppable
-  Future<Note> addNote({
-    required String title,
-    required String body,
-  }) async {
-    final response = await http.post(
-      Uri.parse('https://api.example.com/notes'),
-      body: jsonEncode({'title': title, 'body': body}),
-    );
-    reload();
-    return Note.fromJson(jsonDecode(response.body));
-  }
+@command
+@droppable
+Future<void> deleteNote(Ref ref, {@family required String noteId}) async {
+  await http.delete(
+    Uri.parse('https://api.example.com/notes/$noteId'),
+  );
 }
 ```
 
-### Widget
+### Use in widget
+
+Each item in the list gets its own command state — only the item being deleted shows a spinner:
 
 ```dart
-class AddNoteDialog extends ConsumerWidget {
-  const AddNoteDialog({super.key});
+@override
+Widget build(BuildContext context, WidgetRef ref) {
+  final deleteState = ref.deleteNoteCommand(noteId: note.id).watch();
+  final isDeleting = deleteState.isLoading;
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Watch — for UI state (spinner, disabled button)
-    final addNoteState = ref.notesProvider.addNoteCommand.watch();
-    final isLoading = addNoteState.isLoading;
-
-    // Listen — for one-time reactions (snackbar, navigation)
-    ref.notesProvider.addNoteCommand.listen((prev, next) {
-      next.whenOrNull(
-        data: (arg, note) {
-          Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Created "${note.title}"')),
-          );
-          ref.notesProvider.addNoteCommand.reset();
-        },
-        error: (arg, error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed: $error')),
-          );
-        },
-      );
-    });
-
-    return Column(
-      children: [
-        // ... form fields ...
-        FilledButton.icon(
-          // Run — trigger the command on user action
-          onPressed: isLoading ? null : () {
-            ref.notesProvider.addNoteCommand.run(
-              title: titleController.text,
-              body: bodyController.text,
-            );
-          },
-          icon: isLoading
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.check),
-          label: Text(isLoading ? 'Saving...' : 'Save'),
-        ),
-      ],
-    );
-  }
+  return ListTile(
+    title: Text(note.title),
+    trailing: isDeleting
+        ? const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              ref.deleteNoteCommand(noteId: note.id).run();
+            },
+          ),
+  );
 }
 ```
+
+Without `@family`, all items would share the same command state — tapping delete on one note would show a spinner on every note.

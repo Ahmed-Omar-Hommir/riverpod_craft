@@ -25,6 +25,7 @@ const sidebars: SidebarsConfig = {
         'reference/cli',
       ],
     },
+    'examples',
     'example-app',
   ],
 };
