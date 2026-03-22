@@ -1,9 +1,9 @@
 name: example
 description: Example app demonstrating riverpod_craft usage.
-publish_to: 'none'
+publish_to: "none"
 
 environment:
-  sdk: ^3.8.1
+  sdk: ">=3.8.1 <4.0.0"
 
 dependencies:
   flutter:

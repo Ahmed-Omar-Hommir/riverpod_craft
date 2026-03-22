@@ -1,6 +1,6 @@
 name: riverpod_craft_cli
 description: CLI tool for riverpod_craft. Generates provider code from annotations. Watch mode, single file generation, and cleanup.
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 issue_tracker: https://github.com/Ahmed-Omar-Hommir/riverpod_craft/issues
