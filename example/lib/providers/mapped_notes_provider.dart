@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:riverpod_craft/riverpod_craft.dart';
 import '../models/note.dart';
 import '../models/api_paged_response.dart';
-import '../paged_mapper.dart';
 
 part 'mapped_notes_provider.pg.dart';
 

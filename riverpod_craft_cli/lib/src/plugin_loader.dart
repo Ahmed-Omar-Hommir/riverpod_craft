@@ -76,19 +76,18 @@ class CraftConfig {
   /// The raw input type name from the mapper function (e.g., "ApiPagedResponse").
   static String? pagedMapperInputType;
 
-  /// All imports from the mapper file (to inject into .pg.dart).
-  static List<String> pagedMapperImports = [];
+  /// The full source of the `pagedMapper` function, to inline in `.pg.dart`.
+  static String? pagedMapperFunctionSource;
 
-  /// Parses the mapper file to extract the input type and imports.
+  /// Parses the mapper file to extract the input type and function body.
   ///
   /// Given a mapper like:
   /// ```dart
-  /// import 'models/api_paged_response.dart';
   /// PaginatedResponse<T> pagedMapper<T>(ApiPagedResponse<T> data) { ... }
   /// ```
   /// Extracts:
   /// - `pagedMapperInputType` = "ApiPagedResponse"
-  /// - `pagedMapperImports` = all import directives from the mapper file
+  /// - `pagedMapperFunctionSource` = the full function source code
   static void parseMapperFile() {
     if (pagedMapperPath == null) return;
 
@@ -102,16 +101,14 @@ class CraftConfig {
     final result = parseString(content: content);
     final unit = result.unit;
 
-    // Collect all imports from the mapper file
-    pagedMapperImports = unit.directives
-        .whereType<ImportDirective>()
-        .map((d) => d.toSource())
-        .toList();
-
-    // Find the `pagedMapper` function and extract its first param type
+    // Find the `pagedMapper` function
     for (final declaration in unit.declarations) {
       if (declaration is FunctionDeclaration &&
           declaration.name.lexeme == 'pagedMapper') {
+        // Store the full function source
+        pagedMapperFunctionSource = declaration.toSource();
+
+        // Extract input type from first param
         final params = declaration.functionExpression.parameters?.parameters;
         if (params != null && params.isNotEmpty) {
           final firstParam = params.first;

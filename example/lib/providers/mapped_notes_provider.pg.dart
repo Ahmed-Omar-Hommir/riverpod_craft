@@ -2,6 +2,16 @@ part of 'mapped_notes_provider.dart';
 
 typedef Paged<T> = Future<ApiPagedResponse<T>>;
 
+PaginatedResponse<T> pagedMapper<T>(ApiPagedResponse<T> data) {
+  return PaginatedResponse(
+    results: data.items,
+    currentPage: data.page,
+    total: data.totalItems,
+    lastPage: data.totalPages,
+    pageSize: data.perPage,
+  );
+}
+
 abstract class _$MappedNotes
     extends PagedDataNotifier<Note, ({String? category})> {
   Paged<Note> create(int page, {required String? category});

@@ -118,16 +118,6 @@ class FileProcessor {
         parsedUnit,
       );
 
-      // Auto-inject mapper imports if paged providers detected
-      if (hasPaged) {
-        final reParsed = parseString(content: effectiveContents);
-        effectiveContents = await _ensureMapperImports(
-          file,
-          effectiveContents,
-          reParsed.unit,
-        );
-      }
-
       _fileContentCache[file.path] = effectiveContents;
 
       final fullContent = "part of '$fileName';\n$pagedPreamble\n$generatedContent";
@@ -145,94 +135,24 @@ class FileProcessor {
     }
   }
 
-  /// Builds the Paged<T> typedef for .pg.dart files.
+  /// Builds the Paged<T> typedef (and mapper function) for .pg.dart files.
   ///
-  /// With mapper: `typedef Paged<T> = Future<ApiPagedResponse<T>>;`
-  /// Without mapper: `typedef Paged<T> = Future<PaginatedResponse<T>>;`
+  /// With mapper: typedef + inlined pagedMapper function.
+  /// Without mapper: typedef defaults to PaginatedResponse<T>.
   static String _buildPagedPreamble() {
     if (CraftConfig.hasPagedMapper && CraftConfig.pagedMapperInputType != null) {
       final inputType = CraftConfig.pagedMapperInputType!;
-      return '\ntypedef Paged<T> = Future<$inputType<T>>;\n';
+      final mapperFn = CraftConfig.pagedMapperFunctionSource ?? '';
+      return '''
+
+typedef Paged<T> = Future<$inputType<T>>;
+
+$mapperFn
+''';
     }
     return '\ntypedef Paged<T> = Future<PaginatedResponse<T>>;\n';
   }
 
-  /// Auto-injects mapper imports into the source file when paged providers
-  /// are detected and a mapper is configured.
-  static Future<String> _ensureMapperImports(
-    File file,
-    String contents,
-    CompilationUnit unit,
-  ) async {
-    if (!CraftConfig.hasPagedMapper) return contents;
-
-    final existingImports = unit.directives
-        .whereType<ImportDirective>()
-        .map((d) => d.uri.stringValue)
-        .toSet();
-
-    final missingImports = <String>[];
-
-    // Resolve mapper imports relative to the source file's directory
-    final sourceDir = p.dirname(file.path);
-    final mapperDir = CraftConfig.pagedMapperPath != null
-        ? p.dirname(p.join(Directory.current.path, CraftConfig.pagedMapperPath!))
-        : Directory.current.path;
-
-    for (final importStatement in CraftConfig.pagedMapperImports) {
-      final match = RegExp(r"import '(.+)';").firstMatch(importStatement);
-      if (match == null) continue;
-
-      final uri = match.group(1)!;
-
-      // Skip package: imports that are already present
-      if (uri.startsWith('package:')) {
-        if (!existingImports.contains(uri)) {
-          // Skip riverpod_craft imports — source file already has it
-          if (!uri.startsWith('package:riverpod_craft/')) {
-            missingImports.add(importStatement);
-          }
-        }
-        continue;
-      }
-
-      // Relative import — resolve from mapper dir to source dir
-      final absolutePath = p.normalize(p.join(mapperDir, uri));
-      final relativeToSource = p.relative(absolutePath, from: sourceDir);
-      if (!existingImports.contains(relativeToSource) &&
-          !existingImports.contains(uri)) {
-        missingImports.add("import '$relativeToSource';");
-      }
-    }
-
-    // Ensure mapper file itself is imported
-    if (CraftConfig.pagedMapperPath != null) {
-      final mapperAbsolute = p.join(Directory.current.path, CraftConfig.pagedMapperPath!);
-      final relativePath = p.relative(mapperAbsolute, from: sourceDir);
-      if (!existingImports.contains(relativePath) &&
-          !existingImports.any((imp) => imp != null && imp.contains('paged_mapper'))) {
-        missingImports.add("import '$relativePath';");
-      }
-    }
-
-    if (missingImports.isEmpty) return contents;
-
-    // Insert after last import directive
-    int insertOffset = 0;
-    final imports = unit.directives.whereType<ImportDirective>();
-    if (imports.isNotEmpty) {
-      insertOffset = imports.last.end;
-    }
-
-    final insertText = '\n${missingImports.join('\n')}';
-    final newContents =
-        contents.substring(0, insertOffset) +
-        insertText +
-        contents.substring(insertOffset);
-
-    await file.writeAsString(newContents);
-    return newContents;
-  }
 
   static Future<String> _ensurePartDirective(
     File file,
