@@ -55,5 +55,5 @@ class XMappedNotes extends _$XMappedNotes {
 void x(Ref ref) {
   ref.xMappedNotesProvider(category: '');
 
-  ref.mappedNotesProvider(1, category: '');
+  ref.mappedNotesProvider(category: '');
 }
