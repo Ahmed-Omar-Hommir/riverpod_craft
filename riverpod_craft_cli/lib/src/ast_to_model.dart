@@ -28,13 +28,13 @@ DartClassInfo _convertClass(ClassDeclaration declaration) {
     name: declaration.name.lexeme,
     annotations: _convertAnnotations(declaration.metadata),
     methods: _convertMethods(declaration),
-    superclass: declaration.extendsClause?.superclass.name2.lexeme,
+    superclass: declaration.extendsClause?.superclass.name.lexeme,
     mixins: declaration.withClause?.mixinTypes
-            .map((t) => t.name2.lexeme)
+            .map((t) => t.name.lexeme)
             .toList() ??
         const [],
     interfaces: declaration.implementsClause?.interfaces
-            .map((t) => t.name2.lexeme)
+            .map((t) => t.name.lexeme)
             .toList() ??
         const [],
   );

@@ -1,6 +1,6 @@
 part of 'search_query_provider.dart';
 
-final _searchQueryProvider = NotifierProvider<$$SearchQuery, String>(
+final _searchQueryProvider = NotifierProvider(
   () => $$SearchQuery()..arg = (),
   isAutoDispose: true,
 );

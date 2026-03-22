@@ -1,3 +1,10 @@
+## 0.1.1
+
+- Fix: add explicit type parameters to `NotifierProvider` declarations
+- Plugin system: extensible code generation via `RiverpodCraftPlugin`
+- Built-in `ProviderPlugin` and `CommandPlugin` can be extended and replaced
+- `runWithPlugins()` API for custom code generation pipelines
+
 ## 0.1.0
 
 - Initial alpha release

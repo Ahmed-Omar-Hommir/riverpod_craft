@@ -31,6 +31,7 @@
 /// ```
 ///
 /// Then run: `dart run tool/craft.dart watch`
+library;
 
 // Built-in plugins (extend these to customize code generation)
 export 'src/plugins/provider_plugin.dart';
