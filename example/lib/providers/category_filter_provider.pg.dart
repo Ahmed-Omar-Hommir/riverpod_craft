@@ -24,6 +24,9 @@ class $CategoryFilterFacadeRef {
 
   void invalidate() => _ref.invalidate(_provider);
 
+  void setState(NoteCategory value) =>
+      _ref.read(_provider.notifier).updateState(value);
+
   void listen(
     void Function(NoteCategory? previous, NoteCategory next) listener, {
     void Function(Object, StackTrace)? onError,

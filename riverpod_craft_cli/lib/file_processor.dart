@@ -1,16 +1,39 @@
 import 'dart:io';
 
-import 'package:riverpod_craft_cli/collect_data.dart';
-import 'package:riverpod_craft_cli/provider_generated_file.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
+import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
+
+import 'src/plugin_runner.dart';
+import 'src/plugins/provider_plugin.dart';
+import 'src/plugins/command_plugin.dart';
+
+/// The default set of built-in plugins.
+final List<RiverpodCraftPlugin> builtInPlugins = [
+  ProviderPlugin(),
+  CommandPlugin(),
+];
 
 /// Handles file processing operations
 class FileProcessor {
   static final Map<String, String> _fileContentCache = {};
   static final Map<String, DateTime> _fileModificationCache = {};
+
+  /// The plugin runner used for code generation.
+  static PluginRunner _pluginRunner = PluginRunner(builtInPlugins);
+
+  /// Register additional plugins (e.g., community plugins from config).
+  ///
+  /// If an extra plugin has the same [RiverpodCraftPlugin.id] as a built-in,
+  /// it **replaces** the built-in plugin instead of running alongside it.
+  /// This lets developers extend a built-in plugin and swap it in.
+  static void registerPlugins(List<RiverpodCraftPlugin> extraPlugins) {
+    final extraIds = extraPlugins.map((p) => p.id).toSet();
+    final kept = builtInPlugins.where((p) => !extraIds.contains(p.id)).toList();
+    _pluginRunner = PluginRunner([...kept, ...extraPlugins]);
+  }
 
   /// Processes file only if it has changed
   static Future<void> processFileIfChanged(File file) async {
@@ -41,18 +64,18 @@ class FileProcessor {
           '${file.parent.path.endsWith('/') ? file.parent.path : '${file.parent.path}/'}$partName';
       final generatedFile = File(generatedFilePath);
 
-      // Fast path: if file clearly has no provider annotations, avoid analyzer parse.
-      // Strip comments before checking to avoid false positives from commented code.
+      // Fast path: if file clearly has no plugin annotations, avoid analyzer parse.
+      // The check is driven by the union of all registered plugin annotation names.
       final stripped = effectiveContents
           // Remove block comments
           .replaceAll(RegExp(r'/\*.*?\*/', dotAll: true), '')
           // Remove line comments
           .replaceAll(RegExp(r'//.*'), '');
 
-      final maybeAnnotated =
-          stripped.contains('@provider') ||
-          stripped.contains('@command') ||
-          stripped.contains('@Command');
+      final allAnnotations = _pluginRunner.allAnnotations;
+      final maybeAnnotated = allAnnotations.any(
+        (name) => stripped.contains('@$name'),
+      );
 
       if (!maybeAnnotated) {
         final hasPartLine =
@@ -75,29 +98,10 @@ class FileProcessor {
       final parsedResult = parseString(content: effectiveContents);
       final parsedUnit = parsedResult.unit;
 
-      final providerDataCollection = collectData(parsedResult);
+      // Run the plugin pipeline
+      final generatedContent = _pluginRunner.run(parsedResult);
 
-      String generatedContent = '';
-
-      final hasProvidersOrCommands =
-          providerDataCollection.providers.isNotEmpty ||
-          providerDataCollection.commands.isNotEmpty;
-
-      generatedContent +=
-          ProviderGeneratedFile(
-            file: file,
-            providerDataCollection: providerDataCollection,
-          ).build() ??
-          '';
-
-      if (!hasProvidersOrCommands) {
-        await _cleanupPartAndGenerated(file, parsedUnit);
-        _fileContentCache[file.path] = await file.readAsString();
-        return; // No providers/commands -> clean part + generated and exit
-      }
-
-      if (generatedContent.isEmpty) {
-        // Defensive: nothing generated, still ensure cleanup
+      if (generatedContent == null || generatedContent.isEmpty) {
         await _cleanupPartAndGenerated(file, parsedUnit);
         _fileContentCache[file.path] = await file.readAsString();
         return;
@@ -110,13 +114,13 @@ class FileProcessor {
       );
       _fileContentCache[file.path] = effectiveContents;
 
-      generatedContent = "part of '$fileName';\n\n$generatedContent";
+      final fullContent = "part of '$fileName';\n\n$generatedContent";
 
       final formatter = DartFormatter(
         languageVersion: DartFormatter.latestLanguageVersion,
       );
 
-      final formatted = formatter.format(generatedContent);
+      final formatted = formatter.format(fullContent);
       await File(generatedFilePath).writeAsString(formatted);
     } on FileSystemException catch (e) {
       print('FileSystemException: ${e.message}, path = ${e.path}');
