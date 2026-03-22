@@ -30,13 +30,30 @@ class MappedNotes extends _$MappedNotes {
     required String? category,
   }) async {
     final response = await http.get(
-      Uri.parse(
-        'https://api.example.com/notes?page=$page&category=$category',
-      ),
+      Uri.parse('https://api.example.com/notes?page=$page&category=$category'),
     );
     return ApiPagedResponse.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
-      (json) => Note.fromJson(json),
+      (json) => '' as Note,
     );
   }
+}
+
+@provider
+class XMappedNotes extends _$XMappedNotes {
+  /// Override returns the raw API model.
+  /// The generated code passes the result to pagedMapper() automatically.
+  @override
+  Paged<Note> create(int page, {required String? category}) async {
+    final response = await http.get(
+      Uri.parse('https://api.example.com/notes?page=$page&category=$category'),
+    );
+    return '' as Paged<Note>;
+  }
+}
+
+void x(Ref ref) {
+  ref.xMappedNotesProvider(category: '');
+
+  ref.mappedNotesProvider(1, category: '');
 }
