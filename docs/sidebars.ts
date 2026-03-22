@@ -11,6 +11,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'concepts/better-syntax',
         'concepts/side-effects',
+        'concepts/command',
         'concepts/settable-providers',
       ],
     },
