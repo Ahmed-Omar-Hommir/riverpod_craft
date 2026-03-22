@@ -14,34 +14,43 @@ abstract class _$Notes extends DataNotifier<List<Note>, ()> {
     required NoteCategory category,
   });
 
-  late final _$addNoteCommand = NotifierProvider(
-    () => _$AddNoteCommandNotes(this as Notes),
-    isAutoDispose: true,
-  );
+  late final _$addNoteCommand =
+      NotifierProvider<
+        CommandNotifier<
+          Note,
+          ({String title, String body, NoteCategory category})
+        >,
+        ArgCommandState<
+          Note,
+          ({String title, String body, NoteCategory category})
+        >
+      >(() => _$AddNoteCommandNotes(this as Notes), isAutoDispose: true);
 
   $AddNoteCommandFacadeNotesRef get addNoteCommand =>
       $AddNoteCommandFacadeNotesRef(ref, this as Notes);
   Future<String> deleteNote({required String id});
 
-  late final _$deleteNoteCommand = NotifierProvider(
-    () => _$DeleteNoteCommandNotes(this as Notes),
-    isAutoDispose: true,
-  );
+  late final _$deleteNoteCommand =
+      NotifierProvider<
+        CommandNotifier<String, ({String id})>,
+        ArgCommandState<String, ({String id})>
+      >(() => _$DeleteNoteCommandNotes(this as Notes), isAutoDispose: true);
 
   $DeleteNoteCommandFacadeNotesRef get deleteNoteCommand =>
       $DeleteNoteCommandFacadeNotesRef(ref, this as Notes);
   Future<Note> updateNote({required Note note});
 
-  late final _$updateNoteCommand = NotifierProvider(
-    () => _$UpdateNoteCommandNotes(this as Notes),
-    isAutoDispose: true,
-  );
+  late final _$updateNoteCommand =
+      NotifierProvider<
+        CommandNotifier<Note, ({Note note})>,
+        ArgCommandState<Note, ({Note note})>
+      >(() => _$UpdateNoteCommandNotes(this as Notes), isAutoDispose: true);
 
   $UpdateNoteCommandFacadeNotesRef get updateNoteCommand =>
       $UpdateNoteCommandFacadeNotesRef(ref, this as Notes);
 }
 
-final _notesProvider = NotifierProvider(
+final _notesProvider = NotifierProvider<Notes, DataState<List<Note>>>(
   () => Notes()..arg = (),
   isAutoDispose: true,
 );

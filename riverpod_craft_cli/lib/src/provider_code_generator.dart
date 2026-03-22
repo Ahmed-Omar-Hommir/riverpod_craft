@@ -129,15 +129,12 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent())
     final autoDisposeArg = _info.isKeepAlive ? '' : ', isAutoDispose: true';
 
     if (!isFamilyProvider) {
-      // Non-family providers also use ..arg = () to set empty record
-      return 'final _${_info.providerVarName} = NotifierProvider(() => $className()..arg = ()$autoDisposeArg);';
+      return 'final _${_info.providerVarName} = NotifierProvider<$className, ${_info.stateType}>(() => $className()..arg = ()$autoDisposeArg);';
     }
 
-    // Keep family arg types inferred from the notifier constructor; no explicit generics needed
     final argRecordType = hasFamily ? familyRecordType : nonFamilyRecordType;
-    // All family providers inject arg via setter
     final ctor = '($argRecordType arg) => $className()..arg = arg';
-    return 'final _${_info.providerVarName} = NotifierProvider.family($ctor$autoDisposeArg);';
+    return 'final _${_info.providerVarName} = NotifierProvider.family<$className, ${_info.stateType}, $argRecordType>($ctor$autoDisposeArg);';
   }
 
   String _buildFunctionalNotifierClass(

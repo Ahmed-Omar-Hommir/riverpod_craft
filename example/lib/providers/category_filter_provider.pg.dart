@@ -1,20 +1,22 @@
 part of 'category_filter_provider.dart';
 
-final _categoryFilterProvider = NotifierProvider(
-  () => $$CategoryFilter()..arg = (),
-  isAutoDispose: true,
-);
+final _categoryFilterProvider =
+    NotifierProvider.family<$$CategoryFilter, NoteCategory, ({int id})>(
+      (({int id}) arg) => $$CategoryFilter()..arg = arg,
+      isAutoDispose: true,
+    );
 
-class $$CategoryFilter extends StateDataNotifier<NoteCategory, ()> {
+class $$CategoryFilter extends StateDataNotifier<NoteCategory, ({int id})> {
   @override
-  NoteCategory buildData(() arg) => categoryFilter(ref);
+  NoteCategory buildData(({int id}) arg) => categoryFilter(ref, id: arg.id);
 }
 
 class $CategoryFilterFacadeRef {
-  $CategoryFilterFacadeRef(this._ref);
+  $CategoryFilterFacadeRef(this._ref, this._arg);
   final Ref _ref;
+  final ({int id}) _arg;
 
-  late final _provider = _categoryFilterProvider;
+  late final _provider = _categoryFilterProvider(_arg);
 
   NoteCategory read() => _ref.read(_provider);
   NoteCategory watch() => _ref.watch(_provider);
@@ -37,10 +39,11 @@ class $CategoryFilterFacadeRef {
 }
 
 class $CategoryFilterFacadeWidget {
-  $CategoryFilterFacadeWidget(this._ref);
+  $CategoryFilterFacadeWidget(this._ref, this._arg);
   final WidgetRef _ref;
+  final ({int id}) _arg;
 
-  late final _provider = _categoryFilterProvider;
+  late final _provider = _categoryFilterProvider(_arg);
 
   NoteCategory read() => _ref.read(_provider);
   NoteCategory watch() => _ref.watch(_provider);
@@ -61,12 +64,32 @@ class $CategoryFilterFacadeWidget {
   }
 }
 
+class $CategoryFilterFacadeRefCallable {
+  $CategoryFilterFacadeRefCallable(this._ref);
+  final Ref _ref;
+
+  $CategoryFilterFacadeRef call({required int id}) =>
+      $CategoryFilterFacadeRef(_ref, (id: id));
+
+  void invalidateFamily() => _ref.invalidate(_categoryFilterProvider);
+}
+
+class $CategoryFilterFacadeWidgetCallable {
+  $CategoryFilterFacadeWidgetCallable(this._ref);
+  final WidgetRef _ref;
+
+  $CategoryFilterFacadeWidget call({required int id}) =>
+      $CategoryFilterFacadeWidget(_ref, (id: id));
+
+  void invalidateFamily() => _ref.invalidate(_categoryFilterProvider);
+}
+
 extension CategoryFilterFacadeRefEx on Ref {
-  $CategoryFilterFacadeRef get categoryFilterProvider =>
-      $CategoryFilterFacadeRef(this);
+  $CategoryFilterFacadeRefCallable get categoryFilterProvider =>
+      $CategoryFilterFacadeRefCallable(this);
 }
 
 extension CategoryFilterFacadeWidgetRefEx on WidgetRef {
-  $CategoryFilterFacadeWidget get categoryFilterProvider =>
-      $CategoryFilterFacadeWidget(this);
+  $CategoryFilterFacadeWidgetCallable get categoryFilterProvider =>
+      $CategoryFilterFacadeWidgetCallable(this);
 }

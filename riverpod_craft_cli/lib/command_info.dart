@@ -158,7 +158,7 @@ class $_generatedClassName extends CommandNotifier<$dataType, $argRecordType> {
 }''';
     }
 
-    return '''final _\$${name}Command = NotifierProvider(
+    return '''final _\$${name}Command = NotifierProvider<$notifierType, $stateType>(
   () => $_generatedClassName(),
   isAutoDispose: $isAutoDispose,
 );
@@ -502,7 +502,7 @@ class $facadeCommandClassNameWidgetRef implements CommandProviderFacade<${comman
     return '''
   Future<${command.dataType}> ${command.name}(${command.params.toParameterSignature()});
 
-  late final _\$${command.name}Command = NotifierProvider(
+  late final _\$${command.name}Command = NotifierProvider<${command.notifierType}, ${command.stateType}>(
     () => $_parentCommandClassName(this as ${parent!.name}),
     isAutoDispose: $isAutoDispose,
   );
