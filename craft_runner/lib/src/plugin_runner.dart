@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/analysis/results.dart' show ParseStringResult;
 import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
-import 'package:riverpod_craft_cli/provider_info.dart';
+import 'package:craft_runner/provider_info.dart';
 
 import 'ast_to_model.dart';
 

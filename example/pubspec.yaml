@@ -18,8 +18,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  riverpod_craft_cli:
-    path: ../riverpod_craft_cli
+  craft_runner:
+    path: ../craft_runner
 
 flutter:
   uses-material-design: true

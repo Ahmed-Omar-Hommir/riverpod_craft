@@ -6,11 +6,12 @@ sidebar_position: 3
 
 ## Installation
 
-```bash
-dart pub global activate riverpod_craft_cli
-```
+Add `craft_runner` as a dev dependency:
 
-This installs the `riverpod_craft` command globally.
+```yaml
+dev_dependencies:
+  craft_runner: ^0.1.0
+```
 
 ## Commands
 
@@ -19,7 +20,7 @@ This installs the `riverpod_craft` command globally.
 Start watch mode. The recommended way to use the CLI — keep it running while you develop:
 
 ```bash
-riverpod_craft watch
+dart run craft_runner watch
 ```
 
 Watches all `*_provider.dart` files in your project. When you save a file, it automatically generates the corresponding `.pg.dart` file.
@@ -29,7 +30,7 @@ Watches all `*_provider.dart` files in your project. When you save a file, it au
 Generate code for a single file:
 
 ```bash
-riverpod_craft generate lib/providers/todos_provider.dart
+dart run craft_runner generate lib/providers/todos_provider.dart
 ```
 
 ### `clean`
@@ -37,7 +38,7 @@ riverpod_craft generate lib/providers/todos_provider.dart
 Remove all generated `.pg.dart` files:
 
 ```bash
-riverpod_craft clean
+dart run craft_runner clean
 ```
 
 ### `init`
@@ -45,7 +46,7 @@ riverpod_craft clean
 Initialize a project for riverpod_craft (installs dependencies):
 
 ```bash
-riverpod_craft init
+dart run craft_runner init
 ```
 
 ### `help`
@@ -53,7 +54,7 @@ riverpod_craft init
 Show available commands:
 
 ```bash
-riverpod_craft help
+dart run craft_runner help
 ```
 
 ## Generated files

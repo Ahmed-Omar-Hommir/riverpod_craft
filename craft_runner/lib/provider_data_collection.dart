@@ -1,5 +1,5 @@
-import 'package:riverpod_craft_cli/command_info.dart';
-import 'package:riverpod_craft_cli/provider_info.dart';
+import 'package:craft_runner/command_info.dart';
+import 'package:craft_runner/provider_info.dart';
 
 class ProviderDataCollection {
   const ProviderDataCollection({

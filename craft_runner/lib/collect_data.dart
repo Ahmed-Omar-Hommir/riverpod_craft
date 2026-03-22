@@ -1,7 +1,7 @@
-import 'package:riverpod_craft_cli/command_info.dart';
-import 'package:riverpod_craft_cli/concurrency_type.dart';
-import 'package:riverpod_craft_cli/parameter_info.dart';
-import 'package:riverpod_craft_cli/provider_info.dart';
+import 'package:craft_runner/command_info.dart';
+import 'package:craft_runner/concurrency_type.dart';
+import 'package:craft_runner/parameter_info.dart';
+import 'package:craft_runner/provider_info.dart';
 import 'package:analyzer/dart/analysis/results.dart' show ParseStringResult;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';

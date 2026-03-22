@@ -8,7 +8,7 @@ import 'cli.dart';
 /// Create a `tool/craft.dart` file in your project:
 ///
 /// ```dart
-/// import 'package:riverpod_craft_cli/riverpod_craft_cli.dart';
+/// import 'package:craft_runner/craft_runner.dart';
 /// import '../lib/plugins/my_plugin.dart';
 ///
 /// void main(List<String> args) {

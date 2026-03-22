@@ -13,10 +13,16 @@ Full documentation available at **[ahmed-omar-hommir.github.io/riverpod_craft](h
 
 ## Quick Start
 
-### 1. Install the CLI
+### 1. Add dependencies
 
-```bash
-dart pub global activate riverpod_craft_cli
+```yaml
+# pubspec.yaml
+dependencies:
+  riverpod_craft: ^0.1.0
+  flutter_riverpod: ^3.1.0
+
+dev_dependencies:
+  craft_runner: ^0.1.0
 ```
 
 ### 2. Run the generator
@@ -24,18 +30,10 @@ dart pub global activate riverpod_craft_cli
 Run this in your project root and keep it running — it watches your files and auto-generates code on save:
 
 ```bash
-riverpod_craft watch
+dart run craft_runner watch
 ```
 
-### 3. Add the runtime dependency
-
-```yaml
-# pubspec.yaml
-dependencies:
-  riverpod_craft: ^0.1.0
-```
-
-### 4. Write a provider
+### 3. Write a provider
 
 Create a file ending with `_provider.dart` (e.g. `todos_provider.dart`):
 
@@ -53,9 +51,9 @@ Future<List<Todo>> todos(Ref ref) async {
 }
 ```
 
-> **⚠️ Important:** Provider files must end with `_provider.dart` (e.g. `todos_provider.dart`, `auth_provider.dart`). The generator only watches files matching this pattern.
+> **Warning:** Provider files must end with `_provider.dart` (e.g. `todos_provider.dart`, `auth_provider.dart`). The generator only watches files matching this pattern.
 
-### 5. Use in widgets
+### 4. Use in widgets
 
 ```dart
 class TodosPage extends ConsumerWidget {
@@ -79,7 +77,7 @@ class TodosPage extends ConsumerWidget {
 | Package | Description |
 |---------|-------------|
 | `riverpod_craft` | Runtime library — annotations, notifiers, state types |
-| `riverpod_craft_cli` | CLI tool — parses your code and generates `.pg.dart` files |
+| `craft_runner` | Code generation runner — parses your code and generates `.pg.dart` files |
 
 ## Requirements
 

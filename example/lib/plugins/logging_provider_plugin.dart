@@ -1,4 +1,4 @@
-import 'package:riverpod_craft_cli/riverpod_craft_cli.dart';
+import 'package:craft_runner/craft_runner.dart';
 
 /// Example: extends ProviderPlugin to add logState() to every facade.
 class LoggingProviderPlugin extends ProviderPlugin {

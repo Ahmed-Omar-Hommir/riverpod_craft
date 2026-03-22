@@ -1,4 +1,4 @@
-import 'package:riverpod_craft_cli/src/provider_code_generator.dart';
+import 'package:craft_runner/src/provider_code_generator.dart';
 
 import 'command_info.dart';
 import 'parameter_info.dart';

@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:riverpod_craft_cli/file_processor.dart';
-import 'package:riverpod_craft_cli/src/plugin_loader.dart';
+import 'package:craft_runner/file_processor.dart';
+import 'package:craft_runner/src/plugin_loader.dart';
 import 'package:path/path.dart' as path;
 
 /// Main entry point for the Riverpod Craft CLI tool
@@ -277,18 +277,18 @@ Commands:
   help                  Show this help message
 
 Examples:
-  riverpod_craft                                    # Start watch mode
-  riverpod_craft watch                              # Start watch mode
-  riverpod_craft init                               # Initialize project dependencies
-  riverpod_craft generate lib/features/auth/auth_provider.dart
-  riverpod_craft clean                              # Clean all generated files
+  dart run craft_runner                             # Start watch mode
+  dart run craft_runner watch                       # Start watch mode
+  dart run craft_runner init                        # Initialize project dependencies
+  dart run craft_runner generate lib/features/auth/auth_provider.dart
+  dart run craft_runner clean                       # Clean all generated files
 
 Custom Plugins:
-  1. Add riverpod_craft_cli as a dev dependency
+  1. Add craft_runner as a dev dependency
   2. Create your plugin extending ProviderPlugin or CommandPlugin
   3. Create tool/craft.dart:
 
-     import 'package:riverpod_craft_cli/riverpod_craft_cli.dart';
+     import 'package:craft_runner/craft_runner.dart';
      import '../lib/plugins/my_plugin.dart';
 
      void main(List<String> args) {

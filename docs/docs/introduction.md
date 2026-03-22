@@ -23,7 +23,7 @@ Currently available:
 | Package | Description |
 |---------|-------------|
 | [`riverpod_craft`](https://pub.dev/packages/riverpod_craft) | Runtime library — annotations, notifiers, state types |
-| [`riverpod_craft_cli`](https://pub.dev/packages/riverpod_craft_cli) | CLI tool — parses your code and generates `.pg.dart` files |
+| [`craft_runner`](https://pub.dev/packages/craft_runner) | CLI tool — parses your code and generates `.pg.dart` files |
 
 ## How it works
 

@@ -3,7 +3,7 @@
 /// ## Extend a built-in plugin
 ///
 /// ```dart
-/// import 'package:riverpod_craft_cli/riverpod_craft_cli.dart';
+/// import 'package:craft_runner/craft_runner.dart';
 ///
 /// class LoggingProviderPlugin extends ProviderPlugin {
 ///   @override
@@ -22,7 +22,7 @@
 /// Create `tool/craft.dart` in your project:
 ///
 /// ```dart
-/// import 'package:riverpod_craft_cli/riverpod_craft_cli.dart';
+/// import 'package:craft_runner/craft_runner.dart';
 /// import '../lib/plugins/logging_provider_plugin.dart';
 ///
 /// void main(List<String> args) {

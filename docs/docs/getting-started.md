@@ -4,32 +4,27 @@ sidebar_position: 2
 
 # Getting Started
 
-## 1. Install the CLI
-
-```bash
-dart pub global activate riverpod_craft_cli
-```
-
-This gives you the `riverpod_craft` command globally.
-
-## 2. Run the generator
-
-In your project root, start the watcher. Keep it running — it auto-generates code when you save files:
-
-```bash
-riverpod_craft watch
-```
-
-## 3. Add the runtime dependency
+## 1. Add dependencies
 
 ```yaml
 # pubspec.yaml
 dependencies:
   riverpod_craft: ^0.1.0
   flutter_riverpod: ^3.1.0
+
+dev_dependencies:
+  craft_runner: ^0.1.0
 ```
 
-## 4. Write a provider
+## 2. Run the generator
+
+In your project root, start the watcher. Keep it running — it auto-generates code when you save files:
+
+```bash
+dart run craft_runner watch
+```
+
+## 3. Write a provider
 
 Create a file ending with `_provider.dart` (e.g. `todos_provider.dart`):
 
@@ -53,7 +48,7 @@ Provider files **must** end with `_provider.dart` (e.g. `todos_provider.dart`, `
 
 When you save this file, the CLI automatically generates `todos_provider.pg.dart` with all the boilerplate.
 
-## 5. Use in widgets
+## 4. Use in widgets
 
 ```dart
 class TodosPage extends ConsumerWidget {
