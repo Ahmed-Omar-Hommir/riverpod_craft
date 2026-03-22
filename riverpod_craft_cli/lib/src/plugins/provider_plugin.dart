@@ -3,6 +3,7 @@ import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
 import 'package:riverpod_craft_cli/command_info.dart';
 import 'package:riverpod_craft_cli/concurrency_type.dart';
 import 'package:riverpod_craft_cli/provider_info.dart';
+import 'package:riverpod_craft_cli/src/plugin_loader.dart';
 
 /// Built-in plugin that handles `@provider` annotations.
 ///
@@ -78,6 +79,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
       params: familyParams,
       commands: commands,
       publicMethods: publicMethods,
+      hasPagedMapper: providerType == ProviderType.paged && CraftConfig.hasPagedMapper,
     );
   }
 
@@ -126,6 +128,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
       functionName: functionName,
       requiresRef: requiresRef,
       isSettable: functionInfo.hasAnnotation('settable'),
+      hasPagedMapper: providerType == ProviderType.paged && CraftConfig.hasPagedMapper,
       publicMethods: const <PublicMethod>[],
     );
   }

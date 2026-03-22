@@ -90,11 +90,17 @@ ${_buildExtensions()}
       final pagedCreateCall = familyParams.isEmpty
           ? ''
           : ', ${createCallArgs}';
+      final createReturnType = _info.hasPagedMapper
+          ? 'Future<dynamic>'
+          : 'Future<PaginatedResponse<${_info.dataType}>>';
+      final buildPagedLine = _info.hasPagedMapper
+          ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await create(page$pagedCreateCall));'
+          : 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => create(page$pagedCreateCall);';
       return '''
 abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, $classArgType> {
-  Future<PaginatedResponse<${_info.dataType}>> create(int page${familyParams.isEmpty ? '' : ', $createParamSig'});
+  $createReturnType create(int page${familyParams.isEmpty ? '' : ', $createParamSig'});
   @override
-  Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => create(page$pagedCreateCall);
+  $buildPagedLine
 
 ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent()).join('\n')}
 }''';
@@ -184,10 +190,13 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent())
       if (paramsCallPaged.isNotEmpty) pagedPieces.add(paramsCallPaged);
       final pagedFunctionCall = '${_info.functionName}(${pagedPieces.join(', ')})';
 
+      final functionalBuildLine = _info.hasPagedMapper
+          ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await $pagedFunctionCall);'
+          : 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => $pagedFunctionCall;';
       return '''
 class ${_info.notifierType} extends $controllerType<${_info.dataType}, $dataArgType> {
   @override
-  Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => $pagedFunctionCall;
+  $functionalBuildLine
 }''';
     }
 
@@ -430,7 +439,6 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
     final argRecordTypeForData = _info.params.isEmpty
         ? '()'
         : _info.params.toRecordType();
-    final ofMethodArg2 = _info.hasArg ? ', _arg' : '';
     final implementsClause = _info.type == ProviderType.paged
         ? ' implements PagedDataProviderFacade<${_info.dataType}>, PagedProviderValue<${_info.dataType}>'
         : _info.type == ProviderType.sync

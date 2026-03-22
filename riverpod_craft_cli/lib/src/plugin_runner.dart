@@ -81,6 +81,7 @@ class PluginRunner {
         functionName: info.functionName,
         requiresRef: info.requiresRef,
         isSettable: info.isSettable,
+        hasPagedMapper: info.hasPagedMapper,
         allProviderVarNames: allVarNames,
         publicMethods: info.publicMethods,
       );

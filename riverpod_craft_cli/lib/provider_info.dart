@@ -29,6 +29,7 @@ class ProviderInfo {
     this.functionName,
     this.requiresRef = false,
     this.isSettable = false,
+    this.hasPagedMapper = false,
     this.allProviderVarNames = const [],
     this.publicMethods = const [],
   }) : _dataType = dataType;
@@ -43,6 +44,7 @@ class ProviderInfo {
   final String? functionName;
   final bool requiresRef;
   final bool isSettable;
+  final bool hasPagedMapper;
   final List<String> allProviderVarNames;
   final List<PublicMethod> publicMethods;
 

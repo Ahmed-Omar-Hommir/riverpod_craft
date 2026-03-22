@@ -7,8 +7,8 @@ import 'package:path/path.dart' as path;
 /// Main entry point for the Riverpod Craft CLI tool
 class RiverpodCraftCLI {
   static Future<void> main(List<String> args) async {
-    // Load community plugins from riverpod_craft.yaml if present
-    _loadPlugins();
+    // Load config from riverpod_craft.yaml if present
+    _loadConfig();
 
     if (args.isEmpty) {
       await _startWatchMode();
@@ -17,19 +17,23 @@ class RiverpodCraftCLI {
     }
   }
 
-  /// Loads community plugins from riverpod_craft.yaml config.
-  static void _loadPlugins() {
+  /// Loads config from riverpod_craft.yaml (plugins + mapper).
+  static void _loadConfig() {
     if (!PluginLoader.hasConfig()) return;
 
-    final pluginPaths = PluginLoader.loadPluginPaths();
-    if (pluginPaths.isEmpty) return;
+    // Load paged mapper config
+    CraftConfig.pagedMapperPath = PluginLoader.loadPagedMapperPath();
 
-    print('Found ${pluginPaths.length} community plugin(s) in riverpod_craft.yaml');
-    for (final pluginPath in pluginPaths) {
-      print('   $pluginPath');
+    // Load community plugins
+    final pluginPaths = PluginLoader.loadPluginPaths();
+    if (pluginPaths.isNotEmpty) {
+      print('Found ${pluginPaths.length} community plugin(s) in riverpod_craft.yaml');
+      for (final pluginPath in pluginPaths) {
+        print('   $pluginPath');
+      }
+      print('   Use runWithPlugins() to load custom plugins. See: riverpod_craft help');
+      print('');
     }
-    print('   Use runWithPlugins() to load custom plugins. See: riverpod_craft help');
-    print('');
   }
 
   /// Starts watch mode to monitor file changes

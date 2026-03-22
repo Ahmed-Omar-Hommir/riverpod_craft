@@ -37,9 +37,37 @@ class PluginLoader {
     }
   }
 
+  /// Reads the `paged_provider_mapper` path from `riverpod_craft.yaml`.
+  ///
+  /// Returns `null` if not configured.
+  static String? loadPagedMapperPath([Directory? directory]) {
+    final dir = directory ?? Directory.current;
+    final configFile = File('${dir.path}/riverpod_craft.yaml');
+
+    if (!configFile.existsSync()) return null;
+
+    try {
+      final content = configFile.readAsStringSync();
+      final yaml = loadYaml(content);
+
+      if (yaml is! YamlMap) return null;
+
+      final mapper = yaml['paged_provider_mapper'];
+      return mapper is String ? mapper : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   /// Checks if a `riverpod_craft.yaml` config file exists.
   static bool hasConfig([Directory? directory]) {
     final dir = directory ?? Directory.current;
     return File('${dir.path}/riverpod_craft.yaml').existsSync();
   }
+}
+
+/// Global config populated at CLI startup.
+class CraftConfig {
+  static String? pagedMapperPath;
+  static bool get hasPagedMapper => pagedMapperPath != null;
 }
