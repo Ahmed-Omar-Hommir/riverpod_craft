@@ -48,7 +48,7 @@ class $PaginatedNotesFacadeRef {
 
   void invalidate() => _ref.invalidate(_provider);
 
-  Future<void> fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
+  void fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
   Future<void> reload() => _ref.read(_provider.notifier).reload();
 
   void listen(
@@ -67,7 +67,8 @@ class $PaginatedNotesFacadeRef {
       );
 }
 
-class $PaginatedNotesFacadeWidget implements PagedDataProviderFacade<Note> {
+class $PaginatedNotesFacadeWidget
+    implements PagedDataProviderFacade<Note>, PagedProviderValue<Note> {
   $PaginatedNotesFacadeWidget(this._ref, this._arg);
   final WidgetRef _ref;
   final ({String? category}) _arg;
@@ -86,8 +87,8 @@ class $PaginatedNotesFacadeWidget implements PagedDataProviderFacade<Note> {
   void invalidate() => _ref.invalidate(_provider);
 
   @override
-  Future<void> fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
-  @override
+  void fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
+
   Future<void> reload() => _ref.read(_provider.notifier).reload();
 
   void listen(
@@ -98,6 +99,10 @@ class $PaginatedNotesFacadeWidget implements PagedDataProviderFacade<Note> {
   }) {
     _ref.listen<PagedDataState<Note>>(_provider, listener, onError: onError);
   }
+
+  @override
+  PagedDataProviderFacade<Note> of(WidgetRef ref) =>
+      $PaginatedNotesFacadeWidget(ref, _arg);
 
   $DeleteNoteCommandFacadePaginatedNotesWidget get deleteNoteCommand =>
       $DeleteNoteCommandFacadePaginatedNotesWidget(

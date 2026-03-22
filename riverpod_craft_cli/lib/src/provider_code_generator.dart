@@ -265,7 +265,7 @@ class ${_info.notifierType} extends $controllerType<${_info.dataType}, $syncArgT
     // Paged providers get fetchNextPage() and reload()
     final pagedMethods = _info.type == ProviderType.paged
         ? '''
-  Future<void> fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
+  void fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
   Future<void> reload() => _ref.read(_provider.notifier).reload();'''
         : '';
 
@@ -406,8 +406,8 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
   void invalidate() => _ref.invalidate(_provider);
 
   @override
-  Future<void> fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
-  @override
+  void fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
+
   Future<void> reload() => _ref.read(_provider.notifier).reload();'''
         : _info.type == ProviderType.sync
         ? ''
@@ -430,8 +430,9 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
     final argRecordTypeForData = _info.params.isEmpty
         ? '()'
         : _info.params.toRecordType();
+    final ofMethodArg2 = _info.hasArg ? ', _arg' : '';
     final implementsClause = _info.type == ProviderType.paged
-        ? ' implements PagedDataProviderFacade<${_info.dataType}>'
+        ? ' implements PagedDataProviderFacade<${_info.dataType}>, PagedProviderValue<${_info.dataType}>'
         : _info.type == ProviderType.sync
         ? ''
         : ' implements DataProviderFacade<${_info.dataType}>, DataProviderValue<${_info.dataType}, $argRecordTypeForData>';
@@ -441,7 +442,12 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
         : '@override\n  ';
 
     final ofMethodArg = _info.hasArg ? ', _arg' : '';
-    final ofMethod = (_info.type == ProviderType.sync || _info.type == ProviderType.paged)
+    final ofMethod = _info.type == ProviderType.paged
+        ? '''
+  @override
+  PagedDataProviderFacade<${_info.dataType}> of(WidgetRef ref) =>
+      ${_info.facadeClassName}Widget(ref$ofMethodArg);'''
+        : _info.type == ProviderType.sync
         ? ''
         : '''
   @override

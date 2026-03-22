@@ -1,22 +1,34 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'paged_data_state.dart';
 
-/// Interface that all generated paginated provider facades implement.
+/// Interface for interacting with a paginated provider's state.
 ///
-/// This lets [CraftPagedListView] accept any paginated provider
-/// without knowing its concrete facade type.
+/// Generated Widget facades implement this.
 abstract class PagedDataProviderFacade<T> {
-  /// Read the current state without subscribing.
   PagedDataState<T> read();
-
-  /// Watch the state reactively (rebuilds widget on change).
   PagedDataState<T> watch();
-
-  /// Load the next page.
-  Future<void> fetchNextPage();
-
-  /// Invalidate and re-fetch from page 1.
+  void fetchNextPage();
   void invalidate();
 
-  /// Reset to page 1 and re-fetch.
-  Future<void> reload();
+  void listen(
+    void Function(PagedDataState<T>? previous, PagedDataState<T> next) listener, {
+    void Function(Object, StackTrace)? onError,
+    bool fireImmediately = false,
+  });
+}
+
+/// Interface for creating a [PagedDataProviderFacade] from a [WidgetRef].
+///
+/// The generated Widget facade implements both [PagedDataProviderFacade]
+/// and [PagedProviderValue]. Pass this to [CraftPagedListView]:
+///
+/// ```dart
+/// CraftPagedListView<Note>(
+///   provider: ref.notesProvider(category: 'work'),
+///   itemBuilder: (context, note, index) => ListTile(title: Text(note.title)),
+/// )
+/// ```
+abstract class PagedProviderValue<T> {
+  PagedDataProviderFacade<T> of(WidgetRef ref);
 }
