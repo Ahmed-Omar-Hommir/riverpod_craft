@@ -67,22 +67,27 @@ class $PaginatedNotesFacadeRef {
       );
 }
 
-class $PaginatedNotesFacadeWidget {
+class $PaginatedNotesFacadeWidget implements PagedDataProviderFacade<Note> {
   $PaginatedNotesFacadeWidget(this._ref, this._arg);
   final WidgetRef _ref;
   final ({String? category}) _arg;
 
   late final _provider = _paginatedNotesProvider(_arg);
 
+  @override
   PagedDataState<Note> read() => _ref.read(_provider);
+  @override
   PagedDataState<Note> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
     R Function(PagedDataState<Note> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
+  @override
   void invalidate() => _ref.invalidate(_provider);
 
+  @override
   Future<void> fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
+  @override
   Future<void> reload() => _ref.read(_provider.notifier).reload();
 
   void listen(

@@ -261,6 +261,8 @@ class _NoteCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
+    CraftPagedListView.separated();
+
     return Dismissible(
       key: ValueKey(note.id),
       direction: DismissDirection.endToStart,

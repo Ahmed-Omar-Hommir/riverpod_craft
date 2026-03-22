@@ -8,6 +8,7 @@ export 'src/data_provider/async_state/async_state.dart';
 export 'src/pagination/paginated_response.dart';
 export 'src/pagination/paged_data_state.dart';
 export 'src/pagination/paged_data_notifier.dart';
+export 'src/pagination/paged_data_provider_facade.dart';
 export 'src/pagination/craft_paged_list_view.dart';
 export 'package:riverpod/riverpod.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';

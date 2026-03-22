@@ -1,32 +1,28 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import 'paged_data_state.dart';
+import 'paged_data_provider_facade.dart';
 
 /// A paginated list view that works with riverpod_craft paginated providers.
 ///
-/// Bridges [PagedDataState] from your provider to
-/// [PagedListView] from `infinite_scroll_pagination`.
+/// Pass the provider facade directly — the widget handles watching state
+/// and triggering `fetchNextPage` automatically.
 ///
 /// ```dart
 /// @override
 /// Widget build(BuildContext context, WidgetRef ref) {
-///   final facade = ref.notesProvider(category: 'work');
-///   final state = facade.watch();
-///
 ///   return CraftPagedListView<Note>(
-///     state: state,
-///     fetchNextPage: facade.fetchNextPage,
+///     provider: ref.notesProvider(category: 'work'),
 ///     itemBuilder: (context, note, index) => ListTile(title: Text(note.title)),
 ///   );
 /// }
 /// ```
-class CraftPagedListView<T> extends StatefulWidget {
+class CraftPagedListView<T> extends ConsumerStatefulWidget {
   const CraftPagedListView({
     super.key,
-    required this.state,
-    required this.fetchNextPage,
+    required this.provider,
     required this.itemBuilder,
     this.emptyBuilder,
     this.firstPageLoadingBuilder,
@@ -46,8 +42,7 @@ class CraftPagedListView<T> extends StatefulWidget {
 
   const CraftPagedListView.separated({
     super.key,
-    required this.state,
-    required this.fetchNextPage,
+    required this.provider,
     required this.itemBuilder,
     required Widget Function(BuildContext context, int index) separatorBuilder,
     this.emptyBuilder,
@@ -66,12 +61,8 @@ class CraftPagedListView<T> extends StatefulWidget {
     this.dragStartBehavior = DragStartBehavior.start,
   }) : _separatorBuilder = separatorBuilder;
 
-  /// The current pagination state from your provider's `.watch()`.
-  final PagedDataState<T> state;
-
-  /// Called when the next page needs to be loaded.
-  /// Pass your provider facade's `.fetchNextPage`.
-  final Future<void> Function() fetchNextPage;
+  /// The paginated provider facade (e.g., `ref.notesProvider(category: 'work')`).
+  final PagedDataProviderFacade<T> provider;
 
   /// Builds each item in the list.
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
@@ -107,10 +98,12 @@ class CraftPagedListView<T> extends StatefulWidget {
   final DragStartBehavior dragStartBehavior;
 
   @override
-  State<CraftPagedListView<T>> createState() => _CraftPagedListViewState<T>();
+  ConsumerState<CraftPagedListView<T>> createState() =>
+      _CraftPagedListViewState<T>();
 }
 
-class _CraftPagedListViewState<T> extends State<CraftPagedListView<T>> {
+class _CraftPagedListViewState<T>
+    extends ConsumerState<CraftPagedListView<T>> {
   late PagingController<int, T> _pagingController;
 
   @override
@@ -118,21 +111,8 @@ class _CraftPagedListViewState<T> extends State<CraftPagedListView<T>> {
     super.initState();
     _pagingController = PagingController(firstPageKey: 1);
     _pagingController.addPageRequestListener((_) {
-      widget.fetchNextPage();
+      widget.provider.fetchNextPage();
     });
-    _syncState();
-  }
-
-  @override
-  void didUpdateWidget(CraftPagedListView<T> oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.state != widget.state) {
-      _syncState();
-    }
-  }
-
-  void _syncState() {
-    _pagingController.value = widget.state.pagingState;
   }
 
   @override
@@ -143,19 +123,20 @@ class _CraftPagedListViewState<T> extends State<CraftPagedListView<T>> {
 
   @override
   Widget build(BuildContext context) {
+    final state = widget.provider.watch();
+    _pagingController.value = state.pagingState;
+
     final delegate = PagedChildBuilderDelegate<T>(
       itemBuilder: (context, item, index) =>
           widget.itemBuilder(context, item, index),
       noItemsFoundIndicatorBuilder: widget.emptyBuilder,
       firstPageProgressIndicatorBuilder: widget.firstPageLoadingBuilder,
       firstPageErrorIndicatorBuilder: widget.firstPageErrorBuilder != null
-          ? (context) =>
-              widget.firstPageErrorBuilder!(context, widget.state.error)
+          ? (context) => widget.firstPageErrorBuilder!(context, state.error)
           : null,
       newPageProgressIndicatorBuilder: widget.newPageLoadingBuilder,
       newPageErrorIndicatorBuilder: widget.newPageErrorBuilder != null
-          ? (context) =>
-              widget.newPageErrorBuilder!(context, widget.state.error)
+          ? (context) => widget.newPageErrorBuilder!(context, state.error)
           : null,
     );
 
@@ -195,11 +176,10 @@ class _CraftPagedListViewState<T> extends State<CraftPagedListView<T>> {
 /// A paginated sliver list view for use inside [CustomScrollView].
 ///
 /// Same API as [CraftPagedListView] but renders as a sliver.
-class CraftPagedSliverListView<T> extends StatefulWidget {
+class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
   const CraftPagedSliverListView({
     super.key,
-    required this.state,
-    required this.fetchNextPage,
+    required this.provider,
     required this.itemBuilder,
     this.emptyBuilder,
     this.firstPageLoadingBuilder,
@@ -210,8 +190,7 @@ class CraftPagedSliverListView<T> extends StatefulWidget {
 
   const CraftPagedSliverListView.separated({
     super.key,
-    required this.state,
-    required this.fetchNextPage,
+    required this.provider,
     required this.itemBuilder,
     required Widget Function(BuildContext context, int index) separatorBuilder,
     this.emptyBuilder,
@@ -221,8 +200,7 @@ class CraftPagedSliverListView<T> extends StatefulWidget {
     this.newPageErrorBuilder,
   }) : _separatorBuilder = separatorBuilder;
 
-  final PagedDataState<T> state;
-  final Future<void> Function() fetchNextPage;
+  final PagedDataProviderFacade<T> provider;
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
   final Widget Function(BuildContext context, int index)? _separatorBuilder;
   final Widget Function(BuildContext context)? emptyBuilder;
@@ -234,12 +212,12 @@ class CraftPagedSliverListView<T> extends StatefulWidget {
       newPageErrorBuilder;
 
   @override
-  State<CraftPagedSliverListView<T>> createState() =>
+  ConsumerState<CraftPagedSliverListView<T>> createState() =>
       _CraftPagedSliverListViewState<T>();
 }
 
 class _CraftPagedSliverListViewState<T>
-    extends State<CraftPagedSliverListView<T>> {
+    extends ConsumerState<CraftPagedSliverListView<T>> {
   late PagingController<int, T> _pagingController;
 
   @override
@@ -247,21 +225,8 @@ class _CraftPagedSliverListViewState<T>
     super.initState();
     _pagingController = PagingController(firstPageKey: 1);
     _pagingController.addPageRequestListener((_) {
-      widget.fetchNextPage();
+      widget.provider.fetchNextPage();
     });
-    _syncState();
-  }
-
-  @override
-  void didUpdateWidget(CraftPagedSliverListView<T> oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.state != widget.state) {
-      _syncState();
-    }
-  }
-
-  void _syncState() {
-    _pagingController.value = widget.state.pagingState;
   }
 
   @override
@@ -272,19 +237,20 @@ class _CraftPagedSliverListViewState<T>
 
   @override
   Widget build(BuildContext context) {
+    final state = widget.provider.watch();
+    _pagingController.value = state.pagingState;
+
     final delegate = PagedChildBuilderDelegate<T>(
       itemBuilder: (context, item, index) =>
           widget.itemBuilder(context, item, index),
       noItemsFoundIndicatorBuilder: widget.emptyBuilder,
       firstPageProgressIndicatorBuilder: widget.firstPageLoadingBuilder,
       firstPageErrorIndicatorBuilder: widget.firstPageErrorBuilder != null
-          ? (context) =>
-              widget.firstPageErrorBuilder!(context, widget.state.error)
+          ? (context) => widget.firstPageErrorBuilder!(context, state.error)
           : null,
       newPageProgressIndicatorBuilder: widget.newPageLoadingBuilder,
       newPageErrorIndicatorBuilder: widget.newPageErrorBuilder != null
-          ? (context) =>
-              widget.newPageErrorBuilder!(context, widget.state.error)
+          ? (context) => widget.newPageErrorBuilder!(context, state.error)
           : null,
     );
 
