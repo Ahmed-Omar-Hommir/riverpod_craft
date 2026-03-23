@@ -23,7 +23,7 @@ Start watch mode. The recommended way to use the CLI — keep it running while y
 dart run craft_runner watch
 ```
 
-Watches all `*_provider.dart` files in your project. When you save a file, it automatically generates the corresponding `.pg.dart` file.
+Watches all `*_provider.dart` files in your project. When you save a file, it automatically generates the corresponding `.craft.dart` file.
 
 ### `generate`
 
@@ -35,7 +35,7 @@ dart run craft_runner generate lib/providers/todos_provider.dart
 
 ### `clean`
 
-Remove all generated `.pg.dart` files:
+Remove all generated `.craft.dart` files:
 
 ```bash
 dart run craft_runner clean
@@ -61,9 +61,9 @@ dart run craft_runner help
 
 | Source file | Generated file |
 |-------------|---------------|
-| `my_provider.dart` | `my_provider.pg.dart` |
+| `my_provider.dart` | `my_provider.craft.dart` |
 
-The generated file is connected via Dart's `part`/`part of` directives. The CLI adds `part 'my_provider.pg.dart';` to your source file automatically if it's not already there.
+The generated file is connected via Dart's `part`/`part of` directives. The CLI adds `part 'my_provider.craft.dart';` to your source file automatically if it's not already there.
 
 ## What gets generated
 

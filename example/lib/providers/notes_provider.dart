@@ -3,7 +3,7 @@ import 'package:riverpod_craft/riverpod_craft.dart';
 import '../data/notes_repository.dart';
 import '../models/note.dart';
 
-part 'notes_provider.pg.dart';
+part 'notes_provider.craft.dart';
 
 @provider
 class Notes extends _$Notes {

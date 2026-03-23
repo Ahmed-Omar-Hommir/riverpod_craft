@@ -11,35 +11,42 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Better Syntax',
+    title: 'Clean API',
     emoji: '\u2728',
     description: (
       <>
-        Access providers via <code>ref.myProvider.watch()</code> instead of{' '}
-        <code>ref.watch(myProvider)</code>. Call methods directly without{' '}
-        <code>.notifier</code>. Your IDE autocompletes everything.
+        Write less boilerplate. Get full IDE autocomplete from <code>ref.</code> — discover
+        every provider, method, and command without memorizing names.
       </>
     ),
   },
   {
-    title: 'Side Effect Solution',
+    title: 'Side Effects',
     emoji: '\u26A1',
     description: (
       <>
-        Handle async operations with <code>@command</code>. Each side effect
-        gets its own loading/error/success state, independent from the data
-        provider. Built-in concurrency control.
+        Stop writing loading/error/success tracking for every API call.
+        Add <code>@command</code> and get independent state management with concurrency control for free.
       </>
     ),
   },
   {
-    title: 'Code Generation',
-    emoji: '\uD83D\uDEE0\uFE0F',
+    title: 'Pagination',
+    emoji: '\uD83D\uDCC4',
     description: (
       <>
-        Write simple annotated classes. The CLI generates all boilerplate:
-        provider declarations, notifier classes, and typed accessor classes.
-        Just run <code>riverpod_craft watch</code>.
+        Build infinite scroll lists without managing page state, controllers, or loading indicators yourself.
+        Just define your data source.
+      </>
+    ),
+  },
+  {
+    title: 'Fast Generation',
+    emoji: '\uD83D\uDE80',
+    description: (
+      <>
+        Save a file, see generated code instantly. No more waiting seconds (or minutes)
+        for code generation to finish.
       </>
     ),
   },
@@ -47,8 +54,8 @@ const FeatureList: FeatureItem[] = [
 
 function Feature({title, emoji, description}: FeatureItem) {
   return (
-    <div className={clsx('col col--4')}>
-      <div className="text--center" style={{fontSize: '3rem', marginBottom: '1rem'}}>
+    <div className={clsx('col col--3')}>
+      <div className="text--center" style={{fontSize: '2.5rem', marginBottom: '0.8rem'}}>
         {emoji}
       </div>
       <div className="text--center padding-horiz--md">

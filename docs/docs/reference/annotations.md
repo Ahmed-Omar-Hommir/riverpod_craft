@@ -11,7 +11,7 @@ Marks a class or function as a Riverpod provider. The generator creates the noti
 ### Class-based (async)
 
 ```dart
-part 'todos_provider.pg.dart';
+part 'todos_provider.craft.dart';
 
 @provider
 class Todos extends _$Todos {
@@ -23,7 +23,7 @@ class Todos extends _$Todos {
 ### Class-based (sync)
 
 ```dart
-part 'counter_provider.pg.dart';
+part 'counter_provider.craft.dart';
 
 @provider
 class Counter extends _$Counter {
@@ -35,7 +35,7 @@ class Counter extends _$Counter {
 ### Functional (async)
 
 ```dart
-part 'user_provider.pg.dart';
+part 'user_provider.craft.dart';
 
 @provider
 Future<User> user(Ref ref) => api.getUser();
@@ -44,7 +44,7 @@ Future<User> user(Ref ref) => api.getUser();
 ### Stream
 
 ```dart
-part 'messages_provider.pg.dart';
+part 'messages_provider.craft.dart';
 
 @provider
 Stream<List<Message>> messages(Ref ref) => api.messagesStream();
@@ -112,7 +112,7 @@ Enables `setState()` on functional providers. Only works on functional providers
 NoteCategory categoryFilter(Ref ref) => NoteCategory.all;
 ```
 
-See [Settable Providers](../concepts/settable-providers) for the full guide.
+See [State Provider](../concepts/state-provider) for the full guide.
 
 ---
 
@@ -123,7 +123,7 @@ Creates parameterized providers. Use parameters in `create()` (class-based) or f
 ### Functional
 
 ```dart
-part 'note_detail_provider.pg.dart';
+part 'note_detail_provider.craft.dart';
 
 @provider
 Future<Note> noteDetail(Ref ref, {required String id}) {
@@ -140,7 +140,7 @@ ref.noteDetailProvider(id: '123').watch()
 ### Class-based
 
 ```dart
-part 'user_profile_provider.pg.dart';
+part 'user_profile_provider.craft.dart';
 
 @provider
 class UserProfile extends _$UserProfile {

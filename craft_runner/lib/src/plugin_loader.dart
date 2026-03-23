@@ -76,7 +76,7 @@ class CraftConfig {
   /// The raw input type name from the mapper function (e.g., "ApiPagedResponse").
   static String? pagedMapperInputType;
 
-  /// The full source of the `pagedMapper` function, to inline in `.pg.dart`.
+  /// The full source of the `pagedMapper` function, to inline in `.craft.dart`.
   static String? pagedMapperFunctionSource;
 
   /// Parses the mapper file to extract the input type and function body.

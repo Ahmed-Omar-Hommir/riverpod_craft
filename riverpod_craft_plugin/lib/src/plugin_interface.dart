@@ -31,7 +31,7 @@ abstract class RiverpodCraftPlugin<T> {
 
   /// Additional imports the generated file needs.
   ///
-  /// Override this to add import statements to the generated `.pg.dart` file.
+  /// Override this to add import statements to the generated `.craft.dart` file.
   List<String> get requiredImports => [];
 }
 

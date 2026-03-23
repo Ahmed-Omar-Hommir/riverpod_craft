@@ -2,7 +2,7 @@ import 'package:riverpod_craft/riverpod_craft.dart';
 import '../models/note.dart';
 import '../models/api_paged_response.dart';
 
-part 'paginated_notes_provider.pg.dart';
+part 'paginated_notes_provider.craft.dart';
 
 @provider
 class PaginatedNotes extends _$PaginatedNotes {

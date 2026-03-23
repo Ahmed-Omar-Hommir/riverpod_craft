@@ -109,7 +109,7 @@ class RiverpodCraftCLI {
       recursive: true,
       followLinks: false,
     )) {
-      if (entity is File && entity.path.endsWith('.pg.dart')) {
+      if (entity is File && entity.path.endsWith('.craft.dart')) {
         generatedFiles.add(entity);
       }
     }
@@ -272,7 +272,7 @@ Usage:
 Commands:
   watch                 Start watching for file changes (default)
   generate              Generate a single provider file
-  clean                 Remove all generated .pg.dart files
+  clean                 Remove all generated .craft.dart files
   init                  Initialize project (install dependencies & VS Code extension)
   help                  Show this help message
 
@@ -302,7 +302,7 @@ Custom Plugins:
   static Future<void> _cleanupExistingFiles(Directory directory) async {
     final List<File> generatedFiles = [];
     await for (final entity in directory.list(recursive: true, followLinks: false)) {
-      if (entity is File && entity.path.endsWith('.pg.dart')) {
+      if (entity is File && entity.path.endsWith('.craft.dart')) {
         generatedFiles.add(entity);
       }
     }

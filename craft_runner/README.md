@@ -16,7 +16,7 @@ dev_dependencies:
 
 ### `watch` (default)
 
-Monitors the `lib/` directory and regenerates `.pg.dart` files on save.
+Monitors the `lib/` directory and regenerates `.craft.dart` files on save.
 
 ```bash
 dart run riverpod_craft_cli
@@ -25,13 +25,13 @@ dart run riverpod_craft_cli watch
 ```
 
 On startup, watch mode:
-1. Cleans up orphaned `.pg.dart` files (where the source file no longer has annotations)
+1. Cleans up orphaned `.craft.dart` files (where the source file no longer has annotations)
 2. Processes all existing annotated files
 3. Watches for file changes
 
 ### `generate <file_path>`
 
-Generates the `.pg.dart` file for a single source file.
+Generates the `.craft.dart` file for a single source file.
 
 ```bash
 dart run riverpod_craft_cli generate lib/providers/my_provider.dart
@@ -39,7 +39,7 @@ dart run riverpod_craft_cli generate lib/providers/my_provider.dart
 
 ### `clean`
 
-Removes all generated `.pg.dart` files from the project.
+Removes all generated `.craft.dart` files from the project.
 
 ```bash
 dart run riverpod_craft_cli clean
@@ -64,10 +64,10 @@ dart run riverpod_craft_cli help
 ## Generated Files
 
 - Source: `my_provider.dart`
-- Output: `my_provider.pg.dart`
-- Connected via `part 'my_provider.pg.dart';` (added automatically to source)
+- Output: `my_provider.craft.dart`
+- Connected via `part 'my_provider.craft.dart';` (added automatically to source)
 
-If you remove all annotations from a source file, the CLI automatically deletes the corresponding `.pg.dart` file and removes the `part` directive.
+If you remove all annotations from a source file, the CLI automatically deletes the corresponding `.craft.dart` file and removes the `part` directive.
 
 ## What Gets Generated
 
@@ -86,7 +86,7 @@ For each annotated provider, the CLI generates:
 1. **Parse** — Uses the Dart `analyzer` package to parse source files into AST
 2. **Collect** — Walks the AST to find annotated classes/functions and extract metadata (types, parameters, annotations)
 3. **Generate** — Builds provider code from the collected metadata
-4. **Write** — Outputs the `.pg.dart` file and ensures the `part` directive exists in the source
+4. **Write** — Outputs the `.craft.dart` file and ensures the `part` directive exists in the source
 
 ## Requirements
 

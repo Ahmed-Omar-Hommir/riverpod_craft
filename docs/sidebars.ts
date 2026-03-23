@@ -9,11 +9,12 @@ const sidebars: SidebarsConfig = {
       label: 'Concepts',
       collapsed: false,
       items: [
-        'concepts/better-syntax',
+        'concepts/state-provider',
+        'concepts/fetch-data',
+        'concepts/pagination',
         'concepts/side-effects',
         'concepts/command',
-        'concepts/settable-providers',
-        'concepts/pagination',
+        'concepts/why-craft-runner',
       ],
     },
     {
@@ -27,7 +28,6 @@ const sidebars: SidebarsConfig = {
       ],
     },
     'examples',
-    'example-app',
   ],
 };
 

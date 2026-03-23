@@ -33,7 +33,7 @@ Create a file ending with `_provider.dart` (e.g. `todos_provider.dart`):
 import 'package:riverpod_craft/riverpod_craft.dart';
 import 'package:http/http.dart' as http;
 
-part 'todos_provider.pg.dart';
+part 'todos_provider.craft.dart';
 
 @provider
 Future<List<Todo>> todos(Ref ref) async {
@@ -46,7 +46,7 @@ Future<List<Todo>> todos(Ref ref) async {
 Provider files **must** end with `_provider.dart` (e.g. `todos_provider.dart`, `auth_provider.dart`). The generator only watches files matching this pattern.
 :::
 
-When you save this file, the CLI automatically generates `todos_provider.pg.dart` with all the boilerplate.
+When you save this file, the CLI automatically generates `todos_provider.craft.dart` with all the boilerplate.
 
 ## 4. Use in widgets
 
@@ -73,5 +73,5 @@ That's it. The generated code gives you `ref.todosProvider` with `.watch()`, `.r
 
 Now that you have the basics, learn about the two main features:
 
-- **[Better Syntax](./concepts/better-syntax)** — all the ways the generated API improves on vanilla Riverpod
+- **[State & Provider](./concepts/state-provider)** — all the ways the generated API improves on vanilla Riverpod
 - **[Side Effects](./concepts/side-effects)** — how to handle mutations, API calls, and async operations with `@command`

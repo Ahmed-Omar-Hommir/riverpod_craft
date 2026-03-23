@@ -4,7 +4,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'Riverpod Craft',
-  tagline: 'A code generation toolkit for Riverpod',
+  tagline: 'Solutions and enhancements for Riverpod state management',
   favicon: 'img/favicon.ico',
 
   future: {
@@ -79,8 +79,8 @@ const config: Config = {
               to: '/docs/introduction',
             },
             {
-              label: 'Better Syntax',
-              to: '/docs/concepts/better-syntax',
+              label: 'State & Provider',
+              to: '/docs/concepts/state-provider',
             },
             {
               label: 'Side Effects',

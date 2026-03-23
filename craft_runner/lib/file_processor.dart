@@ -60,7 +60,7 @@ class FileProcessor {
       }
 
       final fileName = file.uri.pathSegments.last;
-      final partName = fileName.replaceAll('.dart', '.pg.dart');
+      final partName = fileName.replaceAll('.dart', '.craft.dart');
       final generatedFilePath =
           '${file.parent.path.endsWith('/') ? file.parent.path : '${file.parent.path}/'}$partName';
       final generatedFile = File(generatedFilePath);
@@ -135,7 +135,7 @@ class FileProcessor {
     }
   }
 
-  /// Builds the Paged<T> typedef (and mapper function) for .pg.dart files.
+  /// Builds the Paged<T> typedef (and mapper function) for .craft.dart files.
   ///
   /// With mapper: typedef + inlined pagedMapper function.
   /// Without mapper: typedef defaults to PaginatedResponse<T>.
@@ -160,7 +160,7 @@ $mapperFn
     CompilationUnit unit,
   ) async {
     final fileName = p.basename(file.path);
-    final partName = fileName.replaceAll('.dart', '.pg.dart');
+    final partName = fileName.replaceAll('.dart', '.craft.dart');
 
     final hasPartDirective = unit.directives.whereType<PartDirective>().any(
       (p) => p.uri.stringValue == partName,
@@ -201,7 +201,7 @@ $mapperFn
     CompilationUnit unit,
   ) async {
     final fileName = p.basename(file.path);
-    final partName = fileName.replaceAll('.dart', '.pg.dart');
+    final partName = fileName.replaceAll('.dart', '.craft.dart');
     final generatedFile = File(p.join(file.parent.path, partName));
 
     // Delete generated file if it exists

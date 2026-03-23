@@ -44,7 +44,7 @@ Create a file ending with `_provider.dart` (e.g. `todos_provider.dart`):
 import 'package:riverpod_craft/riverpod_craft.dart';
 import 'package:http/http.dart' as http;
 
-part 'todos_provider.pg.dart';
+part 'todos_provider.craft.dart';
 
 @provider
 Future<List<Todo>> todos(Ref ref) async {
@@ -79,7 +79,7 @@ class TodosPage extends ConsumerWidget {
 | Package | Description |
 |---------|-------------|
 | `riverpod_craft` | Runtime library — annotations, notifiers, state types |
-| `riverpod_craft_cli` | CLI tool — parses your code and generates `.pg.dart` files |
+| `riverpod_craft_cli` | CLI tool — parses your code and generates `.craft.dart` files |
 
 ## Requirements
 

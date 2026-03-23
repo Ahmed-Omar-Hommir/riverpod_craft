@@ -57,31 +57,6 @@ class NotesPage extends ConsumerWidget {
 }
 ```
 
-### Manual control
-
-You can also watch the state directly and build your own UI:
-
-```dart
-class NotesPage extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final facade = ref.notesProvider(category: 'work');
-    final state = facade.watch();
-
-    return ListView.builder(
-      itemCount: state.items.length,
-      itemBuilder: (context, index) {
-        // Trigger next page when reaching the end
-        if (index == state.items.length - 1) {
-          facade.fetchNextPage();
-        }
-        return ListTile(title: Text(state.items[index].title));
-      },
-    );
-  }
-}
-```
-
 ## Global Mapper
 
 Most APIs return their own pagination format — not `PaginatedResponse`. Instead of converting in every provider, you write **one mapper function** and the code generator applies it everywhere.
@@ -129,7 +104,7 @@ paged_provider_mapper: lib/paged_mapper.dart
 The code generator reads your mapper function and:
 
 1. **Changes `Paged<T>`** — instead of `Future<PaginatedResponse<T>>`, it becomes `Future<ApiPagedResponse<T>>` (your API type)
-2. **Inlines the mapper** — the mapper function is written directly into every `.pg.dart` file that has paged providers
+2. **Inlines the mapper** — the mapper function is written directly into every `.craft.dart` file that has paged providers
 3. **Wraps `create()` automatically** — the generated `buildPagedData()` calls `pagedMapper(await create(page, ...))`
 
 Your provider just returns the raw API response:
@@ -152,32 +127,11 @@ class Notes extends _$Notes {
 ```
 
 :::info
-You don't need to import the mapper file in your provider. The code generator copies the mapper function into the generated `.pg.dart` file automatically.
+You don't need to import the mapper file in your provider. The code generator copies the mapper function into the generated `.craft.dart` file automatically.
 :::
 
-## Commands Inside Paged Providers
-
-You can add `@command` methods to paged providers — for example, deleting an item from the list:
-
-```dart
-@provider
-class Notes extends _$Notes {
-  @override
-  Paged<Note> create(int page, {required String? category}) async {
-    // fetch notes...
-  }
-
-  @override
-  @command
-  @droppable
-  Future<void> deleteNote({required String id}) async {
-    await http.delete(Uri.parse('https://api.example.com/notes/$id'));
-    // Remove from local state
-    state = state.removeWhere((note) => note.id == id);
-  }
-}
-```
-
 ## Next
+
+To add side effects (delete, update) to your paged providers, see **[Command](./command)**.
 
 See the [Annotations Reference](/docs/reference/annotations) for all pagination-related annotations.

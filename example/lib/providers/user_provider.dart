@@ -1,6 +1,6 @@
 import 'package:riverpod_craft/riverpod_craft.dart';
 
-part 'user_provider.pg.dart';
+part 'user_provider.craft.dart';
 
 @provider
 class User extends _$User {
