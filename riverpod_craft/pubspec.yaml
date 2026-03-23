@@ -1,6 +1,6 @@
 name: riverpod_craft
 description: A code generation toolkit for Riverpod state management. Better syntax and side effect solution with commands.
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 issue_tracker: https://github.com/Ahmed-Omar-Hommir/riverpod_craft/issues
