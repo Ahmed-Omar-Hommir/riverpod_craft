@@ -1,3 +1,10 @@
+## 0.1.1
+
+- Generated files now use `.craft.dart` extension instead of `.pg.dart`
+- Added `PagedProviderValue` interface for `CraftPagedListView`
+- Added `PagedDataProviderFacade` with `listen()` support
+- Explicit type parameters on all `NotifierProvider` declarations
+
 ## 0.1.0
 
 - Initial alpha release
