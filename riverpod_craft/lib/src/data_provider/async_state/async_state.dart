@@ -13,35 +13,35 @@ sealed class AsynchronousState<T, ArgT extends Record> with EquatableMixin {
 extension AsynchronousStateExtension<T, ArgT extends Record>
     on AsynchronousState<T, ArgT> {
   bool get isLoading => switch (this) {
-    DataLoading<T>() => true,
+    DataLoading<T, Object>() => true,
     CommandLoading<T, ArgT>() => true,
     ArgCommandLoading<T, Record>() => true,
     _ => false,
   };
 
   bool get isData => switch (this) {
-    DataSuccess<T>() => true,
+    DataSuccess<T, Object>() => true,
     CommandData<T, ArgT>() => true,
     ArgCommandData<T, Record>() => true,
     _ => false,
   };
 
   bool get isError => switch (this) {
-    DataError<T>() => true,
+    DataError<T, Object>() => true,
     CommandError<T, ArgT>() => true,
     ArgCommandError<T, Record>() => true,
     _ => false,
   };
 
   T? get data => switch (this) {
-    DataSuccess<T>(data: final data) => data,
+    DataSuccess<T, Object>(data: final data) => data,
     CommandData<T, ArgT>(data: final data) => data,
     ArgCommandData<T, Record>(data: final data) => data,
     _ => null,
   };
 
   Object? get error => switch (this) {
-    DataError<T>(error: final error) => error,
+    DataError<T, Object>(error: final error) => error,
     CommandError<T, ArgT>(error: final error) => error,
     ArgCommandError<T, Record>(error: final error) => error,
     _ => null,
@@ -54,9 +54,9 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
     required R Function(ArgT? arg, Object error) error,
   }) {
     return switch (this) {
-      DataLoading<T>() => loading(null),
-      DataSuccess<T>(data: final dataValue) => data(null, dataValue),
-      DataError<T>(error: final errorValue) => error(null, errorValue),
+      DataLoading<T, Object>() => loading(null),
+      DataSuccess<T, Object>(data: final dataValue) => data(null, dataValue),
+      DataError<T, Object>(error: final errorValue) => error(null, errorValue),
       CommandInit<T, ArgT>() => init(),
       CommandLoading<T, ArgT>() => loading(null),
       CommandData<T, ArgT>(data: final dataValue) => data(null, dataValue),
@@ -81,10 +81,10 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
     required R Function() orElse,
   }) {
     return switch (this) {
-      DataLoading<T>() => loading?.call(null) ?? orElse(),
-      DataSuccess<T>(data: final dataValue) =>
+      DataLoading<T, Object>() => loading?.call(null) ?? orElse(),
+      DataSuccess<T, Object>(data: final dataValue) =>
         data?.call(null, dataValue) ?? orElse(),
-      DataError<T>(error: final errorValue) =>
+      DataError<T, Object>(error: final errorValue) =>
         error?.call(null, errorValue) ?? orElse(),
       CommandInit<T, ArgT>() => init?.call() ?? orElse(),
       CommandLoading<T, ArgT>() => loading?.call(null) ?? orElse(),
@@ -110,9 +110,9 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
     R Function(ArgT? arg, Object error)? error,
   }) {
     return switch (this) {
-      DataLoading<T>() => loading?.call(null),
-      DataSuccess<T>(data: final dataValue) => data?.call(null, dataValue),
-      DataError<T>(error: final errorValue) => error?.call(null, errorValue),
+      DataLoading<T, Object>() => loading?.call(null),
+      DataSuccess<T, Object>(data: final dataValue) => data?.call(null, dataValue),
+      DataError<T, Object>(error: final errorValue) => error?.call(null, errorValue),
       CommandInit<T, ArgT>() => init?.call(),
       CommandLoading<T, ArgT>() => loading?.call(null),
       CommandData<T, ArgT>(data: final dataValue) => data?.call(

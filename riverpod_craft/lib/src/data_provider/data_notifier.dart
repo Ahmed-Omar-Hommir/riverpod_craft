@@ -15,8 +15,8 @@ import 'async_state/async_state.dart';
 ///
 /// Set [isFuture] to `true` when using [buildDataWithFuture],
 /// or `false` when using [buildDataWithStream].
-abstract class DataNotifier<T, Arg extends Record>
-    extends Notifier<DataState<T>> {
+abstract class DataNotifier<T, Arg extends Record, E extends Object = Object>
+    extends Notifier<DataState<T, E>> {
   late final Arg arg;
 
   StreamSubscription? _subscription;
@@ -42,8 +42,8 @@ abstract class DataNotifier<T, Arg extends Record>
   @protected
   void setData(T data) {
     final currentState = state;
-    if (currentState is! DataSuccess<T>) return;
-    state = DataSuccess<T>(data);
+    if (currentState is! DataSuccess<T, E>) return;
+    state = DataSuccess<T, E>(data);
   }
 
   Stream<Result<T>> _buildData(Arg arg) async* {
@@ -74,7 +74,7 @@ abstract class DataNotifier<T, Arg extends Record>
   Future<void> _getData(Arg arg, {bool silent = false}) async {
     _subscription?.cancel();
 
-    if (!silent) state = DataLoading<T>();
+    if (!silent) state = DataLoading<T, E>();
 
     final completer = Completer<void>();
 
@@ -83,9 +83,9 @@ abstract class DataNotifier<T, Arg extends Record>
         (result) {
           switch (result) {
             case Ok<T>(value: final value):
-              state = DataSuccess<T>(value);
+              state = DataSuccess<T, E>(value);
             case Error<T>(error: final e):
-              state = DataError(e);
+              state = DataError<T, E>(e as E);
           }
 
           if (!completer.isCompleted) {
@@ -93,7 +93,7 @@ abstract class DataNotifier<T, Arg extends Record>
           }
         },
         onError: (e) {
-          if (!silent) state = DataError(e);
+          if (!silent) state = DataError<T, E>(e as E);
 
           if (!completer.isCompleted) {
             completer.completeError(e);
@@ -103,7 +103,7 @@ abstract class DataNotifier<T, Arg extends Record>
 
       ref.onDispose(() => _subscription?.cancel());
     } catch (e) {
-      if (!silent) state = DataError(e);
+      if (!silent) state = DataError<T, E>(e as E);
       if (!completer.isCompleted) {
         completer.completeError(e);
       }
@@ -113,9 +113,9 @@ abstract class DataNotifier<T, Arg extends Record>
   }
 
   @override
-  DataState<T> build() {
+  DataState<T, E> build() {
     _getData(arg);
-    return DataLoading<T>();
+    return DataLoading<T, E>();
   }
 
   Future<void> reload() => _getData(arg);

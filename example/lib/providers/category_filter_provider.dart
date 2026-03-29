@@ -4,6 +4,10 @@ import '../models/note.dart';
 
 part 'category_filter_provider.craft.dart';
 
+typedef XXX = List<NoteCategory>;
+
 @provider
 @settable
-NoteCategory categoryFilter(Ref ref) => NoteCategory.all;
+NoteCategory categoryFilter(Ref ref) {
+  return NoteCategory.all;
+}

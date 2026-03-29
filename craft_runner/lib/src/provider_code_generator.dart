@@ -90,9 +90,22 @@ ${_buildExtensions()}
       final pagedCreateCall = familyParams.isEmpty
           ? ''
           : ', ${createCallArgs}';
-      final buildPagedLine = _info.hasPagedMapper
-          ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await create(page$pagedCreateCall));'
-          : 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => create(page$pagedCreateCall);';
+      final pagedCallExpr = _info.hasPagedMapper
+          ? 'pagedMapper(await create(page$pagedCreateCall))'
+          : 'await create(page$pagedCreateCall)';
+      final et = _info.errorType;
+      final buildPagedLine = et != null
+          ? '''Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async {
+    try {
+      return $pagedCallExpr;
+    } catch (e, st) {
+      if (e is $et) throw Expected<$et>(e);
+      throw Unexpected<$et>(e, st);
+    }
+  }'''
+          : _info.hasPagedMapper
+              ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await create(page$pagedCreateCall));'
+              : 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => create(page$pagedCreateCall);';
       return '''
 abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, $classArgType> {
   Paged<${_info.dataType}> create(int page${familyParams.isEmpty ? '' : ', $createParamSig'});
@@ -111,14 +124,15 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent())
       final buildMethodName = isFuture
           ? 'buildDataWithFuture'
           : 'buildDataWithStream';
+      final errorTypeParam = _info.errorType != null ? ', CraftError<${_info.errorType}>' : '';
       return '''
-abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, $classArgType> {
+abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, $classArgType$errorTypeParam> {
   @override
   bool get isFuture => $isFuture;
 
   ${_info.returnName} create($createParamSig);
   @override
-  ${_info.returnName} $buildMethodName() => create($dataCreateCall);
+  ${_info.returnName} $buildMethodName()${_buildErrorWrappedBody(dataCreateCall, isFuture: isFuture)}
 
 ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent()).join('\n')}
 }''';
@@ -187,9 +201,22 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent())
       if (paramsCallPaged.isNotEmpty) pagedPieces.add(paramsCallPaged);
       final pagedFunctionCall = '${_info.functionName}(${pagedPieces.join(', ')})';
 
-      final functionalBuildLine = _info.hasPagedMapper
-          ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await $pagedFunctionCall);'
-          : 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => $pagedFunctionCall;';
+      final pagedExpr = _info.hasPagedMapper
+          ? 'pagedMapper(await $pagedFunctionCall)'
+          : 'await $pagedFunctionCall';
+      final et = _info.errorType;
+      final functionalBuildLine = et != null
+          ? '''Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async {
+    try {
+      return $pagedExpr;
+    } catch (e, st) {
+      if (e is $et) throw Expected<$et>(e);
+      throw Unexpected<$et>(e, st);
+    }
+  }'''
+          : _info.hasPagedMapper
+              ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await $pagedFunctionCall);'
+              : 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => $pagedFunctionCall;';
       return '''
 class ${_info.notifierType} extends $controllerType<${_info.dataType}, $dataArgType> {
   @override
@@ -205,13 +232,14 @@ class ${_info.notifierType} extends $controllerType<${_info.dataType}, $dataArgT
       final buildMethodName = isFuture
           ? 'buildDataWithFuture'
           : 'buildDataWithStream';
+      final errorTypeParam = _info.errorType != null ? ', CraftError<${_info.errorType}>' : '';
       return '''
-class ${_info.notifierType} extends $controllerType<${_info.dataType}, $dataArgType> {
+class ${_info.notifierType} extends $controllerType<${_info.dataType}, $dataArgType$errorTypeParam> {
   @override
   bool get isFuture => $isFuture;
 
   @override
-  ${_info.returnName} $buildMethodName() => $functionCall;
+  ${_info.returnName} $buildMethodName()${_buildErrorWrappedBodyFunctional(functionCall, isFuture: isFuture)}
 }''';
     }
 
@@ -389,6 +417,63 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
   ${_widgetFacadeClassName()}Callable get ${_info.providerVarName} =>
       ${_widgetFacadeClassName()}Callable(this);
 }''';
+    }
+  }
+
+  // Typed error is handled by DataState<T, E> directly — no facade methods needed.
+
+  /// Generates the body for buildDataWithFuture/buildDataWithStream.
+  /// When errorType is set, wraps in try/catch that produces Expected/Unexpected.
+  String _buildErrorWrappedBody(String createCallArgs, {bool isFuture = true}) {
+    final et = _info.errorType;
+    if (et == null) {
+      return ' => create($createCallArgs);';
+    }
+
+    if (isFuture) {
+      return ''' async {
+    try {
+      return await create($createCallArgs);
+    } catch (e, st) {
+      if (e is $et) throw Expected<$et>(e);
+      throw Unexpected<$et>(e, st);
+    }
+  }''';
+    } else {
+      // Stream — wrap with handleError
+      return ''' {
+    return create($createCallArgs).handleError((e, st) {
+      if (e is $et) throw Expected<$et>(e);
+      throw Unexpected<$et>(e, st);
+    });
+  }''';
+    }
+  }
+
+  /// Same as [_buildErrorWrappedBody] but for functional providers where
+  /// we have the full function call string.
+  String _buildErrorWrappedBodyFunctional(String functionCall, {bool isFuture = true}) {
+    final et = _info.errorType;
+    if (et == null) {
+      return ' => $functionCall;';
+    }
+
+    if (isFuture) {
+      return ''' async {
+    try {
+      return await $functionCall;
+    } catch (e, st) {
+      if (e is $et) throw Expected<$et>(e);
+      throw Unexpected<$et>(e, st);
+    }
+  }''';
+    } else {
+      return ''' {
+    return $functionCall.handleError((e, st) {
+      if (e is $et) throw Expected<$et>(e);
+      throw Unexpected<$et>(e, st);
+    });
+  }''';
     }
   }
 

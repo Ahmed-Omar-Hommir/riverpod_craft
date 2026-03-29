@@ -1,4 +1,5 @@
 export 'src/annotations.dart';
+export 'src/craft_error.dart';
 export 'src/result.dart';
 export 'src/data_provider/data_provider_facade.dart';
 export 'src/data_provider/state_data/state_data_notifier.dart';

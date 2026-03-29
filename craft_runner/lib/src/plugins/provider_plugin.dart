@@ -83,6 +83,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
       commands: commands,
       publicMethods: publicMethods,
       hasPagedMapper: providerType == ProviderType.paged && CraftConfig.hasPagedMapper,
+      errorType: extractErrorType(classInfo.annotations),
     );
   }
 
@@ -135,6 +136,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
       requiresRef: requiresRef,
       isSettable: functionInfo.hasAnnotation('settable'),
       hasPagedMapper: providerType == ProviderType.paged && CraftConfig.hasPagedMapper,
+      errorType: extractErrorType(functionInfo.annotations),
       publicMethods: const <PublicMethod>[],
     );
   }
@@ -142,6 +144,15 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
+
+  /// Extracts the error type from `@ErrorResult(MyError)` annotation.
+  /// Returns `null` if no `@ErrorResult` is present.
+  String? extractErrorType(List<AnnotationInfo> annotations) {
+    final errorResult = annotations.where((a) => a.name == 'ErrorResult').firstOrNull;
+    if (errorResult == null) return null;
+    if (errorResult.positionalArguments.isEmpty) return null;
+    return errorResult.positionalArguments.first;
+  }
 
   /// Extracts the generic type from `Future<T>`, `Stream<T>`, `Paged<T>`,
   /// `Future<PaginatedResponse<T>>`, or returns as-is.

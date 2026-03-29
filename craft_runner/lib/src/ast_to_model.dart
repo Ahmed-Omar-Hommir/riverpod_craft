@@ -146,17 +146,21 @@ List<ParameterInfo> _convertParameters(FormalParameterList? parameters) {
 List<AnnotationInfo> _convertAnnotations(NodeList<Annotation> metadata) {
   return metadata.map((annotation) {
     final args = <String, String>{};
+    final positionalArgs = <String>[];
     final arguments = annotation.arguments;
     if (arguments != null) {
       for (final arg in arguments.arguments) {
         if (arg is NamedExpression) {
           args[arg.name.label.name] = arg.expression.toSource();
+        } else {
+          positionalArgs.add(arg.toSource());
         }
       }
     }
     return AnnotationInfo(
       name: annotation.name.name,
       arguments: args,
+      positionalArguments: positionalArgs,
     );
   }).toList();
 }

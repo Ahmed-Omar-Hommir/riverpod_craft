@@ -30,6 +30,7 @@ class ProviderInfo {
     this.requiresRef = false,
     this.isSettable = false,
     this.hasPagedMapper = false,
+    this.errorType,
     this.allProviderVarNames = const [],
     this.publicMethods = const [],
   }) : _dataType = dataType;
@@ -45,6 +46,7 @@ class ProviderInfo {
   final bool requiresRef;
   final bool isSettable;
   final bool hasPagedMapper;
+  final String? errorType;
   final List<String> allProviderVarNames;
   final List<PublicMethod> publicMethods;
 
@@ -65,6 +67,8 @@ class ProviderInfo {
       return dataType;
     } else if (type == ProviderType.paged) {
       return 'PagedDataState<$dataType>';
+    } else if (errorType != null) {
+      return 'DataState<$dataType, CraftError<$errorType>>';
     } else {
       return 'DataState<$dataType>';
     }

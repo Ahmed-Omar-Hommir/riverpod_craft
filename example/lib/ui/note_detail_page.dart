@@ -129,7 +129,7 @@ class _NoteDetailPageState extends ConsumerState<NoteDetailPage> {
       floatingActionButton: !_isEditing && detailState.isData
           ? FloatingActionButton(
               onPressed: () =>
-                  _startEditing((detailState as DataSuccess<Note>).data),
+                  _startEditing((detailState as DataSuccess<Note, Object>).data),
               child: const Icon(Icons.edit),
             )
           : null,

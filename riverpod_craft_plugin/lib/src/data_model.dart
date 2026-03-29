@@ -2,10 +2,15 @@ import 'parameter_info.dart';
 
 /// Metadata about a Dart annotation (e.g., `@provider`, `@command`).
 class AnnotationInfo {
-  const AnnotationInfo({required this.name, this.arguments = const {}});
+  const AnnotationInfo({
+    required this.name,
+    this.arguments = const {},
+    this.positionalArguments = const [],
+  });
 
   final String name;
   final Map<String, String> arguments;
+  final List<String> positionalArguments;
 }
 
 /// Metadata about a class method.

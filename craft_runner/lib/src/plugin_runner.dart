@@ -82,6 +82,7 @@ class PluginRunner {
         requiresRef: info.requiresRef,
         isSettable: info.isSettable,
         hasPagedMapper: info.hasPagedMapper,
+        errorType: info.errorType,
         allProviderVarNames: allVarNames,
         publicMethods: info.publicMethods,
       );

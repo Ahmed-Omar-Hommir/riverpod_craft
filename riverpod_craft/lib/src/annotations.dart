@@ -38,3 +38,18 @@ class SettableAnnotation {
 }
 
 const settable = SettableAnnotation();
+
+/// Declares the expected error type for a provider or command.
+///
+/// When an exception is thrown that matches this type, it becomes [Expected].
+/// Any other exception becomes [Unexpected].
+///
+/// ```dart
+/// @provider
+/// @ErrorResult(MyError)
+/// Future<String> name(Ref ref) async { ... }
+/// ```
+class ErrorResult {
+  const ErrorResult(this.type);
+  final Type type;
+}
