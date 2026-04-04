@@ -27,7 +27,19 @@ const sidebars: SidebarsConfig = {
         'reference/cli',
       ],
     },
-    'examples',
+    {
+      type: 'category',
+      label: 'Examples',
+      collapsed: false,
+      link: {type: 'doc', id: 'examples/index'},
+      items: [
+        'examples/counter',
+        'examples/quote',
+        'examples/notes',
+        'examples/movies-app',
+        'examples/command-strategies',
+      ],
+    },
   ],
 };
 
