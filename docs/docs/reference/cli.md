@@ -10,7 +10,7 @@ Add `craft_runner` as a dev dependency:
 
 ```yaml
 dev_dependencies:
-  craft_runner: ^0.1.0
+  craft_runner: ^0.2.0
 ```
 
 ## Commands

@@ -9,11 +9,11 @@ sidebar_position: 2
 ```yaml
 # pubspec.yaml
 dependencies:
-  riverpod_craft: ^0.1.0
+  riverpod_craft: ^0.2.0
   flutter_riverpod: ^3.1.0
 
 dev_dependencies:
-  craft_runner: ^0.1.0
+  craft_runner: ^0.2.0
 ```
 
 ## 2. Run the generator
