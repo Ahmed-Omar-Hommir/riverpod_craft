@@ -1,3 +1,7 @@
+## 0.2.0
+
+- Version bump to align with riverpod_craft 0.2.0
+
 ## 0.1.0
 
 - Initial release

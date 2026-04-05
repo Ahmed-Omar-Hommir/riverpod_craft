@@ -1,3 +1,8 @@
+## 0.2.0
+
+- Generate `updateState()` inside `@settable` notifier classes instead of base class
+- Removed logging plugin from notes example
+
 ## 0.1.1
 
 - Fix: add explicit type parameters to `NotifierProvider` declarations

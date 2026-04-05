@@ -1,3 +1,10 @@
+## 0.2.0
+
+- Removed `setState()` and `updateState()` from `StateDataNotifier` base class
+- `@settable` providers now generate `updateState()` in the notifier class directly
+- Added examples documentation: counter, quote, notes, movies_app, command_strategies
+- Renamed arcade example to command_strategies
+
 ## 0.1.1
 
 - Generated files now use `.craft.dart` extension instead of `.pg.dart`
