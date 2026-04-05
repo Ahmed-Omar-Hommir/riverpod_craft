@@ -120,7 +120,7 @@ class FileProcessor {
 
       _fileContentCache[file.path] = effectiveContents;
 
-      final fullContent = "part of '$fileName';\n$pagedPreamble\n$generatedContent";
+      final fullContent = "// GENERATED CODE - DO NOT MODIFY BY HAND\n// ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member\npart of '$fileName';\n$pagedPreamble\n$generatedContent";
 
       final formatter = DartFormatter(
         languageVersion: DartFormatter.latestLanguageVersion,

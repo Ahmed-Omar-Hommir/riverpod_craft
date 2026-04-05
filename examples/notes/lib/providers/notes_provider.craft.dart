@@ -1,3 +1,5 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
 part of 'notes_provider.dart';
 
 abstract class _$Notes extends DataNotifier<List<Note>, ()> {

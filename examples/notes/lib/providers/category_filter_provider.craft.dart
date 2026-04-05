@@ -1,3 +1,5 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
 part of 'category_filter_provider.dart';
 
 final _categoryFilterProvider =
@@ -9,9 +11,6 @@ final _categoryFilterProvider =
 class $$CategoryFilter extends StateDataNotifier<NoteCategory, ()> {
   @override
   NoteCategory buildData(() arg) => categoryFilter(ref);
-  void updateState(NoteCategory value) {
-    state = value;
-  }
 }
 
 class $CategoryFilterFacadeRef {
@@ -29,7 +28,7 @@ class $CategoryFilterFacadeRef {
   void invalidate() => _ref.invalidate(_provider);
 
   void setState(NoteCategory value) =>
-      _ref.read(_provider.notifier).updateState(value);
+      _ref.read(_provider.notifier).state = value;
 
   void listen(
     void Function(NoteCategory? previous, NoteCategory next) listener, {
@@ -54,7 +53,7 @@ class $CategoryFilterFacadeWidget {
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
 
   void setState(NoteCategory value) =>
-      _ref.read(_provider.notifier).updateState(value);
+      _ref.read(_provider.notifier).state = value;
 
   void listen(
     void Function(NoteCategory? previous, NoteCategory next) listener, {

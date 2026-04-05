@@ -217,13 +217,10 @@ class ${_info.notifierType} extends $controllerType<${_info.dataType}, $dataArgT
 
     // For StateDataNotifier (sync providers) - use same pattern as Future/Stream
     final syncArgType = _info.params.isNotEmpty ? nonFamilyRecordType : '()';
-    final updateStateMethod = _info.isSettable
-        ? '\n  void updateState(${_info.dataType} value) { state = value; }'
-        : '';
     return '''
 class ${_info.notifierType} extends $controllerType<${_info.dataType}, $syncArgType> {
   @override
-  ${_info.returnName} buildData($syncArgType arg) => $functionCall;$updateStateMethod
+  ${_info.returnName} buildData($syncArgType arg) => $functionCall;
 }''';
   }
 
@@ -268,7 +265,7 @@ class ${_info.notifierType} extends $controllerType<${_info.dataType}, $syncArgT
     // Add setState for sync providers only with @settable
     final hasSetState = _info.type == ProviderType.sync && _info.isSettable;
     final setStateMethod = hasSetState
-        ? 'void setState(${_info.dataType} value) => _ref.read(_provider.notifier).updateState(value);'
+        ? 'void setState(${_info.dataType} value) => _ref.read(_provider.notifier).state = value;'
         : '';
 
     // Paged providers get fetchNextPage() and reload()
@@ -316,7 +313,7 @@ class ${_refFacadeClassName()} {
     // Add setState for sync providers only with @settable
     final hasSetState = _info.type == ProviderType.sync && _info.isSettable;
     final setStateMethod = hasSetState
-        ? 'void setState(${_info.dataType} value) => _ref.read(_provider.notifier).updateState(value);'
+        ? 'void setState(${_info.dataType} value) => _ref.read(_provider.notifier).state = value;'
         : '';
 
     return '''
@@ -433,7 +430,7 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
 
     // Add setState for sync providers only with @settable
     final setStateMethod = _info.type == ProviderType.sync && _info.isSettable
-        ? 'void setState(${_info.dataType} value) => _ref.read(_provider.notifier).updateState(value);'
+        ? 'void setState(${_info.dataType} value) => _ref.read(_provider.notifier).state = value;'
         : '';
 
     final argRecordTypeForData = _info.params.isEmpty

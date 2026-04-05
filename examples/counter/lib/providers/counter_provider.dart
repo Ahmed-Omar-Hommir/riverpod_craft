@@ -13,12 +13,12 @@ class BoundedCounter extends _$BoundedCounter {
 
   void decrement() {
     if (state == 0) return;
-    state--;
+    state = state - 1;
   }
 
   void increment() {
     if (state < 0) return;
-    state++;
+    state = state + 1;
   }
 
   void reset() {

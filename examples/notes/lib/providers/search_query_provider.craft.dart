@@ -1,3 +1,5 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
 part of 'search_query_provider.dart';
 
 final _searchQueryProvider = NotifierProvider<$$SearchQuery, String>(
@@ -8,9 +10,6 @@ final _searchQueryProvider = NotifierProvider<$$SearchQuery, String>(
 class $$SearchQuery extends StateDataNotifier<String, ()> {
   @override
   String buildData(() arg) => searchQuery(ref);
-  void updateState(String value) {
-    state = value;
-  }
 }
 
 class $SearchQueryFacadeRef {
@@ -27,8 +26,7 @@ class $SearchQueryFacadeRef {
 
   void invalidate() => _ref.invalidate(_provider);
 
-  void setState(String value) =>
-      _ref.read(_provider.notifier).updateState(value);
+  void setState(String value) => _ref.read(_provider.notifier).state = value;
 
   void listen(
     void Function(String? previous, String next) listener, {
@@ -51,8 +49,7 @@ class $SearchQueryFacadeWidget {
   SelectedWidgetRefFacade<R> select<R>(R Function(String state) selector) =>
       SelectedWidgetRefFacade(_ref, _provider.select(selector));
 
-  void setState(String value) =>
-      _ref.read(_provider.notifier).updateState(value);
+  void setState(String value) => _ref.read(_provider.notifier).state = value;
 
   void listen(
     void Function(String? previous, String next) listener, {

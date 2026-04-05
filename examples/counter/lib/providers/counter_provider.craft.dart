@@ -1,3 +1,5 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
 part of 'counter_provider.dart';
 
 final _counterProvider = NotifierProvider<$$Counter, int>(
@@ -8,9 +10,6 @@ final _counterProvider = NotifierProvider<$$Counter, int>(
 class $$Counter extends StateDataNotifier<int, ()> {
   @override
   int buildData(() arg) => counter(ref);
-  void updateState(int value) {
-    state = value;
-  }
 }
 
 class $CounterFacadeRef {
@@ -27,7 +26,7 @@ class $CounterFacadeRef {
 
   void invalidate() => _ref.invalidate(_provider);
 
-  void setState(int value) => _ref.read(_provider.notifier).updateState(value);
+  void setState(int value) => _ref.read(_provider.notifier).state = value;
 
   void listen(
     void Function(int? previous, int next) listener, {
@@ -50,7 +49,7 @@ class $CounterFacadeWidget {
   SelectedWidgetRefFacade<R> select<R>(R Function(int state) selector) =>
       SelectedWidgetRefFacade(_ref, _provider.select(selector));
 
-  void setState(int value) => _ref.read(_provider.notifier).updateState(value);
+  void setState(int value) => _ref.read(_provider.notifier).state = value;
 
   void listen(
     void Function(int? previous, int next) listener, {
