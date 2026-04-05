@@ -1,3 +1,9 @@
+## 0.2.2
+
+- Add `map`, `maybeMap`, `mapOrNull` pattern matching to all state types
+- Supported on: `DataState`, `CommandState`, `ArgCommandState`, `AsynchronousState`
+- Nullable extensions also support `map` family for `CommandState?` and `ArgCommandState?`
+
 ## 0.2.1
 
 - `@settable` facades now use `state = value` directly instead of `updateState()` bridge

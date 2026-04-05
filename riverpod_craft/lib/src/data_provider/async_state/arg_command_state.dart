@@ -78,6 +78,49 @@ sealed class ArgCommandState<T, ArgT extends Record>
     };
   }
 
+  R map<R>({
+    required R Function(ArgCommandInit<T, ArgT> state) init,
+    required R Function(ArgCommandLoading<T, ArgT> state) loading,
+    required R Function(ArgCommandData<T, ArgT> state) data,
+    required R Function(ArgCommandError<T, ArgT> state) error,
+  }) {
+    return switch (this) {
+      ArgCommandInit<T, ArgT>() && final s => init(s),
+      ArgCommandLoading<T, ArgT>() && final s => loading(s),
+      ArgCommandData<T, ArgT>() && final s => data(s),
+      ArgCommandError<T, ArgT>() && final s => error(s),
+    };
+  }
+
+  R maybeMap<R>({
+    R Function(ArgCommandInit<T, ArgT> state)? init,
+    R Function(ArgCommandLoading<T, ArgT> state)? loading,
+    R Function(ArgCommandData<T, ArgT> state)? data,
+    R Function(ArgCommandError<T, ArgT> state)? error,
+    required R Function() orElse,
+  }) {
+    return switch (this) {
+      ArgCommandInit<T, ArgT>() && final s => init != null ? init(s) : orElse(),
+      ArgCommandLoading<T, ArgT>() && final s => loading != null ? loading(s) : orElse(),
+      ArgCommandData<T, ArgT>() && final s => data != null ? data(s) : orElse(),
+      ArgCommandError<T, ArgT>() && final s => error != null ? error(s) : orElse(),
+    };
+  }
+
+  R? mapOrNull<R>({
+    R Function(ArgCommandInit<T, ArgT> state)? init,
+    R Function(ArgCommandLoading<T, ArgT> state)? loading,
+    R Function(ArgCommandData<T, ArgT> state)? data,
+    R Function(ArgCommandError<T, ArgT> state)? error,
+  }) {
+    return switch (this) {
+      ArgCommandInit<T, ArgT>() && final s => init?.call(s),
+      ArgCommandLoading<T, ArgT>() && final s => loading?.call(s),
+      ArgCommandData<T, ArgT>() && final s => data?.call(s),
+      ArgCommandError<T, ArgT>() && final s => error?.call(s),
+    };
+  }
+
   R when<R>({
     required R Function() init,
     required R Function(ArgT arg) loading,
@@ -203,6 +246,52 @@ extension NullableArgCommandStateExtension<T, ArgT extends Record>
     final self = this;
     if (self == null) return null;
     return self.error;
+  }
+
+  R map<R>({
+    required R Function(ArgCommandInit<T, ArgT> state) init,
+    required R Function(ArgCommandLoading<T, ArgT> state) loading,
+    required R Function(ArgCommandData<T, ArgT> state) data,
+    required R Function(ArgCommandError<T, ArgT> state) error,
+    required R Function() orNull,
+  }) {
+    final self = this;
+    if (self == null) return orNull();
+    return self.map(init: init, loading: loading, data: data, error: error);
+  }
+
+  R maybeMap<R>({
+    R Function(ArgCommandInit<T, ArgT> state)? init,
+    R Function(ArgCommandLoading<T, ArgT> state)? loading,
+    R Function(ArgCommandData<T, ArgT> state)? data,
+    R Function(ArgCommandError<T, ArgT> state)? error,
+    required R Function() orElse,
+  }) {
+    final self = this;
+    if (self == null) return orElse();
+    return self.maybeMap(
+      init: init,
+      loading: loading,
+      data: data,
+      error: error,
+      orElse: orElse,
+    );
+  }
+
+  R? mapOrNull<R>({
+    R Function(ArgCommandInit<T, ArgT> state)? init,
+    R Function(ArgCommandLoading<T, ArgT> state)? loading,
+    R Function(ArgCommandData<T, ArgT> state)? data,
+    R Function(ArgCommandError<T, ArgT> state)? error,
+  }) {
+    final self = this;
+    if (self == null) return null;
+    return self.mapOrNull(
+      init: init,
+      loading: loading,
+      data: data,
+      error: error,
+    );
   }
 
   R when<R>({

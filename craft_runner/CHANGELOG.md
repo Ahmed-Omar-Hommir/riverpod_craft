@@ -1,3 +1,7 @@
+## 0.2.2
+
+- Version bump to align with riverpod_craft 0.2.2
+
 ## 0.2.1
 
 - Remove `updateState()` from generated notifier classes

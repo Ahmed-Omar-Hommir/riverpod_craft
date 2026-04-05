@@ -83,6 +83,43 @@ extension DataStateExtension<T> on DataState<T> {
     };
   }
 
+  R map<R>({
+    required R Function(DataLoading<T> state) loading,
+    required R Function(DataSuccess<T> state) data,
+    required R Function(DataError<T> state) error,
+  }) {
+    return switch (this) {
+      DataLoading<T>() && final s => loading(s),
+      DataSuccess<T>() && final s => data(s),
+      DataError<T>() && final s => error(s),
+    };
+  }
+
+  R maybeMap<R>({
+    R Function(DataLoading<T> state)? loading,
+    R Function(DataSuccess<T> state)? data,
+    R Function(DataError<T> state)? error,
+    required R Function() orElse,
+  }) {
+    return switch (this) {
+      DataLoading<T>() && final s => loading != null ? loading(s) : orElse(),
+      DataSuccess<T>() && final s => data != null ? data(s) : orElse(),
+      DataError<T>() && final s => error != null ? error(s) : orElse(),
+    };
+  }
+
+  R? mapOrNull<R>({
+    R Function(DataLoading<T> state)? loading,
+    R Function(DataSuccess<T> state)? data,
+    R Function(DataError<T> state)? error,
+  }) {
+    return switch (this) {
+      DataLoading<T>() && final s => loading?.call(s),
+      DataSuccess<T>() && final s => data?.call(s),
+      DataError<T>() && final s => error?.call(s),
+    };
+  }
+
   bool get isLoading => this is DataLoading<T>;
   bool get isData => this is DataSuccess<T>;
   bool get isError => this is DataError<T>;
