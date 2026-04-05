@@ -48,14 +48,14 @@ class Cart extends _$Cart {
   List<CartItem> create() => [];
 
   void addItem(CartItem item) {
-    setState([...state, item]);
+    state = [...state, item];
   }
 
   void removeItem(String itemId) {
-    setState(state.where((item) => item.id != itemId).toList());
+    state = state.where((item) => item.id != itemId).toList();
   }
 
-  void clear() => setState([]);
+  void clear() => state = [];
 }
 ```
 

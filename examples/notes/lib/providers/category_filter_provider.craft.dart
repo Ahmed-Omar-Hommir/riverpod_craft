@@ -9,6 +9,9 @@ final _categoryFilterProvider =
 class $$CategoryFilter extends StateDataNotifier<NoteCategory, ()> {
   @override
   NoteCategory buildData(() arg) => categoryFilter(ref);
+  void updateState(NoteCategory value) {
+    state = value;
+  }
 }
 
 class $CategoryFilterFacadeRef {

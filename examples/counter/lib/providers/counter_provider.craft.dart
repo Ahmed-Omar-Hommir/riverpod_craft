@@ -8,6 +8,9 @@ final _counterProvider = NotifierProvider<$$Counter, int>(
 class $$Counter extends StateDataNotifier<int, ()> {
   @override
   int buildData(() arg) => counter(ref);
+  void updateState(int value) {
+    state = value;
+  }
 }
 
 class $CounterFacadeRef {

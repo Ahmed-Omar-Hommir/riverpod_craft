@@ -8,6 +8,9 @@ final _searchQueryProvider = NotifierProvider<$$SearchQuery, String>(
 class $$SearchQuery extends StateDataNotifier<String, ()> {
   @override
   String buildData(() arg) => searchQuery(ref);
+  void updateState(String value) {
+    state = value;
+  }
 }
 
 class $SearchQueryFacadeRef {

@@ -217,10 +217,13 @@ class ${_info.notifierType} extends $controllerType<${_info.dataType}, $dataArgT
 
     // For StateDataNotifier (sync providers) - use same pattern as Future/Stream
     final syncArgType = _info.params.isNotEmpty ? nonFamilyRecordType : '()';
+    final updateStateMethod = _info.isSettable
+        ? '\n  void updateState(${_info.dataType} value) { state = value; }'
+        : '';
     return '''
 class ${_info.notifierType} extends $controllerType<${_info.dataType}, $syncArgType> {
   @override
-  ${_info.returnName} buildData($syncArgType arg) => $functionCall;
+  ${_info.returnName} buildData($syncArgType arg) => $functionCall;$updateStateMethod
 }''';
   }
 

@@ -8,6 +8,9 @@ final _selectedGenreProvider = NotifierProvider<$$SelectedGenre, int?>(
 class $$SelectedGenre extends StateDataNotifier<int?, ()> {
   @override
   int? buildData(() arg) => selectedGenre(ref);
+  void updateState(int? value) {
+    state = value;
+  }
 }
 
 class $SelectedGenreFacadeRef {
