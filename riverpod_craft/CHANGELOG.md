@@ -1,3 +1,9 @@
+## 0.2.1
+
+- `@settable` facades now use `state = value` directly instead of `updateState()` bridge
+- Generated files include `// GENERATED CODE - DO NOT MODIFY BY HAND` header
+- Added `ignore_for_file` directives to suppress protected member warnings
+
 ## 0.2.0
 
 - Removed `setState()` and `updateState()` from `StateDataNotifier` base class

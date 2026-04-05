@@ -1,3 +1,10 @@
+## 0.2.1
+
+- Remove `updateState()` from generated notifier classes
+- `setState` in facades now uses `.state = value` directly
+- Generated files include `// GENERATED CODE - DO NOT MODIFY BY HAND` header
+- Added `ignore_for_file` directives for protected member warnings
+
 ## 0.2.0
 
 - Generate `updateState()` inside `@settable` notifier classes instead of base class
