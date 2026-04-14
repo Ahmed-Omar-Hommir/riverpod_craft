@@ -37,20 +37,25 @@ class $CounterFacadeRef {
   }
 }
 
-class $CounterFacadeWidget {
+class $CounterFacadeWidget implements ProviderFacade<int>, ProviderValue<int> {
   $CounterFacadeWidget(this._ref);
   final WidgetRef _ref;
 
   late final _provider = _counterProvider;
 
+  @override
   int read() => _ref.read(_provider);
+  @override
   int watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(R Function(int state) selector) =>
       SelectedWidgetRefFacade(_ref, _provider.select(selector));
+  @override
+  void invalidate() => _ref.invalidate(_provider);
 
   void setState(int value) => _ref.read(_provider.notifier).state = value;
 
+  @override
   void listen(
     void Function(int? previous, int next) listener, {
     void Function(Object, StackTrace)? onError,
@@ -58,6 +63,9 @@ class $CounterFacadeWidget {
   }) {
     _ref.listen<int>(_provider, listener, onError: onError);
   }
+
+  @override
+  ProviderFacade<int> of(WidgetRef ref) => $CounterFacadeWidget(ref);
 }
 
 extension CounterFacadeRefEx on Ref {
@@ -108,18 +116,24 @@ class $BoundedCounterFacadeRef {
   void reset() => _ref.read(_provider.notifier).reset();
 }
 
-class $BoundedCounterFacadeWidget {
+class $BoundedCounterFacadeWidget
+    implements ProviderFacade<int>, ProviderValue<int> {
   $BoundedCounterFacadeWidget(this._ref);
   final WidgetRef _ref;
 
   late final _provider = _boundedCounterProvider;
 
+  @override
   int read() => _ref.read(_provider);
+  @override
   int watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(R Function(int state) selector) =>
       SelectedWidgetRefFacade(_ref, _provider.select(selector));
+  @override
+  void invalidate() => _ref.invalidate(_provider);
 
+  @override
   void listen(
     void Function(int? previous, int next) listener, {
     void Function(Object, StackTrace)? onError,
@@ -127,6 +141,9 @@ class $BoundedCounterFacadeWidget {
   }) {
     _ref.listen<int>(_provider, listener, onError: onError);
   }
+
+  @override
+  ProviderFacade<int> of(WidgetRef ref) => $BoundedCounterFacadeWidget(ref);
 
   void decrement() => _ref.read(_provider.notifier).decrement();
 

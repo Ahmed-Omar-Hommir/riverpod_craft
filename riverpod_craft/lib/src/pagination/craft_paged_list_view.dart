@@ -1,9 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-
-import 'paged_data_provider_facade.dart';
+import 'package:riverpod_craft/riverpod_craft.dart';
 
 /// A paginated list view that works with riverpod_craft paginated providers.
 ///
@@ -72,10 +69,10 @@ class CraftPagedListView<T> extends ConsumerStatefulWidget {
   final Widget Function(BuildContext context)? emptyBuilder;
   final Widget Function(BuildContext context)? firstPageLoadingBuilder;
   final Widget Function(BuildContext context, Object? error)?
-      firstPageErrorBuilder;
+  firstPageErrorBuilder;
   final Widget Function(BuildContext context)? newPageLoadingBuilder;
   final Widget Function(BuildContext context, Object? error)?
-      newPageErrorBuilder;
+  newPageErrorBuilder;
 
   final EdgeInsetsGeometry? padding;
   final ScrollController? scrollController;
@@ -92,10 +89,9 @@ class CraftPagedListView<T> extends ConsumerStatefulWidget {
       _CraftPagedListViewState<T>();
 }
 
-class _CraftPagedListViewState<T>
-    extends ConsumerState<CraftPagedListView<T>> {
+class _CraftPagedListViewState<T> extends ConsumerState<CraftPagedListView<T>> {
   late PagingController<int, T> _pagingController;
-  late PagedDataProviderFacade<T> _facade;
+  late PagedProviderFacade<T> _facade;
 
   @override
   void initState() {
@@ -196,10 +192,10 @@ class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
   final Widget Function(BuildContext context)? emptyBuilder;
   final Widget Function(BuildContext context)? firstPageLoadingBuilder;
   final Widget Function(BuildContext context, Object? error)?
-      firstPageErrorBuilder;
+  firstPageErrorBuilder;
   final Widget Function(BuildContext context)? newPageLoadingBuilder;
   final Widget Function(BuildContext context, Object? error)?
-      newPageErrorBuilder;
+  newPageErrorBuilder;
 
   @override
   ConsumerState<CraftPagedSliverListView<T>> createState() =>
@@ -209,7 +205,7 @@ class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
 class _CraftPagedSliverListViewState<T>
     extends ConsumerState<CraftPagedSliverListView<T>> {
   late PagingController<int, T> _pagingController;
-  late PagedDataProviderFacade<T> _facade;
+  late PagedProviderFacade<T> _facade;
 
   @override
   void initState() {

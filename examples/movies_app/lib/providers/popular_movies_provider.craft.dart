@@ -52,7 +52,7 @@ class $PopularMoviesFacadeRef {
 }
 
 class $PopularMoviesFacadeWidget
-    implements PagedDataProviderFacade<Movie>, PagedProviderValue<Movie> {
+    implements PagedProviderFacade<Movie>, PagedProviderValue<Movie> {
   $PopularMoviesFacadeWidget(this._ref, this._arg);
   final WidgetRef _ref;
   final ({int? genreId}) _arg;
@@ -85,7 +85,7 @@ class $PopularMoviesFacadeWidget
   }
 
   @override
-  PagedDataProviderFacade<Movie> of(WidgetRef ref) =>
+  PagedProviderFacade<Movie> of(WidgetRef ref) =>
       $PopularMoviesFacadeWidget(ref, _arg);
 }
 

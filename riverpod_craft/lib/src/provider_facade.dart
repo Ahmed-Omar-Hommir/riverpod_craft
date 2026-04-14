@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/misc.dart' show ProviderListenable;
 
-import 'async_state/async_state.dart';
+import 'data_provider/async_state/async_state.dart';
+import 'pagination/paged_data_state.dart';
+
+// ─── Selected facades ────────────────────────────────────────────────
 
 /// A facade for selected provider state that supports chained select syntax:
 /// `ref.myProvider.select((s) => s.isLoading).watch()`
@@ -38,6 +41,28 @@ class SelectedWidgetRefFacade<R> {
   }
 }
 
+// ─── Async base facade ───────────────────────────────────────────────
+
+abstract class AsyncProviderFacade<T, ArgT extends Record> {
+  AsynchronousState<T, ArgT> read();
+  AsynchronousState<T, ArgT> watch();
+  void invalidate();
+
+  void listen(
+    void Function(
+      AsynchronousState<T, ArgT>? previous,
+      AsynchronousState<T, ArgT> next,
+    )
+    listener, {
+    void Function(Object, StackTrace)? onError,
+    bool fireImmediately = false,
+  });
+
+  AsyncProviderFacade<T, ArgT> of(WidgetRef ref);
+}
+
+// ─── Data facade ─────────────────────────────────────────────────────
+
 abstract class DataProviderFacade<T> extends AsyncProviderFacade<T, Record> {
   @override
   DataState<T> read();
@@ -57,6 +82,8 @@ abstract class DataProviderFacade<T> extends AsyncProviderFacade<T, Record> {
     bool fireImmediately = false,
   });
 }
+
+// ─── Command facade ──────────────────────────────────────────────────
 
 abstract class CommandProviderFacade<T, ArgT extends Record>
     extends AsyncProviderFacade<T, ArgT> {
@@ -80,41 +107,33 @@ abstract class CommandProviderFacade<T, ArgT extends Record>
   });
 }
 
-abstract class AsyncProviderFacade<T, ArgT extends Record> {
-  AsynchronousState<T, ArgT> read();
-  AsynchronousState<T, ArgT> watch();
+// ─── Paged data facade ──────────────────────────────────────────────
+
+/// Interface for interacting with a paginated provider's state.
+///
+/// Generated Widget facades implement this.
+abstract class PagedProviderFacade<T> {
+  PagedDataState<T> read();
+  PagedDataState<T> watch();
+  void fetchNextPage();
   void invalidate();
 
   void listen(
-    void Function(
-      AsynchronousState<T, ArgT>? previous,
-      AsynchronousState<T, ArgT> next,
-    )
+    void Function(PagedDataState<T>? previous, PagedDataState<T> next)
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   });
-
-  AsyncProviderFacade<T, ArgT> of(WidgetRef ref);
 }
 
-// Provider Value
-abstract class AsyncProviderValue<
-  T,
-  ArgT extends Record,
-  FacadeT extends AsyncProviderFacade<T, ArgT>
-> {
-  FacadeT of(WidgetRef ref);
-}
+abstract class ProviderFacade<T> {
+  T read();
+  T watch();
+  void invalidate();
 
-abstract class CommandProviderValue<T, ArgT extends Record>
-    implements AsyncProviderValue<T, ArgT, CommandProviderFacade<T, ArgT>> {
-  @override
-  CommandProviderFacade<T, ArgT> of(WidgetRef ref);
-}
-
-abstract class DataProviderValue<T, ArgT extends Record>
-    implements AsyncProviderValue<T, Record, DataProviderFacade<T>> {
-  @override
-  DataProviderFacade<T> of(WidgetRef ref);
+  void listen(
+    void Function(T? previous, T next) listener, {
+    void Function(Object, StackTrace)? onError,
+    bool fireImmediately = false,
+  });
 }

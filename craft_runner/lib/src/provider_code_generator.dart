@@ -87,9 +87,7 @@ ${_buildExtensions()}
 
     // For PagedDataNotifier: buildPagedData(int page) delegates to create(page, ...familyParams...)
     if (_info.type == ProviderType.paged) {
-      final pagedCreateCall = familyParams.isEmpty
-          ? ''
-          : ', ${createCallArgs}';
+      final pagedCreateCall = familyParams.isEmpty ? '' : ', ${createCallArgs}';
       final buildPagedLine = _info.hasPagedMapper
           ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await create(page$pagedCreateCall));'
           : 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => create(page$pagedCreateCall);';
@@ -185,7 +183,8 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent())
       pagedPieces.add('page');
       final paramsCallPaged = _info.params.fromRecordToFunctionCall();
       if (paramsCallPaged.isNotEmpty) pagedPieces.add(paramsCallPaged);
-      final pagedFunctionCall = '${_info.functionName}(${pagedPieces.join(', ')})';
+      final pagedFunctionCall =
+          '${_info.functionName}(${pagedPieces.join(', ')})';
 
       final functionalBuildLine = _info.hasPagedMapper
           ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await $pagedFunctionCall);'
@@ -416,7 +415,9 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
 
   Future<void> reload() => _ref.read(_provider.notifier).reload();'''
         : _info.type == ProviderType.sync
-        ? ''
+        ? '''
+  @override
+  void invalidate() => _ref.invalidate(_provider);'''
         : '''
   @override
   void invalidate() => _ref.invalidate(_provider);
@@ -437,12 +438,12 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
         ? '()'
         : _info.params.toRecordType();
     final implementsClause = _info.type == ProviderType.paged
-        ? ' implements PagedDataProviderFacade<${_info.dataType}>, PagedProviderValue<${_info.dataType}>'
+        ? ' implements PagedProviderFacade<${_info.dataType}>, PagedProviderValue<${_info.dataType}>'
         : _info.type == ProviderType.sync
-        ? ''
+        ? ' implements ProviderFacade<${_info.dataType}>, ProviderValue<${_info.dataType}>'
         : ' implements DataProviderFacade<${_info.dataType}>, DataProviderValue<${_info.dataType}, $argRecordTypeForData>';
 
-    final overrideAnnotations = (_info.type == ProviderType.sync || _info.type == ProviderType.paged)
+    final overrideAnnotations = _info.type == ProviderType.paged
         ? ''
         : '@override\n  ';
 
@@ -450,10 +451,13 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
     final ofMethod = _info.type == ProviderType.paged
         ? '''
   @override
-  PagedDataProviderFacade<${_info.dataType}> of(WidgetRef ref) =>
+  PagedProviderFacade<${_info.dataType}> of(WidgetRef ref) =>
       ${_info.facadeClassName}Widget(ref$ofMethodArg);'''
         : _info.type == ProviderType.sync
-        ? ''
+        ? '''
+  @override
+  ProviderFacade<${_info.dataType}> of(WidgetRef ref) =>
+      ${_info.facadeClassName}Widget(ref$ofMethodArg);'''
         : '''
   @override
   DataProviderFacade<${_info.dataType}> of(WidgetRef ref) =>
@@ -469,8 +473,8 @@ class ${_info.facadeClassName}Widget$implementsClause {
 
   late final _provider = _${_info.providerVarName}${_info.hasArg ? '(_arg)' : ''};
 
-  ${_info.type != ProviderType.sync ? '@override\n  ' : ''}${_info.stateType} read() => _ref.read(_provider);
-  ${_info.type != ProviderType.sync ? '@override\n  ' : ''}${_info.stateType} watch() => _ref.watch(_provider);
+  ${_info.type != ProviderType.paged ? '@override\n  ' : ''}${_info.stateType} read() => _ref.read(_provider);
+  ${_info.type != ProviderType.paged ? '@override\n  ' : ''}${_info.stateType} watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(R Function(${_info.stateType} state) selector) =>
       SelectedWidgetRefFacade(_ref, _provider.select(selector));

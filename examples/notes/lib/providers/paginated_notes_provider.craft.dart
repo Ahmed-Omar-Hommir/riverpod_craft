@@ -82,7 +82,7 @@ class $PaginatedNotesFacadeRef {
 }
 
 class $PaginatedNotesFacadeWidget
-    implements PagedDataProviderFacade<Note>, PagedProviderValue<Note> {
+    implements PagedProviderFacade<Note>, PagedProviderValue<Note> {
   $PaginatedNotesFacadeWidget(this._ref, this._arg);
   final WidgetRef _ref;
   final ({String? category}) _arg;
@@ -115,7 +115,7 @@ class $PaginatedNotesFacadeWidget
   }
 
   @override
-  PagedDataProviderFacade<Note> of(WidgetRef ref) =>
+  PagedProviderFacade<Note> of(WidgetRef ref) =>
       $PaginatedNotesFacadeWidget(ref, _arg);
 
   $DeleteNoteCommandFacadePaginatedNotesWidget get deleteNoteCommand =>

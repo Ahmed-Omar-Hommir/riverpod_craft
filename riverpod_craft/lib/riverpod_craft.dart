@@ -1,6 +1,6 @@
 export 'src/annotations.dart';
 export 'src/result.dart';
-export 'src/data_provider/data_provider_facade.dart';
+export 'src/provider_facade.dart';
 export 'src/data_provider/state_data/state_data_notifier.dart';
 export 'src/data_provider/data_notifier.dart';
 export 'src/command/command.dart';
@@ -8,8 +8,8 @@ export 'src/data_provider/async_state/async_state.dart';
 export 'src/pagination/paginated_response.dart';
 export 'src/pagination/paged_data_state.dart';
 export 'src/pagination/paged_data_notifier.dart';
-export 'src/pagination/paged_data_provider_facade.dart';
 export 'src/pagination/craft_paged_list_view.dart';
 export 'package:riverpod/riverpod.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 export 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+export 'src/provider_value.dart';
