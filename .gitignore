@@ -17,5 +17,5 @@ pubspec.lock
 
 *.history
 
-./tool
-./marketing
+./tool/*
+./marketing/*
