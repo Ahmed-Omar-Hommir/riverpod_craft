@@ -16,3 +16,6 @@ pubspec.lock
 .DS_Store
 
 *.history
+
+./tool
+./marketing
