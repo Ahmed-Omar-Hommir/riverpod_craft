@@ -1,3 +1,9 @@
+## 0.3.0
+
+- Add `ProviderValue<T>` interface for synchronous providers
+- Add advanced documentation section with reusable component examples
+- Add `custom_dropdown` example showcasing `SyncDropdown`, `AsyncDropdown`, and `AsyncPagedDropdown`
+
 ## 0.2.2
 
 - Add `map`, `maybeMap`, `mapOrNull` pattern matching to all state types

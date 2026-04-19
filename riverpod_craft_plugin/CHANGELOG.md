@@ -1,3 +1,7 @@
+## 0.3.0
+
+- Version bump to align with riverpod_craft 0.3.0
+
 ## 0.2.2
 
 - Version bump to align with riverpod_craft 0.2.2
