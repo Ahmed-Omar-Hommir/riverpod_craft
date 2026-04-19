@@ -10,7 +10,7 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(title: const Text('Counter')),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
@@ -44,8 +44,9 @@ class _SimpleCounterCard extends ConsumerWidget {
             const SizedBox(height: 4),
             Text(
               '@settable — direct setState, no custom logic',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: cs.onSurfaceVariant),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: cs.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 20),
             Text(
@@ -104,8 +105,9 @@ class _BoundedCounterCard extends ConsumerWidget {
             const SizedBox(height: 4),
             Text(
               'class-based — custom methods, capped at 0',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: cs.onSurfaceVariant),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: cs.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 20),
             Text(

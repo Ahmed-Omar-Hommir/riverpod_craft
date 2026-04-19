@@ -43,19 +43,25 @@ class $FavoriteQuotesFacadeRef {
       _ref.read(_provider.notifier).isFavorite(quoteId);
 }
 
-class $FavoriteQuotesFacadeWidget {
+class $FavoriteQuotesFacadeWidget
+    implements ProviderFacade<List<Quote>>, ProviderValue<List<Quote>> {
   $FavoriteQuotesFacadeWidget(this._ref);
   final WidgetRef _ref;
 
   late final _provider = _favoriteQuotesProvider;
 
+  @override
   List<Quote> read() => _ref.read(_provider);
+  @override
   List<Quote> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
     R Function(List<Quote> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
+  @override
+  void invalidate() => _ref.invalidate(_provider);
 
+  @override
   void listen(
     void Function(List<Quote>? previous, List<Quote> next) listener, {
     void Function(Object, StackTrace)? onError,
@@ -63,6 +69,10 @@ class $FavoriteQuotesFacadeWidget {
   }) {
     _ref.listen<List<Quote>>(_provider, listener, onError: onError);
   }
+
+  @override
+  ProviderFacade<List<Quote>> of(WidgetRef ref) =>
+      $FavoriteQuotesFacadeWidget(ref);
 
   void addQuote(Quote quote) => _ref.read(_provider.notifier).addQuote(quote);
 

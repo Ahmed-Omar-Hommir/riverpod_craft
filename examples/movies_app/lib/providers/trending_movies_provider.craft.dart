@@ -63,9 +63,7 @@ class $TrendingMoviesFacadeRef {
 }
 
 class $TrendingMoviesFacadeWidget
-    implements
-        DataProviderFacade<List<Movie>>,
-        DataProviderValue<List<Movie>, ()> {
+    implements DataProviderFacade<List<Movie>>, DataProviderValue<List<Movie>> {
   $TrendingMoviesFacadeWidget(this._ref);
   final WidgetRef _ref;
 

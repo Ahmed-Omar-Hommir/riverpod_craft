@@ -42,9 +42,7 @@ class $NowPlayingFacadeRef {
 }
 
 class $NowPlayingFacadeWidget
-    implements
-        DataProviderFacade<List<Movie>>,
-        DataProviderValue<List<Movie>, ()> {
+    implements DataProviderFacade<List<Movie>>, DataProviderValue<List<Movie>> {
   $NowPlayingFacadeWidget(this._ref);
   final WidgetRef _ref;
 

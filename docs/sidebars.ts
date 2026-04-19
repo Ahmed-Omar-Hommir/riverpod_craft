@@ -29,6 +29,14 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Advanced',
+      collapsed: false,
+      items: [
+        'advanced/reusable-component',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Examples',
       collapsed: false,
       link: {type: 'doc', id: 'examples/index'},

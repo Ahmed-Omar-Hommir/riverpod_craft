@@ -37,20 +37,26 @@ class $SearchQueryFacadeRef {
   }
 }
 
-class $SearchQueryFacadeWidget {
+class $SearchQueryFacadeWidget
+    implements ProviderFacade<String>, ProviderValue<String> {
   $SearchQueryFacadeWidget(this._ref);
   final WidgetRef _ref;
 
   late final _provider = _searchQueryProvider;
 
+  @override
   String read() => _ref.read(_provider);
+  @override
   String watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(R Function(String state) selector) =>
       SelectedWidgetRefFacade(_ref, _provider.select(selector));
+  @override
+  void invalidate() => _ref.invalidate(_provider);
 
   void setState(String value) => _ref.read(_provider.notifier).state = value;
 
+  @override
   void listen(
     void Function(String? previous, String next) listener, {
     void Function(Object, StackTrace)? onError,
@@ -58,6 +64,9 @@ class $SearchQueryFacadeWidget {
   }) {
     _ref.listen<String>(_provider, listener, onError: onError);
   }
+
+  @override
+  ProviderFacade<String> of(WidgetRef ref) => $SearchQueryFacadeWidget(ref);
 }
 
 extension SearchQueryFacadeRefEx on Ref {

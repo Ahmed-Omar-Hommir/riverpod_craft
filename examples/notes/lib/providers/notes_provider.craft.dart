@@ -90,9 +90,7 @@ class $NotesFacadeRef {
 }
 
 class $NotesFacadeWidget
-    implements
-        DataProviderFacade<List<Note>>,
-        DataProviderValue<List<Note>, ()> {
+    implements DataProviderFacade<List<Note>>, DataProviderValue<List<Note>> {
   $NotesFacadeWidget(this._ref);
   final WidgetRef _ref;
 

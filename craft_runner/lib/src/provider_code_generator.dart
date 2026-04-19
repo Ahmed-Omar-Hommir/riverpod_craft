@@ -441,7 +441,7 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
         ? ' implements PagedProviderFacade<${_info.dataType}>, PagedProviderValue<${_info.dataType}>'
         : _info.type == ProviderType.sync
         ? ' implements ProviderFacade<${_info.dataType}>, ProviderValue<${_info.dataType}>'
-        : ' implements DataProviderFacade<${_info.dataType}>, DataProviderValue<${_info.dataType}, $argRecordTypeForData>';
+        : ' implements DataProviderFacade<${_info.dataType}>, DataProviderValue<${_info.dataType}>';
 
     final overrideAnnotations = _info.type == ProviderType.paged
         ? ''

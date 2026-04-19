@@ -39,7 +39,7 @@ class $RandomQuoteFacadeRef {
 }
 
 class $RandomQuoteFacadeWidget
-    implements DataProviderFacade<Quote>, DataProviderValue<Quote, ()> {
+    implements DataProviderFacade<Quote>, DataProviderValue<Quote> {
   $RandomQuoteFacadeWidget(this._ref);
   final WidgetRef _ref;
 

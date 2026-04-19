@@ -41,9 +41,7 @@ class $NoteDetailFacadeRef {
 }
 
 class $NoteDetailFacadeWidget
-    implements
-        DataProviderFacade<Note>,
-        DataProviderValue<Note, ({String id})> {
+    implements DataProviderFacade<Note>, DataProviderValue<Note> {
   $NoteDetailFacadeWidget(this._ref, this._arg);
   final WidgetRef _ref;
   final ({String id}) _arg;

@@ -25,6 +25,9 @@ abstract class PagedDataNotifier<T, Arg extends Record>
 
   @override
   PagedDataState<T> build() {
+    _pending = false;
+    _currentPage = 0;
+    
     Future.microtask(() => fetchNextPage());
     return PagedDataState(const PagingState());
   }

@@ -89,9 +89,7 @@ class $PaginatedNotesFacadeWidget
 
   late final _provider = _paginatedNotesProvider(_arg);
 
-  @override
   PagedDataState<Note> read() => _ref.read(_provider);
-  @override
   PagedDataState<Note> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(

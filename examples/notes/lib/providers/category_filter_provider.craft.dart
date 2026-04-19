@@ -39,22 +39,28 @@ class $CategoryFilterFacadeRef {
   }
 }
 
-class $CategoryFilterFacadeWidget {
+class $CategoryFilterFacadeWidget
+    implements ProviderFacade<NoteCategory>, ProviderValue<NoteCategory> {
   $CategoryFilterFacadeWidget(this._ref);
   final WidgetRef _ref;
 
   late final _provider = _categoryFilterProvider;
 
+  @override
   NoteCategory read() => _ref.read(_provider);
+  @override
   NoteCategory watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
     R Function(NoteCategory state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
+  @override
+  void invalidate() => _ref.invalidate(_provider);
 
   void setState(NoteCategory value) =>
       _ref.read(_provider.notifier).state = value;
 
+  @override
   void listen(
     void Function(NoteCategory? previous, NoteCategory next) listener, {
     void Function(Object, StackTrace)? onError,
@@ -62,6 +68,10 @@ class $CategoryFilterFacadeWidget {
   }) {
     _ref.listen<NoteCategory>(_provider, listener, onError: onError);
   }
+
+  @override
+  ProviderFacade<NoteCategory> of(WidgetRef ref) =>
+      $CategoryFilterFacadeWidget(ref);
 }
 
 extension CategoryFilterFacadeRefEx on Ref {

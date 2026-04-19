@@ -41,7 +41,7 @@ class $MovieDetailFacadeRef {
 }
 
 class $MovieDetailFacadeWidget
-    implements DataProviderFacade<Movie>, DataProviderValue<Movie, ({int id})> {
+    implements DataProviderFacade<Movie>, DataProviderValue<Movie> {
   $MovieDetailFacadeWidget(this._ref, this._arg);
   final WidgetRef _ref;
   final ({int id}) _arg;

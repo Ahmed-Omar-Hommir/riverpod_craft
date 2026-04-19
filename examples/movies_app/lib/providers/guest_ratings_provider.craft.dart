@@ -51,7 +51,7 @@ class $GuestRatingsFacadeRef {
 class $GuestRatingsFacadeWidget
     implements
         DataProviderFacade<Map<int, double>>,
-        DataProviderValue<Map<int, double>, ()> {
+        DataProviderValue<Map<int, double>> {
   $GuestRatingsFacadeWidget(this._ref);
   final WidgetRef _ref;
 

@@ -37,20 +37,26 @@ class $SelectedGenreFacadeRef {
   }
 }
 
-class $SelectedGenreFacadeWidget {
+class $SelectedGenreFacadeWidget
+    implements ProviderFacade<int?>, ProviderValue<int?> {
   $SelectedGenreFacadeWidget(this._ref);
   final WidgetRef _ref;
 
   late final _provider = _selectedGenreProvider;
 
+  @override
   int? read() => _ref.read(_provider);
+  @override
   int? watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(R Function(int? state) selector) =>
       SelectedWidgetRefFacade(_ref, _provider.select(selector));
+  @override
+  void invalidate() => _ref.invalidate(_provider);
 
   void setState(int? value) => _ref.read(_provider.notifier).state = value;
 
+  @override
   void listen(
     void Function(int? previous, int? next) listener, {
     void Function(Object, StackTrace)? onError,
@@ -58,6 +64,9 @@ class $SelectedGenreFacadeWidget {
   }) {
     _ref.listen<int?>(_provider, listener, onError: onError);
   }
+
+  @override
+  ProviderFacade<int?> of(WidgetRef ref) => $SelectedGenreFacadeWidget(ref);
 }
 
 extension SelectedGenreFacadeRefEx on Ref {

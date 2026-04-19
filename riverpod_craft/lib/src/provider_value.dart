@@ -6,14 +6,14 @@ abstract class ProviderValue<T> {
   ProviderFacade<T> of(WidgetRef ref);
 }
 
-abstract class DataProviderValue<T, ArgT extends Record> {
+abstract class DataProviderValue<T> {
   const DataProviderValue();
 
   DataProviderFacade<T> of(WidgetRef ref);
 }
 
 abstract class PagedProviderValue<T> {
-  PagedProviderValue();
+  const PagedProviderValue();
 
   PagedProviderFacade<T> of(WidgetRef ref);
 }

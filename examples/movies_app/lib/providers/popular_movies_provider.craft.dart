@@ -59,9 +59,7 @@ class $PopularMoviesFacadeWidget
 
   late final _provider = _popularMoviesProvider(_arg);
 
-  @override
   PagedDataState<Movie> read() => _ref.read(_provider);
-  @override
   PagedDataState<Movie> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
