@@ -1,3 +1,9 @@
+/// A code generation toolkit for Riverpod state management.
+///
+/// Provides annotations, state types, commands, pagination, and facade
+/// helpers that reduce boilerplate when building apps with Riverpod.
+library;
+
 export 'src/annotations.dart';
 export 'src/result.dart';
 export 'src/provider_facade.dart';

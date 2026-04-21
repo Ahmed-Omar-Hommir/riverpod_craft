@@ -20,6 +20,7 @@
 /// }
 /// ```
 class PaginatedResponse<T> {
+  /// Creates a [PaginatedResponse] with the given page of [results].
   const PaginatedResponse({
     required this.results,
     required this.currentPage,

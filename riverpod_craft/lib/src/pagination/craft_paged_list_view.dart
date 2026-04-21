@@ -17,6 +17,7 @@ import 'package:riverpod_craft/riverpod_craft.dart';
 /// }
 /// ```
 class CraftPagedListView<T> extends ConsumerStatefulWidget {
+  /// Creates a [CraftPagedListView] backed by a paginated provider.
   const CraftPagedListView({
     super.key,
     required this.provider,
@@ -37,6 +38,7 @@ class CraftPagedListView<T> extends ConsumerStatefulWidget {
     this.dragStartBehavior = DragStartBehavior.start,
   }) : _separatorBuilder = null;
 
+  /// Creates a [CraftPagedListView] with separators between items.
   const CraftPagedListView.separated({
     super.key,
     required this.provider,
@@ -64,24 +66,52 @@ class CraftPagedListView<T> extends ConsumerStatefulWidget {
   /// `ref.notesProvider(category: 'work')`
   final PagedProviderValue<T> provider;
 
+  /// Builds each item in the list.
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
   final Widget Function(BuildContext context, int index)? _separatorBuilder;
+
+  /// Widget shown when the list has no items.
   final Widget Function(BuildContext context)? emptyBuilder;
+
+  /// Widget shown while the first page is loading.
   final Widget Function(BuildContext context)? firstPageLoadingBuilder;
+
+  /// Widget shown when the first page fails to load.
   final Widget Function(BuildContext context, Object? error)?
   firstPageErrorBuilder;
+
+  /// Widget shown while a subsequent page is loading.
   final Widget Function(BuildContext context)? newPageLoadingBuilder;
+
+  /// Widget shown when a subsequent page fails to load.
   final Widget Function(BuildContext context, Object? error)?
   newPageErrorBuilder;
 
+  /// Padding around the list.
   final EdgeInsetsGeometry? padding;
+
+  /// Optional external scroll controller.
   final ScrollController? scrollController;
+
+  /// The axis along which the list scrolls.
   final Axis scrollDirection;
+
+  /// Whether the list scrolls in the reading direction.
   final bool reverse;
+
+  /// Whether this is the primary scroll view.
   final bool? primary;
+
+  /// Scroll physics for the list.
   final ScrollPhysics? physics;
+
+  /// Whether the list should shrink-wrap its contents.
   final bool shrinkWrap;
+
+  /// The viewport's cache extent in logical pixels.
   final double? cacheExtent;
+
+  /// Determines the way drag start behavior is handled.
   final DragStartBehavior dragStartBehavior;
 
   @override
@@ -163,6 +193,7 @@ class _CraftPagedListViewState<T> extends ConsumerState<CraftPagedListView<T>> {
 
 /// A paginated sliver list view for use inside [CustomScrollView].
 class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
+  /// Creates a [CraftPagedSliverListView] backed by a paginated provider.
   const CraftPagedSliverListView({
     super.key,
     required this.provider,
@@ -174,6 +205,7 @@ class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
     this.newPageErrorBuilder,
   }) : _separatorBuilder = null;
 
+  /// Creates a [CraftPagedSliverListView] with separators between items.
   const CraftPagedSliverListView.separated({
     super.key,
     required this.provider,
@@ -186,14 +218,27 @@ class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
     this.newPageErrorBuilder,
   }) : _separatorBuilder = separatorBuilder;
 
+  /// The paginated provider value.
   final PagedProviderValue<T> provider;
+
+  /// Builds each item in the list.
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
   final Widget Function(BuildContext context, int index)? _separatorBuilder;
+
+  /// Widget shown when the list has no items.
   final Widget Function(BuildContext context)? emptyBuilder;
+
+  /// Widget shown while the first page is loading.
   final Widget Function(BuildContext context)? firstPageLoadingBuilder;
+
+  /// Widget shown when the first page fails to load.
   final Widget Function(BuildContext context, Object? error)?
   firstPageErrorBuilder;
+
+  /// Widget shown while a subsequent page is loading.
   final Widget Function(BuildContext context)? newPageLoadingBuilder;
+
+  /// Widget shown when a subsequent page fails to load.
   final Widget Function(BuildContext context, Object? error)?
   newPageErrorBuilder;
 

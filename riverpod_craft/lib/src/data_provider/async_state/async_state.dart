@@ -3,6 +3,7 @@ part 'data_state.dart';
 part 'command_state.dart';
 part 'arg_command_state.dart';
 
+/// Sealed base class representing an asynchronous operation's state.
 sealed class AsynchronousState<T, ArgT extends Record> with EquatableMixin {
   const AsynchronousState();
 
@@ -10,8 +11,10 @@ sealed class AsynchronousState<T, ArgT extends Record> with EquatableMixin {
   List<Object?> get props => [];
 }
 
+/// Convenience getters and pattern-matching helpers for [AsynchronousState].
 extension AsynchronousStateExtension<T, ArgT extends Record>
     on AsynchronousState<T, ArgT> {
+  /// Whether the current state is a loading variant.
   bool get isLoading => switch (this) {
     DataLoading<T>() => true,
     CommandLoading<T, ArgT>() => true,
@@ -19,6 +22,7 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
     _ => false,
   };
 
+  /// Whether the current state is a success/data variant.
   bool get isData => switch (this) {
     DataSuccess<T>() => true,
     CommandData<T, ArgT>() => true,
@@ -26,6 +30,7 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
     _ => false,
   };
 
+  /// Whether the current state is an error variant.
   bool get isError => switch (this) {
     DataError<T>() => true,
     CommandError<T, ArgT>() => true,
@@ -33,6 +38,7 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
     _ => false,
   };
 
+  /// Returns the data value if in a success state, otherwise `null`.
   T? get data => switch (this) {
     DataSuccess<T>(data: final data) => data,
     CommandData<T, ArgT>(data: final data) => data,
@@ -40,6 +46,7 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
     _ => null,
   };
 
+  /// Returns the error object if in an error state, otherwise `null`.
   Object? get error => switch (this) {
     DataError<T>(error: final error) => error,
     CommandError<T, ArgT>(error: final error) => error,
@@ -47,6 +54,7 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
     _ => null,
   };
 
+  /// Exhaustively maps each state variant to a result using the full state object.
   R map<R>({
     required R Function(AsynchronousState<T, ArgT> state) init,
     required R Function(AsynchronousState<T, ArgT> state) loading,
@@ -69,6 +77,7 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
     };
   }
 
+  /// Maps each state variant with an [orElse] fallback for unhandled cases.
   R maybeMap<R>({
     R Function(AsynchronousState<T, ArgT> state)? init,
     R Function(AsynchronousState<T, ArgT> state)? loading,
@@ -81,17 +90,21 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
       DataSuccess<T>() && final s => data != null ? data(s) : orElse(),
       DataError<T>() && final s => error != null ? error(s) : orElse(),
       CommandInit<T, ArgT>() && final s => init != null ? init(s) : orElse(),
-      CommandLoading<T, ArgT>() && final s => loading != null ? loading(s) : orElse(),
+      CommandLoading<T, ArgT>() && final s =>
+        loading != null ? loading(s) : orElse(),
       CommandData<T, ArgT>() && final s => data != null ? data(s) : orElse(),
       CommandError<T, ArgT>() && final s => error != null ? error(s) : orElse(),
       ArgCommandInit<T, ArgT>() && final s => init != null ? init(s) : orElse(),
-      ArgCommandLoading<T, ArgT>() && final s => loading != null ? loading(s) : orElse(),
+      ArgCommandLoading<T, ArgT>() && final s =>
+        loading != null ? loading(s) : orElse(),
       ArgCommandData<T, ArgT>() && final s => data != null ? data(s) : orElse(),
-      ArgCommandError<T, ArgT>() && final s => error != null ? error(s) : orElse(),
+      ArgCommandError<T, ArgT>() && final s =>
+        error != null ? error(s) : orElse(),
       _ => orElse(),
     };
   }
 
+  /// Maps each state variant, returning `null` for unhandled cases.
   R? mapOrNull<R>({
     R Function(AsynchronousState<T, ArgT> state)? init,
     R Function(AsynchronousState<T, ArgT> state)? loading,
@@ -114,6 +127,7 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
     };
   }
 
+  /// Exhaustively matches each state variant using destructured values.
   R when<R>({
     required R Function() init,
     required R Function(ArgT? arg) loading,
@@ -140,6 +154,7 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
     };
   }
 
+  /// Matches each state variant with an [orElse] fallback, using destructured values.
   R maybeWhen<R>({
     R Function()? init,
     R Function(ArgT? arg)? loading,
@@ -170,6 +185,7 @@ extension AsynchronousStateExtension<T, ArgT extends Record>
     };
   }
 
+  /// Matches each state variant, returning `null` for unhandled cases, using destructured values.
   R? whenOrNull<R>({
     R Function()? init,
     R Function(ArgT? arg)? loading,

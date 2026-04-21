@@ -17,6 +17,7 @@ import 'async_state/async_state.dart';
 /// or `false` when using [buildDataWithStream].
 abstract class DataNotifier<T, Arg extends Record>
     extends Notifier<DataState<T>> {
+  /// The argument passed to this notifier, typically used to configure data fetching.
   late final Arg arg;
 
   StreamSubscription? _subscription;
@@ -39,6 +40,7 @@ abstract class DataNotifier<T, Arg extends Record>
     'buildDataWithStream() must be implemented when isFuture is false',
   );
 
+  /// Manually updates the current data if the state is [DataSuccess].
   @protected
   void setData(T data) {
     final currentState = state;
@@ -112,12 +114,16 @@ abstract class DataNotifier<T, Arg extends Record>
     return completer.future;
   }
 
+  /// Builds the initial state by triggering data fetching with [arg].
   @override
   DataState<T> build() {
     _getData(arg);
     return DataLoading<T>();
   }
 
+  /// Re-fetches the data, showing a loading state.
   Future<void> reload() => _getData(arg);
+
+  /// Re-fetches the data without transitioning to a loading state.
   Future<void> silentReload() => _getData(arg, silent: true);
 }

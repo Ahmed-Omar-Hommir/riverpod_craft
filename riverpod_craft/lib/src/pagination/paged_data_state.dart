@@ -6,6 +6,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 /// Wraps [PagingState] from `infinite_scroll_pagination` and exposes
 /// convenient getters and mutation methods for working with paginated data.
 class PagedDataState<T> with EquatableMixin {
+  /// Creates a [PagedDataState] wrapping the given [pagingState].
   const PagedDataState(this.pagingState);
 
   /// The underlying paging state — pass this to `PagedListView`.
@@ -19,7 +20,10 @@ class PagedDataState<T> with EquatableMixin {
 
   /// Whether a subsequent page is currently loading.
   bool get isNextPageLoading =>
-      items != null && items!.isNotEmpty && pagingState.nextPageKey != null && !hasError;
+      items != null &&
+      items!.isNotEmpty &&
+      pagingState.nextPageKey != null &&
+      !hasError;
 
   /// Whether more pages are available.
   bool get hasNextPage => pagingState.nextPageKey != null;
@@ -93,7 +97,9 @@ extension PagedDataStateX<T> on PagedDataState<T> {
     if (current == null) return this;
     return PagedDataState(
       PagingState(
-        itemList: current.map((item) => test(item) ? update(item) : item).toList(),
+        itemList: current
+            .map((item) => test(item) ? update(item) : item)
+            .toList(),
         nextPageKey: pagingState.nextPageKey,
         error: pagingState.error,
       ),

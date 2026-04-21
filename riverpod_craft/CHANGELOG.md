@@ -1,3 +1,10 @@
+## 0.3.1
+
+- Update dependencies to latest compatible versions
+- Remove `dio` dependency
+- Add dartdoc comments to all public API symbols
+- Add example for pub.dev
+
 ## 0.3.0
 
 - Add `ProviderValue<T>` interface for synchronous providers

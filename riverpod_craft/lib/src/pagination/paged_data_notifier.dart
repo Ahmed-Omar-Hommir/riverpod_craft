@@ -24,10 +24,11 @@ abstract class PagedDataNotifier<T, Arg extends Record>
   int _currentPage = 0;
 
   @override
+  /// Initializes the paging state and triggers the first page load.
   PagedDataState<T> build() {
     _pending = false;
     _currentPage = 0;
-    
+
     Future.microtask(() => fetchNextPage());
     return PagedDataState(const PagingState());
   }
