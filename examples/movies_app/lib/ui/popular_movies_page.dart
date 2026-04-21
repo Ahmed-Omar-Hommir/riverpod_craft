@@ -40,8 +40,9 @@ class _Tab extends ConsumerWidget {
   final int? genreId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => CraftPagedListView<Movie>(
-        provider: ref.popularMoviesProvider(genreId: genreId),
+  Widget build(BuildContext context, WidgetRef ref) =>
+      CraftPagedListView<Movie>(
+        providerValue: ref.popularMoviesProvider(genreId: genreId),
         itemBuilder: (_, movie, __) => MovieTile(movie),
         emptyBuilder: (_) => const PagePlaceholder(
           icon: Icons.movie_filter_outlined,

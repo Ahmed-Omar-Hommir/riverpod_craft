@@ -21,16 +21,14 @@ abstract class PagedDataNotifier<T, Arg extends Record>
   Future<PaginatedResponse<T>> buildPagedData(int page);
 
   bool _pending = false;
-  int _currentPage = 0;
 
   @override
   /// Initializes the paging state and triggers the first page load.
   PagedDataState<T> build() {
     _pending = false;
-    _currentPage = 0;
 
     Future.microtask(() => fetchNextPage());
-    return PagedDataState(const PagingState());
+    return PagedDataState(PagingState());
   }
 
   /// Load the next page of results.
@@ -38,32 +36,28 @@ abstract class PagedDataNotifier<T, Arg extends Record>
   /// Safe to call multiple times — concurrent calls are guarded.
   Future<void> fetchNextPage() async {
     if (_pending) return;
-    if (!state.hasNextPage && _currentPage > 0) return;
+    final s = state.pagingState;
+    if (s.isLoading) return;
+    if (!s.hasNextPage && s.pages != null && s.pages!.isNotEmpty) return;
 
     _pending = true;
-    final nextPage = _currentPage + 1;
+    state = PagedDataState(s.copyWith(isLoading: true, error: null));
+
+    final nextPage = (s.keys?.lastOrNull ?? 0) + 1;
 
     try {
       final response = await buildPagedData(nextPage);
-      final existingItems = state.items ?? [];
-      final allItems = [...existingItems, ...response.results];
-
-      _currentPage = nextPage;
 
       state = PagedDataState(
-        PagingState(
-          itemList: allItems,
-          nextPageKey: response.hasMorePages ? nextPage + 1 : null,
+        s.copyWith(
+          pages: [...?s.pages, response.results],
+          keys: [...?s.keys, nextPage],
+          hasNextPage: response.hasMorePages,
+          isLoading: false,
         ),
       );
     } catch (error) {
-      state = PagedDataState(
-        PagingState(
-          itemList: state.items,
-          error: error,
-          nextPageKey: state.pagingState.nextPageKey,
-        ),
-      );
+      state = PagedDataState(s.copyWith(error: error, isLoading: false));
     } finally {
       _pending = false;
     }
@@ -71,9 +65,8 @@ abstract class PagedDataNotifier<T, Arg extends Record>
 
   /// Reset to page 1 and re-fetch.
   Future<void> reload() async {
-    _currentPage = 0;
     _pending = false;
-    state = PagedDataState(const PagingState());
+    state = PagedDataState(PagingState());
     await fetchNextPage();
   }
 }

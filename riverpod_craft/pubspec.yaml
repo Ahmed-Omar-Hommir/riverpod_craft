@@ -1,6 +1,6 @@
 name: riverpod_craft
 description: A code generation toolkit for Riverpod state management. Better syntax and side effect solution with commands.
-version: 0.3.1
+version: 0.3.2
 homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 issue_tracker: https://github.com/Ahmed-Omar-Hommir/riverpod_craft/issues
@@ -12,12 +12,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  riverpod: ^3.2.0
-  flutter_riverpod: ^3.3.0
+  riverpod: ^3.2.1
+  flutter_riverpod: ^3.3.1
   bloc: ^9.2.0
   bloc_concurrency: ^0.3.0
   equatable: ^2.0.8
-  infinite_scroll_pagination: ^4.1.0
+  infinite_scroll_pagination: ^5.1.1
 
 dev_dependencies:
   flutter_test:

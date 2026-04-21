@@ -11,7 +11,7 @@ import 'package:riverpod_craft/riverpod_craft.dart';
 /// @override
 /// Widget build(BuildContext context, WidgetRef ref) {
 ///   return CraftPagedListView<Note>(
-///     provider: ref.notesProvider(category: 'work'),
+///     providerValue: ref.notesProvider(category: 'work'),
 ///     itemBuilder: (context, note, index) => ListTile(title: Text(note.title)),
 ///   );
 /// }
@@ -20,7 +20,7 @@ class CraftPagedListView<T> extends ConsumerStatefulWidget {
   /// Creates a [CraftPagedListView] backed by a paginated provider.
   const CraftPagedListView({
     super.key,
-    required this.provider,
+    required this.providerValue,
     required this.itemBuilder,
     this.emptyBuilder,
     this.firstPageLoadingBuilder,
@@ -41,7 +41,7 @@ class CraftPagedListView<T> extends ConsumerStatefulWidget {
   /// Creates a [CraftPagedListView] with separators between items.
   const CraftPagedListView.separated({
     super.key,
-    required this.provider,
+    required this.providerValue,
     required this.itemBuilder,
     required Widget Function(BuildContext context, int index) separatorBuilder,
     this.emptyBuilder,
@@ -62,9 +62,9 @@ class CraftPagedListView<T> extends ConsumerStatefulWidget {
 
   /// The paginated provider value.
   ///
-  /// Pass the facade from your extension:
+  /// Pass the value from your extension:
   /// `ref.notesProvider(category: 'work')`
-  final PagedProviderValue<T> provider;
+  final PagedProviderValue<T> providerValue;
 
   /// Builds each item in the list.
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
@@ -120,29 +120,10 @@ class CraftPagedListView<T> extends ConsumerStatefulWidget {
 }
 
 class _CraftPagedListViewState<T> extends ConsumerState<CraftPagedListView<T>> {
-  late PagingController<int, T> _pagingController;
-  late PagedProviderFacade<T> _facade;
-
-  @override
-  void initState() {
-    super.initState();
-    _pagingController = PagingController(firstPageKey: 1);
-    _pagingController.addPageRequestListener((_) {
-      _facade.fetchNextPage();
-    });
-  }
-
-  @override
-  void dispose() {
-    _pagingController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    _facade = widget.provider.of(ref);
-    final state = _facade.watch();
-    _pagingController.value = state.pagingState;
+    final provider = widget.providerValue.of(ref);
+    final state = provider.watch();
 
     final delegate = PagedChildBuilderDelegate<T>(
       itemBuilder: (context, item, index) =>
@@ -160,7 +141,8 @@ class _CraftPagedListViewState<T> extends ConsumerState<CraftPagedListView<T>> {
 
     if (widget._separatorBuilder != null) {
       return PagedListView<int, T>.separated(
-        pagingController: _pagingController,
+        state: state.pagingState,
+        fetchNextPage: provider.fetchNextPage,
         builderDelegate: delegate,
         separatorBuilder: widget._separatorBuilder!,
         padding: widget.padding,
@@ -176,7 +158,8 @@ class _CraftPagedListViewState<T> extends ConsumerState<CraftPagedListView<T>> {
     }
 
     return PagedListView<int, T>(
-      pagingController: _pagingController,
+      state: state.pagingState,
+      fetchNextPage: provider.fetchNextPage,
       builderDelegate: delegate,
       padding: widget.padding,
       scrollController: widget.scrollController,
@@ -196,7 +179,7 @@ class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
   /// Creates a [CraftPagedSliverListView] backed by a paginated provider.
   const CraftPagedSliverListView({
     super.key,
-    required this.provider,
+    required this.providerValue,
     required this.itemBuilder,
     this.emptyBuilder,
     this.firstPageLoadingBuilder,
@@ -208,7 +191,7 @@ class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
   /// Creates a [CraftPagedSliverListView] with separators between items.
   const CraftPagedSliverListView.separated({
     super.key,
-    required this.provider,
+    required this.providerValue,
     required this.itemBuilder,
     required Widget Function(BuildContext context, int index) separatorBuilder,
     this.emptyBuilder,
@@ -219,7 +202,7 @@ class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
   }) : _separatorBuilder = separatorBuilder;
 
   /// The paginated provider value.
-  final PagedProviderValue<T> provider;
+  final PagedProviderValue<T> providerValue;
 
   /// Builds each item in the list.
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
@@ -249,29 +232,10 @@ class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
 
 class _CraftPagedSliverListViewState<T>
     extends ConsumerState<CraftPagedSliverListView<T>> {
-  late PagingController<int, T> _pagingController;
-  late PagedProviderFacade<T> _facade;
-
-  @override
-  void initState() {
-    super.initState();
-    _pagingController = PagingController(firstPageKey: 1);
-    _pagingController.addPageRequestListener((_) {
-      _facade.fetchNextPage();
-    });
-  }
-
-  @override
-  void dispose() {
-    _pagingController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    _facade = widget.provider.of(ref);
-    final state = _facade.watch();
-    _pagingController.value = state.pagingState;
+    final provider = widget.providerValue.of(ref);
+    final state = provider.watch();
 
     final delegate = PagedChildBuilderDelegate<T>(
       itemBuilder: (context, item, index) =>
@@ -289,14 +253,16 @@ class _CraftPagedSliverListViewState<T>
 
     if (widget._separatorBuilder != null) {
       return PagedSliverList<int, T>.separated(
-        pagingController: _pagingController,
+        state: state.pagingState,
+        fetchNextPage: provider.fetchNextPage,
         builderDelegate: delegate,
         separatorBuilder: widget._separatorBuilder!,
       );
     }
 
     return PagedSliverList<int, T>(
-      pagingController: _pagingController,
+      state: state.pagingState,
+      fetchNextPage: provider.fetchNextPage,
       builderDelegate: delegate,
     );
   }

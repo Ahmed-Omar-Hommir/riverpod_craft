@@ -3,7 +3,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 /// The state of a paginated provider.
 ///
-/// Wraps [PagingState] from `infinite_scroll_pagination` and exposes
+/// Wraps [PagingState] from `infinite_scroll_pagination` v5 and exposes
 /// convenient getters and mutation methods for working with paginated data.
 class PagedDataState<T> with EquatableMixin {
   /// Creates a [PagedDataState] wrapping the given [pagingState].
@@ -13,20 +13,18 @@ class PagedDataState<T> with EquatableMixin {
   final PagingState<int, T> pagingState;
 
   /// All items loaded so far (flat list from all pages).
-  List<T>? get items => pagingState.itemList;
+  List<T>? get items => pagingState.items;
 
   /// Whether the first page is loading (no items yet, no error).
-  bool get isLoading => items == null && !hasError;
+  bool get isLoading =>
+      pagingState.isLoading && (items == null || items!.isEmpty);
 
   /// Whether a subsequent page is currently loading.
   bool get isNextPageLoading =>
-      items != null &&
-      items!.isNotEmpty &&
-      pagingState.nextPageKey != null &&
-      !hasError;
+      pagingState.isLoading && items != null && items!.isNotEmpty;
 
   /// Whether more pages are available.
-  bool get hasNextPage => pagingState.nextPageKey != null;
+  bool get hasNextPage => pagingState.hasNextPage;
 
   /// The error if any.
   Object? get error => pagingState.error;
@@ -38,7 +36,8 @@ class PagedDataState<T> with EquatableMixin {
   bool get isFirstPageError => hasError && (items == null || items!.isEmpty);
 
   /// Whether the list is empty (loaded at least once but no items).
-  bool get isEmpty => items != null && items!.isEmpty && !isLoading;
+  bool get isEmpty =>
+      items != null && items!.isEmpty && !isLoading && !hasError;
 
   @override
   List<Object?> get props => [pagingState];
@@ -51,39 +50,61 @@ class PagedDataState<T> with EquatableMixin {
 /// state = state.removeWhere((note) => note.id == id);
 /// ```
 extension PagedDataStateX<T> on PagedDataState<T> {
+  List<List<T>> get _pages => pagingState.pages ?? [];
+
   /// Add an item to the front of the list.
   PagedDataState<T> prependItem(T item) {
-    final current = items ?? [];
+    final pages = _pages;
+    if (pages.isEmpty) {
+      return PagedDataState(
+        pagingState.copyWith(
+          pages: [
+            [item],
+          ],
+        ),
+      );
+    }
     return PagedDataState(
-      PagingState(
-        itemList: [item, ...current],
-        nextPageKey: pagingState.nextPageKey,
-        error: pagingState.error,
+      pagingState.copyWith(
+        pages: [
+          [item, ...pages.first],
+          ...pages.skip(1),
+        ],
       ),
     );
   }
 
   /// Add an item to the end of the list.
   PagedDataState<T> appendItem(T item) {
-    final current = items ?? [];
+    final pages = _pages;
+    if (pages.isEmpty) {
+      return PagedDataState(
+        pagingState.copyWith(
+          pages: [
+            [item],
+          ],
+        ),
+      );
+    }
     return PagedDataState(
-      PagingState(
-        itemList: [...current, item],
-        nextPageKey: pagingState.nextPageKey,
-        error: pagingState.error,
+      pagingState.copyWith(
+        pages: [
+          ...pages.take(pages.length - 1),
+          [...pages.last, item],
+        ],
       ),
     );
   }
 
   /// Remove all items matching [test].
   PagedDataState<T> removeWhere(bool Function(T item) test) {
-    final current = items;
-    if (current == null) return this;
+    final pages = _pages;
+    if (pages.isEmpty) return this;
     return PagedDataState(
-      PagingState(
-        itemList: current.where((item) => !test(item)).toList(),
-        nextPageKey: pagingState.nextPageKey,
-        error: pagingState.error,
+      pagingState.copyWith(
+        pages: pages
+            .map((page) => page.where((item) => !test(item)).toList())
+            .toList(),
       ),
     );
   }
@@ -93,15 +114,13 @@ extension PagedDataStateX<T> on PagedDataState<T> {
     bool Function(T item) test,
     T Function(T item) update,
   ) {
-    final current = items;
-    if (current == null) return this;
+    final pages = _pages;
+    if (pages.isEmpty) return this;
     return PagedDataState(
-      PagingState(
-        itemList: current
-            .map((item) => test(item) ? update(item) : item)
+      pagingState.copyWith(
+        pages: pages
+            .map((page) => page.map((i) => test(i) ? update(i) : i).toList())
             .toList(),
-        nextPageKey: pagingState.nextPageKey,
-        error: pagingState.error,
       ),
     );
   }
@@ -111,46 +130,36 @@ extension PagedDataStateX<T> on PagedDataState<T> {
     bool Function(T item) test,
     T Function(T item) update,
   ) {
-    final current = items;
-    if (current == null) return this;
+    final pages = _pages;
+    if (pages.isEmpty) return this;
     bool found = false;
     return PagedDataState(
-      PagingState(
-        itemList: current.map((item) {
-          if (!found && test(item)) {
-            found = true;
-            return update(item);
-          }
-          return item;
-        }).toList(),
-        nextPageKey: pagingState.nextPageKey,
-        error: pagingState.error,
+      pagingState.copyWith(
+        pages: pages
+            .map(
+              (page) => page.map((item) {
+                if (!found && test(item)) {
+                  found = true;
+                  return update(item);
+                }
+                return item;
+              }).toList(),
+            )
+            .toList(),
       ),
     );
   }
 
   /// Replace all items with [newItems].
   PagedDataState<T> replaceAll(List<T> newItems) {
-    return PagedDataState(
-      PagingState(
-        itemList: newItems,
-        nextPageKey: pagingState.nextPageKey,
-        error: pagingState.error,
-      ),
-    );
+    return PagedDataState(pagingState.copyWith(pages: [newItems]));
   }
 
   /// Remove the item at [index].
   PagedDataState<T> removeAt(int index) {
-    final current = items;
-    if (current == null || index < 0 || index >= current.length) return this;
-    final updated = [...current]..removeAt(index);
-    return PagedDataState(
-      PagingState(
-        itemList: updated,
-        nextPageKey: pagingState.nextPageKey,
-        error: pagingState.error,
-      ),
-    );
+    final allItems = items;
+    if (allItems == null || index < 0 || index >= allItems.length) return this;
+    final updated = [...allItems]..removeAt(index);
+    return PagedDataState(pagingState.copyWith(pages: [updated]));
   }
 }

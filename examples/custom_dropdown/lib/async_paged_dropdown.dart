@@ -99,7 +99,7 @@ class _AsyncPagedDropdownState<T> extends ConsumerState<AsyncPagedDropdown<T>> {
                 color: colorScheme.primary,
                 onRefresh: () async => provider.invalidate(),
                 child: CraftPagedListView<T>(
-                  provider: widget.providerValue,
+                  providerValue: widget.providerValue,
                   itemBuilder: (context, item, index) => InkWell(
                     borderRadius: BorderRadius.circular(8),
                     onTap: () {

@@ -1,3 +1,10 @@
+## 0.3.2
+
+- **BREAKING**: Upgrade `infinite_scroll_pagination` from v4 to v5
+- Remove `PagingController` usage — widgets now use `state:` and `fetchNextPage:` directly
+- Pagination state uses `copyWith(pages:, keys:, hasNextPage:, isLoading:)` instead of v4 constructors
+- Rename `provider` to `providerValue` on `CraftPagedListView` and `CraftPagedSliverListView`
+
 ## 0.3.1
 
 - Update dependencies to latest compatible versions
