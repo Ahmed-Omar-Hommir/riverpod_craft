@@ -3,7 +3,7 @@ description: Counter example app demonstrating @settable provider in riverpod_cr
 publish_to: "none"
 
 environment:
-  sdk: ">=3.8.1 <4.0.0"
+  sdk: ">=3.12.0 <4.0.0"
 
 dependencies:
   flutter:

@@ -5,4 +5,4 @@ homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.12.0

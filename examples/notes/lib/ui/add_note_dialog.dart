@@ -92,7 +92,7 @@ class _AddNoteDialogState extends ConsumerState<AddNoteDialog> {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<NoteCategory>(
-            value: _category,
+            initialValue: _category,
             decoration: const InputDecoration(
               labelText: 'Category',
               border: OutlineInputBorder(),

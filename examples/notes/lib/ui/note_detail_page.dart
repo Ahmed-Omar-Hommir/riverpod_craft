@@ -191,7 +191,7 @@ class _NoteDetailPageState extends ConsumerState<NoteDetailPage> {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<NoteCategory>(
-            value: _category,
+            initialValue: _category,
             decoration: const InputDecoration(
               labelText: 'Category',
               border: OutlineInputBorder(),

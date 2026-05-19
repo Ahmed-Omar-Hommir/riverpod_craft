@@ -3,7 +3,7 @@ description: Custom/generic dropdown components built with riverpod_craft.
 publish_to: "none"
 
 environment:
-  sdk: ">=3.8.1 <4.0.0"
+  sdk: ">=3.12.0 <4.0.0"
 
 dependencies:
   flutter:
