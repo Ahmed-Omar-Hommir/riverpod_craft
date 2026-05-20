@@ -81,6 +81,31 @@ For each annotated provider, the CLI generates:
 | `@command` methods | `CommandNotifier` subclass, command facades with `run()`/`reset()`/`retry()` |
 | Family parameters | Callable facade classes, `invalidateFamily()` |
 
+## Community plugins (yaml-driven, since 0.6.0)
+
+craft_runner ships with built-in `@provider` / `@command` plugins. To
+add **community plugins** (e.g. [retrofit_craft][] for a project-wide
+`AppApi` aggregator), list them in `riverpod_craft.yaml`:
+
+```yaml
+plugins:
+  - retrofit_craft_plugin:RetrofitApiPlugin
+```
+
+Each entry is `<package_name>:<ClassName>`. The plugin must (a) be in your
+project's `dev_dependencies` (or `dependencies`), and (b) have a no-arg
+constructor. On the next `dart run craft_runner` invocation, craft_runner
+generates `.dart_tool/craft_runner/entry.dart`, imports each plugin,
+instantiates it, and dispatches via `runWithPlugins(...)` — per-file vs
+project-wide routing happens via runtime `is RiverpodCraftPlugin` /
+`is ProjectWideCraftPlugin` checks.
+
+`dart run craft_runner watch` "just works" — no `tool/craft.dart` needed.
+If you do maintain a custom `tool/craft.dart` that already calls
+`runWithPlugins(...)` directly, that path keeps working unchanged.
+
+[retrofit_craft]: https://pub.dev/packages/retrofit_craft
+
 ## How It Works
 
 1. **Parse** — Uses the Dart `analyzer` package to parse source files into AST

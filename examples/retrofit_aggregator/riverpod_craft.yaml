@@ -1,3 +1,9 @@
+# Community plugins auto-loaded by craft_runner 0.6.0+. Each entry is
+# `<package_name>:<ClassName>`. The plugin must be a (dev_)dependency of
+# this project and expose a no-arg constructor.
+plugins:
+  - retrofit_craft_plugin:RetrofitApiPlugin
+
 retrofit_craft:
   default_entry: Identity
   entry_path: lib/app/api/entries.dart

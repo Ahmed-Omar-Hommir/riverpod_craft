@@ -4,39 +4,94 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:yaml/yaml.dart';
 
+/// One plugin entry declared in `riverpod_craft.yaml`'s `plugins:` list.
+///
+/// Format: `<package_name>:<ClassName>`. The class must have a no-arg
+/// constructor and implement either `RiverpodCraftPlugin<T>` (per-file)
+/// or `ProjectWideCraftPlugin`. The CLI uses a runtime `is` check in the
+/// generated entry script to route each instance to the right
+/// registration call.
+class PluginSpec {
+  const PluginSpec({required this.package, required this.className});
+
+  /// The package name on pub.dev (e.g. `retrofit_craft_plugin`).
+  final String package;
+
+  /// The plugin class exposed by that package's library
+  /// (e.g. `RetrofitApiPlugin`).
+  final String className;
+
+  /// The full `<package>:<ClassName>` source form, used in diagnostics.
+  String get source => '$package:$className';
+
+  /// The Dart import URI for this plugin's package. Convention: the
+  /// package's barrel library has the same base name as the package
+  /// itself, e.g. `package:retrofit_craft_plugin/retrofit_craft_plugin.dart`.
+  String get importUri => 'package:$package/$package.dart';
+}
+
 /// Loads plugin configuration from `riverpod_craft.yaml`.
 ///
-/// The config file format:
+/// The config file format (preferred since 0.6.0):
 /// ```yaml
 /// plugins:
-///   - lib/plugins/my_plugin.dart
-///   - lib/plugins/another_plugin.dart
+///   - retrofit_craft_plugin:RetrofitApiPlugin
+///   - another_package:AnotherPlugin
 /// ```
 class PluginLoader {
-  /// Reads `riverpod_craft.yaml` from the given directory and returns
-  /// the list of plugin file paths declared in the config.
-  ///
-  /// Returns an empty list if the config file doesn't exist.
-  static List<String> loadPluginPaths([Directory? directory]) {
+  /// Reads `riverpod_craft.yaml` and returns each `<package>:<ClassName>`
+  /// entry as a raw string. Returns an empty list if the config or block
+  /// is absent.
+  static List<String> loadPluginPaths([Directory? directory]) =>
+      loadPluginSpecs(directory).map((s) => s.source).toList();
+
+  /// Same as [loadPluginPaths], but returns parsed [PluginSpec] objects.
+  /// Each entry must be a `<package>:<ClassName>` string; otherwise it's
+  /// skipped with a warning.
+  static List<PluginSpec> loadPluginSpecs([Directory? directory]) {
     final dir = directory ?? Directory.current;
     final configFile = File('${dir.path}/riverpod_craft.yaml');
-
     if (!configFile.existsSync()) return [];
 
     try {
-      final content = configFile.readAsStringSync();
-      final yaml = loadYaml(content);
-
+      final yaml = loadYaml(configFile.readAsStringSync());
       if (yaml is! YamlMap) return [];
 
       final plugins = yaml['plugins'];
       if (plugins is! YamlList) return [];
 
-      return plugins.map((e) => e.toString()).toList();
+      final specs = <PluginSpec>[];
+      for (final entry in plugins) {
+        final spec = _parseEntry(entry);
+        if (spec != null) specs.add(spec);
+      }
+      return specs;
     } catch (e) {
       print('Warning: Failed to parse riverpod_craft.yaml: $e');
       return [];
     }
+  }
+
+  static PluginSpec? _parseEntry(dynamic entry) {
+    if (entry is! String) {
+      print(
+        'Warning: ignoring non-string plugins entry "$entry". '
+        'Expected `<package>:<ClassName>`.',
+      );
+      return null;
+    }
+    final colon = entry.indexOf(':');
+    if (colon <= 0 || colon == entry.length - 1) {
+      print(
+        'Warning: ignoring malformed plugins entry "$entry". '
+        'Expected `<package>:<ClassName>`.',
+      );
+      return null;
+    }
+    final pkg = entry.substring(0, colon).trim();
+    final cls = entry.substring(colon + 1).trim();
+    if (pkg.isEmpty || cls.isEmpty) return null;
+    return PluginSpec(package: pkg, className: cls);
   }
 
   /// Reads the `paged_provider_mapper` path from `riverpod_craft.yaml`.

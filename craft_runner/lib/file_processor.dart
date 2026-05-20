@@ -31,6 +31,13 @@ class FileProcessor {
   static ProjectWideProcessor _projectWideProcessor =
       ProjectWideProcessor(const []);
 
+  /// True once any plugin has been registered in-process via
+  /// [registerPlugins] / [registerProjectWidePlugins]. The CLI consults
+  /// this to skip the yaml-driven handoff when the caller already wired
+  /// plugins through `runWithPlugins(...)` from a custom entry script.
+  static bool _pluginsRegistered = false;
+  static bool get hasRegisteredPlugins => _pluginsRegistered;
+
   /// Register additional plugins (e.g., community plugins from config).
   ///
   /// If an extra plugin has the same [RiverpodCraftPlugin.id] as a built-in,
@@ -40,6 +47,7 @@ class FileProcessor {
     final extraIds = extraPlugins.map((p) => p.id).toSet();
     final kept = builtInPlugins.where((p) => !extraIds.contains(p.id)).toList();
     _pluginRunner = PluginRunner([...kept, ...extraPlugins]);
+    if (extraPlugins.isNotEmpty) _pluginsRegistered = true;
   }
 
   /// Register project-wide plugins ([ProjectWideCraftPlugin]).
@@ -50,6 +58,7 @@ class FileProcessor {
     List<ProjectWideCraftPlugin> plugins,
   ) {
     _projectWideProcessor = ProjectWideProcessor(plugins);
+    if (plugins.isNotEmpty) _pluginsRegistered = true;
   }
 
   /// The active project-wide processor.

@@ -1,3 +1,27 @@
+## 0.6.0
+
+- **YAML-driven plugin loading**: `riverpod_craft.yaml` can now list
+  community plugins as `<package_name>:<ClassName>` entries under a
+  `plugins:` block. When `dart run craft_runner watch` (or `generate` /
+  `clean`) is invoked and the list is non-empty, craft_runner generates
+  `.dart_tool/craft_runner/entry.dart` — a Dart script that imports each
+  plugin and dispatches via `runWithPlugins(...)` — then spawns `dart run`
+  on it. The generated entry uses runtime `is` checks to route each
+  plugin to per-file or project-wide registration.
+
+  ```yaml
+  plugins:
+    - retrofit_craft_plugin:RetrofitApiPlugin
+  ```
+
+  No `tool/craft.dart` boilerplate required for the common case. Projects
+  that already use `runWithPlugins(...)` via a custom `tool/craft.dart`
+  keep working — the handoff is skipped when plugins are already
+  registered in-process.
+
+- Only `craft_runner` is bumped for this release; `riverpod_craft_plugin`,
+  `retrofit_craft`, and `retrofit_craft_plugin` stay at 0.5.0.
+
 ## 0.5.0
 
 - Synchronized release across `riverpod_craft_plugin`, `craft_runner`,

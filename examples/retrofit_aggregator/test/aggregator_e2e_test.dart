@@ -17,9 +17,11 @@ void main() {
   final root = Directory.current.path;
   final genFile = File('$root/lib/app/app_api.craft.dart');
 
+  // craft_runner 0.6.0+ auto-loads community plugins from
+  // `riverpod_craft.yaml`'s `plugins:` block — no `tool/craft.dart` needed.
   Future<ProcessResult> craft(List<String> args) => Process.run(
         'dart',
-        ['run', 'tool/craft.dart', ...args],
+        ['run', 'craft_runner', ...args],
         workingDirectory: root,
       );
 

@@ -1,6 +1,6 @@
 name: craft_runner
 description: Code generation runner for riverpod_craft. Watch mode, single file generation, and cleanup.
-version: 0.5.0
+version: 0.6.0
 homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 issue_tracker: https://github.com/Ahmed-Omar-Hommir/riverpod_craft/issues
@@ -20,13 +20,6 @@ dependencies:
 dev_dependencies:
   lints: ^5.0.0
   test: ^1.24.0
-
-# Local dev overrides — stripped at `dart pub publish`. Lets `pub get`
-# resolve against the in-repo source while riverpod_craft_plugin 0.5.0 is
-# not yet on pub.dev. Remove after the chain is published.
-dependency_overrides:
-  riverpod_craft_plugin:
-    path: ../riverpod_craft_plugin
 
 executables:
   craft_runner: craft_runner
