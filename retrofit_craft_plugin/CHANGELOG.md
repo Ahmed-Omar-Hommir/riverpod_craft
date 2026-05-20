@@ -1,3 +1,12 @@
+## 0.5.0
+
+- Synchronized release across `riverpod_craft_plugin`, `craft_runner`,
+  `retrofit_craft`, and `retrofit_craft_plugin`. No functional changes vs
+  0.4.0 — version bumped to keep the four packages in lock-step going
+  forward.
+- Internal: `riverpod_craft_plugin` and `craft_runner` constraints bumped
+  to `^0.5.0`.
+
 ## 0.4.0
 
 Initial pub.dev release. Versioned in lock-step with `retrofit_craft`,
