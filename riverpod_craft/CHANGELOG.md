@@ -1,3 +1,11 @@
+## 0.5.0
+
+- Synchronized release across the `riverpod_craft` ecosystem
+  (`riverpod_craft`, `riverpod_craft_plugin`, `craft_runner`,
+  `retrofit_craft`, `retrofit_craft_plugin`). No functional changes since
+  this package's last published version — version bumped to keep the
+  ecosystem packages in lock-step going forward.
+
 ## 0.3.2
 
 - **BREAKING**: Upgrade `infinite_scroll_pagination` from v4 to v5
