@@ -21,14 +21,27 @@ import 'cli.dart';
 /// Plugins with the same [RiverpodCraftPlugin.id] as a built-in plugin
 /// will **replace** the built-in. For example, a custom `ProviderPlugin`
 /// subclass with `id => 'provider'` replaces the default provider plugin.
+///
+/// Pass [projectWidePlugins] for generators that aggregate across the whole
+/// project and emit standalone output files (e.g. an `AppApi` aggregator
+/// built from `@Api`-annotated retrofit classes scattered across the
+/// codebase).
 Future<void> runWithPlugins(
   List<RiverpodCraftPlugin> plugins,
-  List<String> args,
-) async {
+  List<String> args, {
+  List<ProjectWideCraftPlugin> projectWidePlugins = const [],
+}) async {
   if (plugins.isNotEmpty) {
     final ids = plugins.map((p) => p.id).join(', ');
-    print('🔌 Registered ${plugins.length} custom plugin(s): $ids');
+    print('🔌 Registered ${plugins.length} per-file plugin(s): $ids');
+  }
+  if (projectWidePlugins.isNotEmpty) {
+    final ids = projectWidePlugins.map((p) => p.id).join(', ');
+    print(
+      '🌐 Registered ${projectWidePlugins.length} project-wide plugin(s): $ids',
+    );
   }
   FileProcessor.registerPlugins(plugins);
+  FileProcessor.registerProjectWidePlugins(projectWidePlugins);
   await RiverpodCraftCLI.main(args);
 }

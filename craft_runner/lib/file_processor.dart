@@ -10,6 +10,7 @@ import 'src/plugin_loader.dart';
 import 'src/plugin_runner.dart';
 import 'src/plugins/provider_plugin.dart';
 import 'src/plugins/command_plugin.dart';
+import 'src/project_wide_processor.dart';
 
 /// The default set of built-in plugins.
 final List<RiverpodCraftPlugin> builtInPlugins = [
@@ -25,6 +26,11 @@ class FileProcessor {
   /// The plugin runner used for code generation.
   static PluginRunner _pluginRunner = PluginRunner(builtInPlugins);
 
+  /// The processor for project-wide plugins (e.g. retrofit_craft's
+  /// `AppApi` aggregator). Empty until [registerProjectWidePlugins] is called.
+  static ProjectWideProcessor _projectWideProcessor =
+      ProjectWideProcessor(const []);
+
   /// Register additional plugins (e.g., community plugins from config).
   ///
   /// If an extra plugin has the same [RiverpodCraftPlugin.id] as a built-in,
@@ -35,6 +41,20 @@ class FileProcessor {
     final kept = builtInPlugins.where((p) => !extraIds.contains(p.id)).toList();
     _pluginRunner = PluginRunner([...kept, ...extraPlugins]);
   }
+
+  /// Register project-wide plugins ([ProjectWideCraftPlugin]).
+  ///
+  /// Unlike per-file plugins, these collect across every Dart source file
+  /// under `lib/` and emit standalone (non-part) generated files.
+  static void registerProjectWidePlugins(
+    List<ProjectWideCraftPlugin> plugins,
+  ) {
+    _projectWideProcessor = ProjectWideProcessor(plugins);
+  }
+
+  /// The active project-wide processor.
+  static ProjectWideProcessor get projectWideProcessor =>
+      _projectWideProcessor;
 
   /// Processes file only if it has changed
   static Future<void> processFileIfChanged(File file) async {

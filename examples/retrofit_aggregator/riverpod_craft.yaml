@@ -1,0 +1,6 @@
+retrofit_craft:
+  default_entry: Identity
+  entry_path: lib/app/api/entries.dart
+  version_path: lib/app/api/versions.dart
+  output: lib/app/app_api.craft.dart
+  root_class_name: AppApi

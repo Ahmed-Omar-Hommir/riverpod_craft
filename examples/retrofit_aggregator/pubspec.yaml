@@ -1,0 +1,29 @@
+name: retrofit_aggregator
+description: End-to-end example for retrofit_craft's grouped AppApi generation.
+publish_to: "none"
+version: 0.0.0
+
+environment:
+  sdk: ">=3.12.0 <4.0.0"
+
+dependencies:
+  # dio 5.9.x fails to compile under Dart 3.12 (breaks build_runner); pin stable.
+  dio: 5.8.0+1
+  retrofit: ^4.9.0
+  retrofit_craft:
+    path: ../../retrofit_craft
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.24.0
+  craft_runner:
+    path: ../../craft_runner
+  retrofit_craft_plugin:
+    path: ../../retrofit_craft_plugin
+
+# Local-only overrides: while riverpod_craft_plugin 0.4.0 is unpublished,
+# anything that depends on it (craft_runner, retrofit_craft_plugin) needs
+# to resolve to the in-repo source. Remove after the publish chain lands.
+dependency_overrides:
+  riverpod_craft_plugin:
+    path: ../../riverpod_craft_plugin

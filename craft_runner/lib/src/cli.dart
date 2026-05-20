@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:craft_runner/file_processor.dart';
@@ -46,12 +47,33 @@ class RiverpodCraftCLI {
 
     await _cleanupExistingFiles(currentDir);
     await _processExistingFiles(currentDir);
+    await _runProjectWidePass(currentDir);
     print('👀 Starting file watcher...');
     final watcher = currentDir.watch(recursive: true);
 
     watcher.listen((event) async {
       await _handleFileEvent(event.path);
     });
+  }
+
+  /// Debounce timer for project-wide passes triggered by watch events.
+  static Timer? _projectWideDebounce;
+
+  /// Schedules a project-wide regeneration if any project-wide plugin is
+  /// registered, debounced 250ms so a save-storm produces at most one pass.
+  static void _scheduleProjectWidePass(Directory dir) {
+    if (!FileProcessor.projectWideProcessor.hasPlugins) return;
+    _projectWideDebounce?.cancel();
+    _projectWideDebounce = Timer(const Duration(milliseconds: 250), () async {
+      await FileProcessor.projectWideProcessor.runFullPass(dir.path);
+    });
+  }
+
+  /// Runs the project-wide pass once and awaits it (used at startup and
+  /// after single-file `generate`, where we want output before returning).
+  static Future<void> _runProjectWidePass(Directory dir) async {
+    if (!FileProcessor.projectWideProcessor.hasPlugins) return;
+    await FileProcessor.projectWideProcessor.runFullPass(dir.path);
   }
 
   /// Processes command line arguments
@@ -98,6 +120,7 @@ class RiverpodCraftCLI {
 
     final contents = await file.readAsString();
     await FileProcessor.processProviderFile(contents, file);
+    await _runProjectWidePass(Directory.current);
   }
 
   /// Cleans all generated files
@@ -254,11 +277,24 @@ class RiverpodCraftCLI {
   static Future<void> _handleFileEvent(String eventPath) async {
     final normalized = path.normalize(eventPath);
 
+    // Skip generator outputs.
+    if (normalized.endsWith('.craft.dart') ||
+        normalized.endsWith('.g.dart') ||
+        normalized.endsWith('.freezed.dart')) {
+      return;
+    }
+
     if (normalized.endsWith('_provider.dart')) {
       final file = File(eventPath);
       if (await file.exists()) {
         await FileProcessor.processFileIfChanged(file);
       }
+    }
+
+    // Project-wide plugins watch every .dart file under lib/. Debounce so
+    // a burst of saves produces at most one regeneration.
+    if (normalized.endsWith('.dart')) {
+      _scheduleProjectWidePass(Directory.current);
     }
   }
 

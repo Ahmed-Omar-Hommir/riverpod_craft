@@ -1,12 +1,12 @@
 name: craft_runner
 description: Code generation runner for riverpod_craft. Watch mode, single file generation, and cleanup.
-version: 0.3.0
+version: 0.4.0
 homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 issue_tracker: https://github.com/Ahmed-Omar-Hommir/riverpod_craft/issues
 
 environment:
-  sdk: ^3.12.0
+  sdk: ^3.5.0
 
 dependencies:
   path: ^1.9.1
@@ -15,7 +15,7 @@ dependencies:
   analyzer: ^8.1.1
   crypto: ^3.0.6
   yaml: ^3.1.3
-  riverpod_craft_plugin: ^0.1.0
+  riverpod_craft_plugin: ^0.4.0
 
 dev_dependencies:
   lints: ^5.0.0

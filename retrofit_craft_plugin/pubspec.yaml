@@ -1,0 +1,35 @@
+name: retrofit_craft_plugin
+description: craft_runner plugin that generates a grouped, versioned retrofit API client aggregator.
+version: 0.4.0
+homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
+repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
+issue_tracker: https://github.com/Ahmed-Omar-Hommir/riverpod_craft/issues
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  analyzer: ^8.1.1
+  path: ^1.9.1
+  yaml: ^3.1.3
+  # Hosted constraint for the publish artifact. Local development uses
+  # `dependency_overrides` below so the in-repo source is picked up until
+  # 0.4.0 is on pub.dev.
+  riverpod_craft_plugin: ^0.4.0
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.24.0
+  # craft_runner is only used by the example fixture / docs (no runtime
+  # dependency in this package). The hosted constraint is what consumers
+  # see; the override below keeps local dev working.
+  craft_runner: ^0.4.0
+
+# Local dev overrides — stripped at `dart pub publish`. Remove these lines
+# once riverpod_craft_plugin 0.4.0 + craft_runner 0.4.0 are on pub.dev and
+# delete the local checkout dependency.
+dependency_overrides:
+  riverpod_craft_plugin:
+    path: ../riverpod_craft_plugin
+  craft_runner:
+    path: ../craft_runner

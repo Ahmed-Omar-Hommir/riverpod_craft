@@ -1,3 +1,15 @@
+## 0.4.0
+
+- Project-wide plugins: new `ProjectWideCraftPlugin` interface support for
+  generators that aggregate across the whole project and emit standalone
+  (non-part) output files (e.g. retrofit_craft's `AppApi` aggregator).
+- `runWithPlugins` gains an optional `projectWidePlugins:` parameter.
+- Watch mode triggers a debounced project-wide pass on any `lib/**/*.dart`
+  change (skipping `*.craft.dart`, `*.g.dart`, `*.freezed.dart`).
+- `riverpod_craft_plugin` dependency switched from the stale hosted pin
+  (`^0.1.0`) to a path dep on the local 0.4.0 package — publish bundles must
+  republish `riverpod_craft_plugin` first.
+
 ## 0.3.0
 
 - Generate `ProviderValue<T>` facade for synchronous providers
