@@ -143,7 +143,9 @@ class FileProcessor {
 
       // Inline the global error mapper function when a generated notifier
       // routes its errors through it.
-      final usesErrorMapper = generatedContent.contains('errorMapper(');
+      final usesErrorMapper = generatedContent.contains(
+        '${CraftConfig.errorMapperInlineName}(',
+      );
       final errorMapperPreamble = usesErrorMapper
           ? _buildErrorMapperPreamble()
           : '';

@@ -2,7 +2,7 @@
 // ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
 part of 'notes_provider.dart';
 
-AppError errorMapper(Object error) {
+AppError _$errorMapper(Object error) {
   final text = error.toString();
   if (text.contains('SocketException') || text.contains('Failed host lookup')) {
     return const NetworkError('No internet connection');
@@ -22,7 +22,7 @@ abstract class _$Notes extends DataNotifier<List<Note>, ()> {
   Future<List<Note>> buildDataWithFuture() => create();
 
   @override
-  Object mapError(Object error) => errorMapper(error);
+  Object mapError(Object error) => _$errorMapper(error);
 
   Future<Note> addNote({
     required String title,
@@ -174,7 +174,7 @@ class _$AddNoteCommandNotes
   ActionStrategy get strategy => ActionStrategy.droppable;
 
   @override
-  Object mapError(Object error) => errorMapper(error);
+  Object mapError(Object error) => _$errorMapper(error);
 }
 
 class _$DeleteNoteCommandNotes extends CommandNotifier<String, ({String id})> {
@@ -192,7 +192,7 @@ class _$DeleteNoteCommandNotes extends CommandNotifier<String, ({String id})> {
   ActionStrategy get strategy => ActionStrategy.droppable;
 
   @override
-  Object mapError(Object error) => errorMapper(error);
+  Object mapError(Object error) => _$errorMapper(error);
 }
 
 class _$UpdateNoteCommandNotes extends CommandNotifier<Note, ({Note note})> {
@@ -210,7 +210,7 @@ class _$UpdateNoteCommandNotes extends CommandNotifier<Note, ({Note note})> {
   ActionStrategy get strategy => ActionStrategy.droppable;
 
   @override
-  Object mapError(Object error) => errorMapper(error);
+  Object mapError(Object error) => _$errorMapper(error);
 }
 
 class $AddNoteCommandFacadeNotesRef {

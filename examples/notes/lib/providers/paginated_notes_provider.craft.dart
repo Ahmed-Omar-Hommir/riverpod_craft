@@ -14,7 +14,7 @@ PaginatedResponse<T> pagedMapper<T>(ApiPagedResponse<T> data) {
   );
 }
 
-AppError errorMapper(Object error) {
+AppError _$errorMapper(Object error) {
   final text = error.toString();
   if (text.contains('SocketException') || text.contains('Failed host lookup')) {
     return const NetworkError('No internet connection');
@@ -33,7 +33,7 @@ abstract class _$PaginatedNotes
       pagedMapper(await create(page, category: arg.category));
 
   @override
-  Object mapError(Object error) => errorMapper(error);
+  Object mapError(Object error) => _$errorMapper(error);
 
   Future<void> deleteNote({required String id});
 
@@ -153,7 +153,7 @@ class _$DeleteNoteCommandPaginatedNotes
   ActionStrategy get strategy => ActionStrategy.droppable;
 
   @override
-  Object mapError(Object error) => errorMapper(error);
+  Object mapError(Object error) => _$errorMapper(error);
 }
 
 class $DeleteNoteCommandFacadePaginatedNotesRef {

@@ -72,13 +72,13 @@ error_mapper: lib/error_mapper.dart
 
 The code generator reads your mapper function and:
 
-1. **Inlines the mapper** — `errorMapper` is written directly into every `.craft.dart` file that has a provider which can fail (future, stream, paged, or command).
+1. **Inlines the mapper** — your function is copied into every `.craft.dart` file that has a provider which can fail (future, stream, paged, or command). It's inlined under a private name (`_$errorMapper`) so it never collides when provider files are re-exported through a barrel.
 2. **Routes every caught error through it** — each generated notifier overrides `mapError`, so the error stored on the state is already your type:
 
 ```dart
 // generated in each notifier
 @override
-Object mapError(Object error) => errorMapper(error);
+Object mapError(Object error) => _$errorMapper(error);
 ```
 
 Now your widgets work against `AppError` directly:

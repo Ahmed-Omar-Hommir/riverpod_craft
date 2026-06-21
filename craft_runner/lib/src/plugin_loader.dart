@@ -161,7 +161,14 @@ class CraftConfig {
   static bool get hasErrorMapper => errorMapperPath != null;
 
   /// The full source of the `errorMapper` function, to inline in `.craft.dart`.
+  /// The function is renamed to [errorMapperInlineName] so the inlined copy
+  /// stays private and never collides through barrel re-exports.
   static String? errorMapperFunctionSource;
+
+  /// Private name the user's `errorMapper` is inlined under in each generated
+  /// `.craft.dart`. Leading `_` keeps it library-private so files that are
+  /// re-exported by a barrel don't produce `ambiguous_export` errors.
+  static const errorMapperInlineName = r'_$errorMapper';
 
   /// Parses the mapper file to extract the input type and function body.
   ///
@@ -243,7 +250,13 @@ class CraftConfig {
     for (final declaration in unit.declarations) {
       if (declaration is FunctionDeclaration &&
           declaration.name.lexeme == 'errorMapper') {
-        errorMapperFunctionSource = declaration.toSource();
+        // Rename to a private name so the inlined copy doesn't leak through
+        // barrel re-exports. The declared name is the first textual
+        // occurrence (after the return type), so replaceFirst is safe.
+        errorMapperFunctionSource = declaration.toSource().replaceFirst(
+          'errorMapper',
+          errorMapperInlineName,
+        );
         break;
       }
     }

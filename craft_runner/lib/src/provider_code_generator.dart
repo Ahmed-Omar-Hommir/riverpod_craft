@@ -4,9 +4,10 @@ import 'package:craft_runner/src/plugin_loader.dart';
 
 /// The `mapError` override emitted into generated notifiers when a global
 /// `error_mapper` is configured. Routes every caught error through the inlined
-/// `errorMapper` function. Empty when no mapper is configured.
+/// (privately renamed) `errorMapper` function. Empty when no mapper is
+/// configured.
 String get mapErrorOverride => CraftConfig.hasErrorMapper
-    ? '\n  @override\n  Object mapError(Object error) => errorMapper(error);\n'
+    ? '\n  @override\n  Object mapError(Object error) => ${CraftConfig.errorMapperInlineName}(error);\n'
     : '';
 
 class ProviderCodeGenerator {
