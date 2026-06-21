@@ -1,6 +1,7 @@
 import 'package:riverpod_craft/riverpod_craft.dart';
 import '../models/note.dart';
 import '../models/api_paged_response.dart';
+import '../models/app_error.dart';
 
 part 'paginated_notes_provider.craft.dart';
 

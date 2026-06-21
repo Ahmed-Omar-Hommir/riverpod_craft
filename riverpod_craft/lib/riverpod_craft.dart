@@ -5,6 +5,7 @@
 library;
 
 export 'src/annotations.dart';
+export 'src/error_mapper.dart';
 export 'src/result.dart';
 export 'src/provider_facade.dart';
 export 'src/data_provider/state_data/state_data_notifier.dart';

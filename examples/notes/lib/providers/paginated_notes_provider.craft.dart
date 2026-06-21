@@ -14,12 +14,26 @@ PaginatedResponse<T> pagedMapper<T>(ApiPagedResponse<T> data) {
   );
 }
 
+AppError errorMapper(Object error) {
+  final text = error.toString();
+  if (text.contains('SocketException') || text.contains('Failed host lookup')) {
+    return const NetworkError('No internet connection');
+  }
+  if (text.contains('404') || text.contains('Not Found')) {
+    return const NotFoundError('The requested note was not found');
+  }
+  return UnknownError(text, error);
+}
+
 abstract class _$PaginatedNotes
     extends PagedDataNotifier<Note, ({String? category})> {
   Paged<Note> create(int page, {required String? category});
   @override
   Future<PaginatedResponse<Note>> buildPagedData(int page) async =>
       pagedMapper(await create(page, category: arg.category));
+
+  @override
+  Object mapError(Object error) => errorMapper(error);
 
   Future<void> deleteNote({required String id});
 
@@ -137,6 +151,9 @@ class _$DeleteNoteCommandPaginatedNotes
 
   @override
   ActionStrategy get strategy => ActionStrategy.droppable;
+
+  @override
+  Object mapError(Object error) => errorMapper(error);
 }
 
 class $DeleteNoteCommandFacadePaginatedNotesRef {

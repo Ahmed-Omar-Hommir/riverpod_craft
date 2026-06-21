@@ -1,5 +1,13 @@
 import 'package:craft_runner/parameters_converter.dart';
 import 'package:craft_runner/provider_info.dart';
+import 'package:craft_runner/src/plugin_loader.dart';
+
+/// The `mapError` override emitted into generated notifiers when a global
+/// `error_mapper` is configured. Routes every caught error through the inlined
+/// `errorMapper` function. Empty when no mapper is configured.
+String get mapErrorOverride => CraftConfig.hasErrorMapper
+    ? '\n  @override\n  Object mapError(Object error) => errorMapper(error);\n'
+    : '';
 
 class ProviderCodeGenerator {
   final ProviderInfo _info;
@@ -96,7 +104,7 @@ abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, $clas
   Paged<${_info.dataType}> create(int page${familyParams.isEmpty ? '' : ', $createParamSig'});
   @override
   $buildPagedLine
-
+$mapErrorOverride
 ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent()).join('\n')}
 }''';
     }
@@ -117,7 +125,7 @@ abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, $clas
   ${_info.returnName} create($createParamSig);
   @override
   ${_info.returnName} $buildMethodName() => create($dataCreateCall);
-
+$mapErrorOverride
 ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent()).join('\n')}
 }''';
     }
@@ -193,7 +201,7 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent())
 class ${_info.notifierType} extends $controllerType<${_info.dataType}, $dataArgType> {
   @override
   $functionalBuildLine
-}''';
+$mapErrorOverride}''';
     }
 
     // For DataNotifier (Future/Stream): use isFuture getter and buildDataWithFuture()/buildDataWithStream()
@@ -211,7 +219,7 @@ class ${_info.notifierType} extends $controllerType<${_info.dataType}, $dataArgT
 
   @override
   ${_info.returnName} $buildMethodName() => $functionCall;
-}''';
+$mapErrorOverride}''';
     }
 
     // For StateDataNotifier (sync providers) - use same pattern as Future/Stream

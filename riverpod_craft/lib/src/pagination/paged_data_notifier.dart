@@ -1,6 +1,7 @@
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:riverpod/riverpod.dart';
 
+import '../error_mapper.dart';
 import 'paged_data_state.dart';
 import 'paginated_response.dart';
 
@@ -13,7 +14,8 @@ import 'paginated_response.dart';
 /// Call [fetchNextPage] to load the next page of results (triggered
 /// automatically on build and when the UI reaches the end of the list).
 abstract class PagedDataNotifier<T, Arg extends Record>
-    extends Notifier<PagedDataState<T>> {
+    extends Notifier<PagedDataState<T>>
+    with ErrorMapper {
   /// Family argument set by the generated provider constructor.
   late final Arg arg;
 
@@ -57,7 +59,7 @@ abstract class PagedDataNotifier<T, Arg extends Record>
         ),
       );
     } catch (error) {
-      state = PagedDataState(s.copyWith(error: error, isLoading: false));
+      state = PagedDataState(s.copyWith(error: mapError(error), isLoading: false));
     } finally {
       _pending = false;
     }

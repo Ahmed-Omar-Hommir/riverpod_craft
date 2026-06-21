@@ -1,5 +1,6 @@
 import 'package:craft_runner/parameters_converter.dart';
 import 'package:craft_runner/provider_info.dart';
+import 'package:craft_runner/src/provider_code_generator.dart';
 
 import 'concurrency_type.dart';
 import 'parameter_info.dart';
@@ -155,7 +156,7 @@ class $_generatedClassName extends CommandNotifier<$dataType, $argRecordType> {
 
   @override
   ActionStrategy get strategy => $strategyType;
-}''';
+$mapErrorOverride}''';
     }
 
     return '''final _\$${name}Command = NotifierProvider<$notifierType, $stateType>(
@@ -172,7 +173,7 @@ class $_generatedClassName extends CommandNotifier<$dataType, $argRecordType> {
 
   @override
   ActionStrategy get strategy => $strategyType;
-}''';
+$mapErrorOverride}''';
   }
 
   String build() {
@@ -532,7 +533,7 @@ class $_parentCommandClassName extends CommandNotifier<${command.dataType}, $arg
 
   @override
   ActionStrategy get strategy => ${command.strategyType};
-}''';
+$mapErrorOverride}''';
     }
 
     return '''
@@ -548,6 +549,6 @@ class $_parentCommandClassName extends CommandNotifier<${command.dataType}, $arg
 
   @override
   ActionStrategy get strategy => ${command.strategyType};
-}''';
+$mapErrorOverride}''';
   }
 }

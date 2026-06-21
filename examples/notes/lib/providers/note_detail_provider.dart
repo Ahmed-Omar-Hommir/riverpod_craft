@@ -1,5 +1,6 @@
 import 'package:riverpod_craft/riverpod_craft.dart';
 import '../data/notes_repository.dart';
+import '../models/app_error.dart';
 import '../models/note.dart';
 
 part 'note_detail_provider.craft.dart';

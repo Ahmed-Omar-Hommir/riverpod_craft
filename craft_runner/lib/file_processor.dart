@@ -141,6 +141,13 @@ class FileProcessor {
       final hasPaged = generatedContent.contains('PagedDataNotifier');
       final pagedPreamble = hasPaged ? _buildPagedPreamble() : '';
 
+      // Inline the global error mapper function when a generated notifier
+      // routes its errors through it.
+      final usesErrorMapper = generatedContent.contains('errorMapper(');
+      final errorMapperPreamble = usesErrorMapper
+          ? _buildErrorMapperPreamble()
+          : '';
+
       effectiveContents = await _ensurePartDirective(
         file,
         effectiveContents,
@@ -149,7 +156,7 @@ class FileProcessor {
 
       _fileContentCache[file.path] = effectiveContents;
 
-      final fullContent = "// GENERATED CODE - DO NOT MODIFY BY HAND\n// ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member\npart of '$fileName';\n$pagedPreamble\n$generatedContent";
+      final fullContent = "// GENERATED CODE - DO NOT MODIFY BY HAND\n// ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member\npart of '$fileName';\n$pagedPreamble$errorMapperPreamble\n$generatedContent";
 
       final formatter = DartFormatter(
         languageVersion: DartFormatter.latestLanguageVersion,
@@ -180,6 +187,16 @@ $mapperFn
 ''';
     }
     return '\ntypedef Paged<T> = Future<PaginatedResponse<T>>;\n';
+  }
+
+  /// Inlines the global `errorMapper` function (from `error_mapper` in
+  /// `riverpod_craft.yaml`) into a `.craft.dart` file so generated notifiers
+  /// can route caught errors through it. Returns an empty string when no
+  /// mapper is configured.
+  static String _buildErrorMapperPreamble() {
+    final mapperFn = CraftConfig.errorMapperFunctionSource;
+    if (!CraftConfig.hasErrorMapper || mapperFn == null) return '';
+    return '\n$mapperFn\n';
   }
 
 

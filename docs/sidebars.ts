@@ -12,6 +12,7 @@ const sidebars: SidebarsConfig = {
         'concepts/state-provider',
         'concepts/fetch-data',
         'concepts/pagination',
+        'concepts/error-mapping',
         'concepts/side-effects',
         'concepts/command',
         'concepts/why-craft-runner',

@@ -10,12 +10,19 @@ class ConcurrentController<DataT, Arg extends Record>
   ConcurrentController({
     required Future<DataT> Function(Arg arg) action,
     required ActionStrategy strategy,
+    Object Function(Object error)? mapError,
   }) : _action = action,
+       _mapError = mapError ?? _identity,
        super(ArgCommandState<DataT, Arg>.init()) {
     _setupEventHandler(strategy);
   }
 
   final Future<DataT> Function(Arg arg) _action;
+
+  /// Maps a raw caught error before it is emitted as an error state.
+  final Object Function(Object error) _mapError;
+
+  static Object _identity(Object error) => error;
 
   void fire(Arg arg) => add(_Fire(arg));
 
@@ -26,7 +33,7 @@ class ConcurrentController<DataT, Arg extends Record>
         final data = await _action(event.arg);
         emit(ArgCommandState<DataT, Arg>.data(event.arg, data));
       } catch (e) {
-        emit(ArgCommandState<DataT, Arg>.error(event.arg, e));
+        emit(ArgCommandState<DataT, Arg>.error(event.arg, _mapError(e)));
       }
     }, transformer: _getTransformer<_Fire<Arg>>(strategy));
   }

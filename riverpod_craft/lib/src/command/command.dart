@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod/src/internals.dart';
 
 import '../data_provider/async_state/async_state.dart';
+import '../error_mapper.dart';
 import 'currency_controller.dart';
 
 part 'action_strategy.dart';

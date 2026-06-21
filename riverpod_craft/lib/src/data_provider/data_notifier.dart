@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
 
+import '../error_mapper.dart';
 import '../result.dart';
 import 'async_state/async_state.dart';
 
@@ -16,7 +17,8 @@ import 'async_state/async_state.dart';
 /// Set [isFuture] to `true` when using [buildDataWithFuture],
 /// or `false` when using [buildDataWithStream].
 abstract class DataNotifier<T, Arg extends Record>
-    extends Notifier<DataState<T>> {
+    extends Notifier<DataState<T>>
+    with ErrorMapper {
   /// The argument passed to this notifier, typically used to configure data fetching.
   late final Arg arg;
 
@@ -57,7 +59,7 @@ abstract class DataNotifier<T, Arg extends Record>
         if (e is Error<T>) {
           yield e;
         } else {
-          yield Result.error(e);
+          yield Result.error(mapError(e));
         }
       }
     } else {
@@ -67,7 +69,7 @@ abstract class DataNotifier<T, Arg extends Record>
         if (e is Error<T>) {
           yield e;
         } else {
-          yield Result.error(e);
+          yield Result.error(mapError(e));
         }
       }
     }
@@ -95,7 +97,7 @@ abstract class DataNotifier<T, Arg extends Record>
           }
         },
         onError: (e) {
-          if (!silent) state = DataError(e);
+          if (!silent) state = DataError(mapError(e));
 
           if (!completer.isCompleted) {
             completer.completeError(e);
@@ -105,7 +107,7 @@ abstract class DataNotifier<T, Arg extends Record>
 
       ref.onDispose(() => _subscription?.cancel());
     } catch (e) {
-      if (!silent) state = DataError(e);
+      if (!silent) state = DataError(mapError(e));
       if (!completer.isCompleted) {
         completer.completeError(e);
       }

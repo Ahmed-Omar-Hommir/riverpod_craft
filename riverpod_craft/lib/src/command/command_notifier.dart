@@ -4,7 +4,8 @@ part of 'command.dart';
 ///
 /// Subclass this to define a command with a specific [ActionStrategy].
 abstract class CommandNotifier<DataT, Arg extends Record>
-    extends Notifier<ArgCommandState<DataT, Arg>> {
+    extends Notifier<ArgCommandState<DataT, Arg>>
+    with ErrorMapper {
   late final KeepAliveManager _refManager;
 
   /// The concurrency strategy used when multiple actions are triggered.
@@ -26,6 +27,7 @@ abstract class CommandNotifier<DataT, Arg extends Record>
     _controller = ConcurrentController<DataT, Arg>(
       action: (arg) async => action(ref, arg),
       strategy: strategy,
+      mapError: mapError,
     );
     _initializeController();
     ref.onDispose(() => _dispose());

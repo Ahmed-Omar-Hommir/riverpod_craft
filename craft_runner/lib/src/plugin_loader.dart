@@ -116,6 +116,28 @@ class PluginLoader {
     }
   }
 
+  /// Reads the `error_mapper` path from `riverpod_craft.yaml`.
+  ///
+  /// Returns `null` if not configured.
+  static String? loadErrorMapperPath([Directory? directory]) {
+    final dir = directory ?? Directory.current;
+    final configFile = File('${dir.path}/riverpod_craft.yaml');
+
+    if (!configFile.existsSync()) return null;
+
+    try {
+      final content = configFile.readAsStringSync();
+      final yaml = loadYaml(content);
+
+      if (yaml is! YamlMap) return null;
+
+      final mapper = yaml['error_mapper'];
+      return mapper is String ? mapper : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   /// Checks if a `riverpod_craft.yaml` config file exists.
   static bool hasConfig([Directory? directory]) {
     final dir = directory ?? Directory.current;
@@ -133,6 +155,13 @@ class CraftConfig {
 
   /// The full source of the `pagedMapper` function, to inline in `.craft.dart`.
   static String? pagedMapperFunctionSource;
+
+  /// Path to the global error mapper file, from `error_mapper` in the config.
+  static String? errorMapperPath;
+  static bool get hasErrorMapper => errorMapperPath != null;
+
+  /// The full source of the `errorMapper` function, to inline in `.craft.dart`.
+  static String? errorMapperFunctionSource;
 
   /// Parses the mapper file to extract the input type and function body.
   ///
@@ -187,6 +216,43 @@ class CraftConfig {
         }
         break;
       }
+    }
+  }
+
+  /// Parses the error mapper file to extract the `errorMapper` function source.
+  ///
+  /// Given a mapper like:
+  /// ```dart
+  /// AppError errorMapper(Object error) { ... }
+  /// ```
+  /// Stores the full function source in [errorMapperFunctionSource] so it can
+  /// be inlined into generated `.craft.dart` files.
+  static void parseErrorMapperFile() {
+    if (errorMapperPath == null) return;
+
+    final file = File(errorMapperPath!);
+    if (!file.existsSync()) {
+      print('Warning: Error mapper file not found: $errorMapperPath');
+      return;
+    }
+
+    final content = file.readAsStringSync();
+    final result = parseString(content: content);
+    final unit = result.unit;
+
+    for (final declaration in unit.declarations) {
+      if (declaration is FunctionDeclaration &&
+          declaration.name.lexeme == 'errorMapper') {
+        errorMapperFunctionSource = declaration.toSource();
+        break;
+      }
+    }
+
+    if (errorMapperFunctionSource == null) {
+      print(
+        'Warning: No top-level `errorMapper` function found in '
+        '$errorMapperPath',
+      );
     }
   }
 }

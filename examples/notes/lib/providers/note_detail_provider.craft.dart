@@ -2,6 +2,17 @@
 // ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
 part of 'note_detail_provider.dart';
 
+AppError errorMapper(Object error) {
+  final text = error.toString();
+  if (text.contains('SocketException') || text.contains('Failed host lookup')) {
+    return const NetworkError('No internet connection');
+  }
+  if (text.contains('404') || text.contains('Not Found')) {
+    return const NotFoundError('The requested note was not found');
+  }
+  return UnknownError(text, error);
+}
+
 final _noteDetailProvider =
     NotifierProvider.family<$$NoteDetail, DataState<Note>, ({String id})>(
       (({String id}) arg) => $$NoteDetail()..arg = arg,
@@ -14,6 +25,9 @@ class $$NoteDetail extends DataNotifier<Note, ({String id})> {
 
   @override
   Future<Note> buildDataWithFuture() => noteDetail(ref, id: arg.id);
+
+  @override
+  Object mapError(Object error) => errorMapper(error);
 }
 
 class $NoteDetailFacadeRef {

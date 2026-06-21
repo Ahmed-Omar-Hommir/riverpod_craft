@@ -40,6 +40,10 @@ class RiverpodCraftCLI {
     // Load paged mapper config and parse mapper file
     CraftConfig.pagedMapperPath = PluginLoader.loadPagedMapperPath();
     CraftConfig.parseMapperFile();
+
+    // Load global error mapper config and parse mapper file
+    CraftConfig.errorMapperPath = PluginLoader.loadErrorMapperPath();
+    CraftConfig.parseErrorMapperFile();
   }
 
   /// If `riverpod_craft.yaml`'s `plugins:` list is non-empty, generate

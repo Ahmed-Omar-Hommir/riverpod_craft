@@ -2,6 +2,17 @@
 // ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
 part of 'notes_provider.dart';
 
+AppError errorMapper(Object error) {
+  final text = error.toString();
+  if (text.contains('SocketException') || text.contains('Failed host lookup')) {
+    return const NetworkError('No internet connection');
+  }
+  if (text.contains('404') || text.contains('Not Found')) {
+    return const NotFoundError('The requested note was not found');
+  }
+  return UnknownError(text, error);
+}
+
 abstract class _$Notes extends DataNotifier<List<Note>, ()> {
   @override
   bool get isFuture => true;
@@ -9,6 +20,9 @@ abstract class _$Notes extends DataNotifier<List<Note>, ()> {
   Future<List<Note>> create();
   @override
   Future<List<Note>> buildDataWithFuture() => create();
+
+  @override
+  Object mapError(Object error) => errorMapper(error);
 
   Future<Note> addNote({
     required String title,
@@ -158,6 +172,9 @@ class _$AddNoteCommandNotes
 
   @override
   ActionStrategy get strategy => ActionStrategy.droppable;
+
+  @override
+  Object mapError(Object error) => errorMapper(error);
 }
 
 class _$DeleteNoteCommandNotes extends CommandNotifier<String, ({String id})> {
@@ -173,6 +190,9 @@ class _$DeleteNoteCommandNotes extends CommandNotifier<String, ({String id})> {
 
   @override
   ActionStrategy get strategy => ActionStrategy.droppable;
+
+  @override
+  Object mapError(Object error) => errorMapper(error);
 }
 
 class _$UpdateNoteCommandNotes extends CommandNotifier<Note, ({Note note})> {
@@ -188,6 +208,9 @@ class _$UpdateNoteCommandNotes extends CommandNotifier<Note, ({Note note})> {
 
   @override
   ActionStrategy get strategy => ActionStrategy.droppable;
+
+  @override
+  Object mapError(Object error) => errorMapper(error);
 }
 
 class $AddNoteCommandFacadeNotesRef {
