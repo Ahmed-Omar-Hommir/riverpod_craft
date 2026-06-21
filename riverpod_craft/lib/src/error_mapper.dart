@@ -23,7 +23,7 @@ import 'package:flutter/foundation.dart';
 /// The code generator then types every notifier as `... <Data, AppError, Arg>`
 /// and overrides [mapError] to route caught errors through your `errorMapper`,
 /// so `state.error` is `AppError` instead of a raw `Object`.
-mixin ErrorMapper<F extends Object> {
+mixin ErrorMapper<F> {
   /// Maps a raw caught [error] into the typed error [F] stored in state.
   ///
   /// Returns the error unchanged (when `F` is `Object`) unless overridden by a

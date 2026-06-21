@@ -59,7 +59,7 @@ class SelectedWidgetRefFacade<R> {
 ///
 /// [F] is the error type — `Object` by default, or your custom type when a
 /// global `error_mapper` is configured.
-abstract class AsyncProviderFacade<T, F extends Object, ArgT extends Record> {
+abstract class AsyncProviderFacade<T, F, ArgT extends Record> {
   /// Reads the current async state without subscribing.
   AsynchronousState<T, F, ArgT> read();
 
@@ -87,7 +87,7 @@ abstract class AsyncProviderFacade<T, F extends Object, ArgT extends Record> {
 // ─── Data facade ─────────────────────────────────────────────────────
 
 /// Facade for data providers that fetch and cache a single value.
-abstract class DataProviderFacade<T, F extends Object>
+abstract class DataProviderFacade<T, F>
     extends AsyncProviderFacade<T, F, Record> {
   /// Reads the current data state without subscribing.
   @override
@@ -119,7 +119,7 @@ abstract class DataProviderFacade<T, F extends Object>
 // ─── Command facade ──────────────────────────────────────────────────
 
 /// Facade for command providers that execute actions with arguments.
-abstract class CommandProviderFacade<T, F extends Object, ArgT extends Record>
+abstract class CommandProviderFacade<T, F, ArgT extends Record>
     extends AsyncProviderFacade<T, F, ArgT> {
   /// Reads the current command state without subscribing.
   @override
@@ -153,7 +153,7 @@ abstract class CommandProviderFacade<T, F extends Object, ArgT extends Record>
 /// Interface for interacting with a paginated provider's state.
 ///
 /// Generated Widget facades implement this.
-abstract class PagedProviderFacade<T, F extends Object> {
+abstract class PagedProviderFacade<T, F> {
   /// Reads the current paged data state without subscribing.
   PagedDataState<T, F> read();
 

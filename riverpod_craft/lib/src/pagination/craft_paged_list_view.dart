@@ -19,7 +19,7 @@ import 'package:riverpod_craft/riverpod_craft.dart';
 ///
 /// [F] is the error type exposed to the error builders — `Object` by default,
 /// or your custom type when a global `error_mapper` is configured.
-class CraftPagedListView<T, F extends Object> extends ConsumerStatefulWidget {
+class CraftPagedListView<T, F> extends ConsumerStatefulWidget {
   /// Creates a [CraftPagedListView] backed by a paginated provider.
   const CraftPagedListView({
     super.key,
@@ -120,7 +120,7 @@ class CraftPagedListView<T, F extends Object> extends ConsumerStatefulWidget {
       _CraftPagedListViewState<T, F>();
 }
 
-class _CraftPagedListViewState<T, F extends Object>
+class _CraftPagedListViewState<T, F>
     extends ConsumerState<CraftPagedListView<T, F>> {
   @override
   Widget build(BuildContext context) {
@@ -177,8 +177,7 @@ class _CraftPagedListViewState<T, F extends Object>
 }
 
 /// A paginated sliver list view for use inside [CustomScrollView].
-class CraftPagedSliverListView<T, F extends Object>
-    extends ConsumerStatefulWidget {
+class CraftPagedSliverListView<T, F> extends ConsumerStatefulWidget {
   /// Creates a [CraftPagedSliverListView] backed by a paginated provider.
   const CraftPagedSliverListView({
     super.key,
@@ -231,7 +230,7 @@ class CraftPagedSliverListView<T, F extends Object>
       _CraftPagedSliverListViewState<T, F>();
 }
 
-class _CraftPagedSliverListViewState<T, F extends Object>
+class _CraftPagedSliverListViewState<T, F>
     extends ConsumerState<CraftPagedSliverListView<T, F>> {
   @override
   Widget build(BuildContext context) {

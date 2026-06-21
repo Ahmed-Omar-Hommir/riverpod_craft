@@ -13,7 +13,7 @@ import 'paginated_response.dart';
 /// The notifier manages page tracking, loading state, and error handling.
 /// Call [fetchNextPage] to load the next page of results (triggered
 /// automatically on build and when the UI reaches the end of the list).
-abstract class PagedDataNotifier<T, F extends Object, Arg extends Record>
+abstract class PagedDataNotifier<T, F, Arg extends Record>
     extends Notifier<PagedDataState<T, F>>
     with ErrorMapper<F> {
   /// Family argument set by the generated provider constructor.

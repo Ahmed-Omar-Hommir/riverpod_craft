@@ -19,7 +19,7 @@ import 'async_state/async_state.dart';
 ///
 /// [F] is the error type stored in [DataError] — `Object` by default, or your
 /// custom type when a global `error_mapper` is configured.
-abstract class DataNotifier<T, F extends Object, Arg extends Record>
+abstract class DataNotifier<T, F, Arg extends Record>
     extends Notifier<DataState<T, F>>
     with ErrorMapper<F> {
   /// The argument passed to this notifier, typically used to configure data fetching.

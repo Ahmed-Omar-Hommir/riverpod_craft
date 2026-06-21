@@ -7,8 +7,7 @@ part 'arg_command_state.dart';
 ///
 /// [F] is the error type — `Object` by default, or your custom type when a
 /// global `error_mapper` is configured.
-sealed class AsynchronousState<T, F extends Object, ArgT extends Record>
-    with EquatableMixin {
+sealed class AsynchronousState<T, F, ArgT extends Record> with EquatableMixin {
   const AsynchronousState();
 
   @override
@@ -16,7 +15,7 @@ sealed class AsynchronousState<T, F extends Object, ArgT extends Record>
 }
 
 /// Convenience getters and pattern-matching helpers for [AsynchronousState].
-extension AsynchronousStateExtension<T, F extends Object, ArgT extends Record>
+extension AsynchronousStateExtension<T, F, ArgT extends Record>
     on AsynchronousState<T, F, ArgT> {
   /// Whether the current state is a loading variant.
   bool get isLoading => switch (this) {
@@ -148,8 +147,10 @@ extension AsynchronousStateExtension<T, F extends Object, ArgT extends Record>
       CommandInit<T, F, ArgT>() => init(),
       CommandLoading<T, F, ArgT>() => loading(null),
       CommandData<T, F, ArgT>(data: final dataValue) => data(null, dataValue),
-      CommandError<T, F, ArgT>(error: final errorValue) =>
-        error(null, errorValue),
+      CommandError<T, F, ArgT>(error: final errorValue) => error(
+        null,
+        errorValue,
+      ),
       ArgCommandInit<T, F, ArgT>() => init(),
       ArgCommandLoading<T, F, ArgT>(arg: final arg) => loading(arg),
       ArgCommandData<T, F, ArgT>(arg: final arg, data: final dataValue) => data(

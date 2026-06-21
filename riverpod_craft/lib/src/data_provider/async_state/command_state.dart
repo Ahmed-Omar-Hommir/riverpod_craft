@@ -2,7 +2,7 @@ part of 'async_state.dart';
 
 /// Represents the state of a command operation that produces [T] with arguments
 /// [ArgT] and a typed error [F].
-sealed class CommandState<T, F extends Object, ArgT extends Record>
+sealed class CommandState<T, F, ArgT extends Record>
     with EquatableMixin
     implements AsynchronousState<T, F, ArgT> {
   const CommandState();
@@ -24,8 +24,7 @@ sealed class CommandState<T, F extends Object, ArgT extends Record>
 }
 
 /// The initial idle state before a command has been executed.
-class CommandInit<T, F extends Object, ArgT extends Record>
-    extends CommandState<T, F, ArgT> {
+class CommandInit<T, F, ArgT extends Record> extends CommandState<T, F, ArgT> {
   /// Creates a [CommandInit] instance.
   const CommandInit();
 
@@ -34,7 +33,7 @@ class CommandInit<T, F extends Object, ArgT extends Record>
 }
 
 /// The loading state while a command is being executed.
-class CommandLoading<T, F extends Object, ArgT extends Record>
+class CommandLoading<T, F, ArgT extends Record>
     extends CommandState<T, F, ArgT> {
   /// Creates a [CommandLoading] instance.
   const CommandLoading();
@@ -44,8 +43,7 @@ class CommandLoading<T, F extends Object, ArgT extends Record>
 }
 
 /// The success state holding the [data] result of a command.
-class CommandData<T, F extends Object, ArgT extends Record>
-    extends CommandState<T, F, ArgT> {
+class CommandData<T, F, ArgT extends Record> extends CommandState<T, F, ArgT> {
   /// Creates a [CommandData] instance with the given [data].
   const CommandData(this.data);
 
@@ -57,8 +55,7 @@ class CommandData<T, F extends Object, ArgT extends Record>
 }
 
 /// The error state holding the [error] from a failed command.
-class CommandError<T, F extends Object, ArgT extends Record>
-    extends CommandState<T, F, ArgT> {
+class CommandError<T, F, ArgT extends Record> extends CommandState<T, F, ArgT> {
   /// Creates a [CommandError] instance with the given [error].
   const CommandError(this.error);
 
@@ -70,7 +67,7 @@ class CommandError<T, F extends Object, ArgT extends Record>
 }
 
 /// Convenience getters and pattern-matching methods on [CommandState].
-extension CommandStateExtension<T, F extends Object, ArgT extends Record>
+extension CommandStateExtension<T, F, ArgT extends Record>
     on CommandState<T, F, ArgT> {
   /// Whether this state is [CommandInit].
   bool get isInit => this is CommandInit<T, F, ArgT>;
@@ -207,7 +204,7 @@ extension CommandStateExtension<T, F extends Object, ArgT extends Record>
 }
 
 /// Convenience getters and pattern-matching methods on nullable [CommandState].
-extension NullableCommandStateExtension<T, F extends Object, ArgT extends Record>
+extension NullableCommandStateExtension<T, F, ArgT extends Record>
     on CommandState<T, F, ArgT>? {
   /// Whether this state is [CommandInit] (false if null).
   bool get isInit => this is CommandInit<T, F, ArgT>;

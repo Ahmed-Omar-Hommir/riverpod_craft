@@ -8,7 +8,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 ///
 /// [F] is the error type — `Object` by default, or your custom type when a
 /// global `error_mapper` is configured.
-class PagedDataState<T, F extends Object> with EquatableMixin {
+class PagedDataState<T, F> with EquatableMixin {
   /// Creates a [PagedDataState] wrapping the given [pagingState].
   const PagedDataState(this.pagingState);
 
@@ -52,7 +52,7 @@ class PagedDataState<T, F extends Object> with EquatableMixin {
 /// ```dart
 /// state = state.removeWhere((note) => note.id == id);
 /// ```
-extension PagedDataStateX<T, F extends Object> on PagedDataState<T, F> {
+extension PagedDataStateX<T, F> on PagedDataState<T, F> {
   List<List<T>> get _pages => pagingState.pages ?? [];
 
   /// Add an item to the front of the list.

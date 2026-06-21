@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 import '../data_provider/async_state/async_state.dart';
 import 'command.dart';
 
-class ConcurrentController<DataT, F extends Object, Arg extends Record>
+class ConcurrentController<DataT, F, Arg extends Record>
     extends Bloc<_Fire<Arg>, ArgCommandState<DataT, F, Arg>> {
   ConcurrentController({
     required Future<DataT> Function(Arg arg) action,

@@ -10,7 +10,7 @@ abstract class ProviderValue<T> {
 }
 
 /// A value that resolves to a [DataProviderFacade] for a given [WidgetRef].
-abstract class DataProviderValue<T, F extends Object> {
+abstract class DataProviderValue<T, F> {
   /// Creates a [DataProviderValue].
   const DataProviderValue();
 
@@ -19,7 +19,7 @@ abstract class DataProviderValue<T, F extends Object> {
 }
 
 /// A value that resolves to a [PagedProviderFacade] for a given [WidgetRef].
-abstract class PagedProviderValue<T, F extends Object> {
+abstract class PagedProviderValue<T, F> {
   /// Creates a [PagedProviderValue].
   const PagedProviderValue();
 
@@ -28,7 +28,7 @@ abstract class PagedProviderValue<T, F extends Object> {
 }
 
 /// A value that resolves to a [CommandProviderFacade] for a given [WidgetRef].
-abstract class CommandProviderValue<T, F extends Object, ArgT extends Record> {
+abstract class CommandProviderValue<T, F, ArgT extends Record> {
   /// Creates a [CommandProviderValue].
   const CommandProviderValue();
 

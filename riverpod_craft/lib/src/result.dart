@@ -7,7 +7,7 @@ sealed class Result<T> {
   factory Result.ok(T value) => Ok(value);
 
   /// Creates an error [Result] containing [error].
-  factory Result.error(Object error) => Error(error);
+  factory Result.error(Object? error) => Error(error);
 
   /// Returns the value if this is [Ok], otherwise throws.
   T get valOrThrow {

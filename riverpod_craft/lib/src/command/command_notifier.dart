@@ -3,7 +3,7 @@ part of 'command.dart';
 /// A notifier that executes an asynchronous [action] and exposes its state.
 ///
 /// Subclass this to define a command with a specific [ActionStrategy].
-abstract class CommandNotifier<DataT, F extends Object, Arg extends Record>
+abstract class CommandNotifier<DataT, F, Arg extends Record>
     extends Notifier<ArgCommandState<DataT, F, Arg>>
     with ErrorMapper<F> {
   late final KeepAliveManager _refManager;

@@ -11,7 +11,7 @@ All async state types carry an error type parameter `F`. It defaults to `Object`
 Represents the state of an async data provider. Used for providers that return `Future<T>` or `Stream<T>`. `F` is the error type (`Object` by default).
 
 ```dart
-sealed class DataState<T, F extends Object> {
+sealed class DataState<T, F> {
   factory DataState.loading();
   factory DataState.data(T data);
   factory DataState.error(F error);
@@ -60,7 +60,7 @@ state.whenOrNull(
 Represents the state of a command (side effect) with argument tracking. `F` is the error type (`Object` by default); `ArgT` is a record type of the command's parameters.
 
 ```dart
-sealed class ArgCommandState<T, F extends Object, ArgT> {
+sealed class ArgCommandState<T, F, ArgT> {
   factory ArgCommandState.init();
   factory ArgCommandState.loading(ArgT arg);
   factory ArgCommandState.data(ArgT arg, T data);
@@ -112,7 +112,7 @@ state.whereArg((arg) => arg.id == noteId)?.whenOrNull(
 The base command state. `ArgCommandState` extends it; you'll usually work with `ArgCommandState`. `F` is the error type (`Object` by default).
 
 ```dart
-sealed class CommandState<T, F extends Object, ArgT extends Record> {
+sealed class CommandState<T, F, ArgT extends Record> {
   factory CommandState.init();
   factory CommandState.loading();
   factory CommandState.data(T data);

@@ -2,7 +2,7 @@ part of 'async_state.dart';
 
 /// A command state that carries a typed argument [ArgT] alongside its async
 /// lifecycle, with a typed error [F].
-sealed class ArgCommandState<T, F extends Object, ArgT extends Record>
+sealed class ArgCommandState<T, F, ArgT extends Record>
     extends CommandState<T, F, ArgT> {
   const ArgCommandState();
 
@@ -198,14 +198,14 @@ sealed class ArgCommandState<T, F extends Object, ArgT extends Record>
 }
 
 /// The initial state before a command has been invoked.
-class ArgCommandInit<DataT, F extends Object, ArgT extends Record>
+class ArgCommandInit<DataT, F, ArgT extends Record>
     extends ArgCommandState<DataT, F, ArgT> {
   /// Creates an [ArgCommandInit] instance.
   const ArgCommandInit();
 }
 
 /// The loading state while a command is in progress.
-class ArgCommandLoading<DataT, F extends Object, ArgT extends Record>
+class ArgCommandLoading<DataT, F, ArgT extends Record>
     extends ArgCommandState<DataT, F, ArgT>
     implements AsynchronousState<DataT, F, ArgT> {
   /// Creates an [ArgCommandLoading] with the triggering [arg].
@@ -217,7 +217,7 @@ class ArgCommandLoading<DataT, F extends Object, ArgT extends Record>
 }
 
 /// The success state holding the command result and its argument.
-class ArgCommandData<DataT, F extends Object, ArgT extends Record>
+class ArgCommandData<DataT, F, ArgT extends Record>
     extends ArgCommandState<DataT, F, ArgT> {
   /// Creates an [ArgCommandData] with the triggering [arg] and resulting [data].
   const ArgCommandData(this.arg, this.data);
@@ -232,7 +232,7 @@ class ArgCommandData<DataT, F extends Object, ArgT extends Record>
 }
 
 /// The error state holding the failure and the argument that caused it.
-class ArgCommandError<DataT, F extends Object, ArgT extends Record>
+class ArgCommandError<DataT, F, ArgT extends Record>
     extends ArgCommandState<DataT, F, ArgT> {
   /// Creates an [ArgCommandError] with the triggering [arg] and the [error].
   const ArgCommandError(this.arg, this.error);
@@ -247,8 +247,8 @@ class ArgCommandError<DataT, F extends Object, ArgT extends Record>
 }
 
 /// Convenience accessors for nullable [ArgCommandState] values.
-extension NullableArgCommandStateExtension<T, F extends Object,
-    ArgT extends Record> on ArgCommandState<T, F, ArgT>? {
+extension NullableArgCommandStateExtension<T, F, ArgT extends Record>
+    on ArgCommandState<T, F, ArgT>? {
   /// Whether this is [ArgCommandInit] or null.
   bool get isInit => this is ArgCommandInit<T, F, ArgT>;
 

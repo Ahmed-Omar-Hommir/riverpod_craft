@@ -4,7 +4,7 @@ part of 'async_state.dart';
 ///
 /// [F] is the error type — `Object` by default, or your custom type when a
 /// global `error_mapper` is configured.
-sealed class DataState<T, F extends Object>
+sealed class DataState<T, F>
     with EquatableMixin
     implements AsynchronousState<T, F, Record> {
   const DataState();
@@ -23,7 +23,7 @@ sealed class DataState<T, F extends Object>
 }
 
 /// The loading substate of [DataState].
-class DataLoading<T, F extends Object> extends DataState<T, F> {
+class DataLoading<T, F> extends DataState<T, F> {
   /// Creates a [DataLoading] instance.
   const DataLoading();
 
@@ -35,7 +35,7 @@ class DataLoading<T, F extends Object> extends DataState<T, F> {
 }
 
 /// The success substate of [DataState], holding the resulting data.
-class DataSuccess<T, F extends Object> extends DataState<T, F> {
+class DataSuccess<T, F> extends DataState<T, F> {
   /// The successfully loaded data.
   final T data;
 
@@ -50,7 +50,7 @@ class DataSuccess<T, F extends Object> extends DataState<T, F> {
 }
 
 /// The error substate of [DataState], holding the typed error object.
-class DataError<T, F extends Object> extends DataState<T, F> {
+class DataError<T, F> extends DataState<T, F> {
   /// The error that occurred during the operation.
   final F error;
 
@@ -65,7 +65,7 @@ class DataError<T, F extends Object> extends DataState<T, F> {
 }
 
 /// Convenience methods for pattern-matching and inspecting [DataState].
-extension DataStateExtension<T, F extends Object> on DataState<T, F> {
+extension DataStateExtension<T, F> on DataState<T, F> {
   /// Calls the matching callback based on the current state.
   R when<R>({
     required R Function() loading,
