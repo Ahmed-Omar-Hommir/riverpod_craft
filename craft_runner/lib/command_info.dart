@@ -1,5 +1,6 @@
 import 'package:craft_runner/parameters_converter.dart';
 import 'package:craft_runner/provider_info.dart';
+import 'package:craft_runner/src/plugin_loader.dart';
 import 'package:craft_runner/src/provider_code_generator.dart';
 
 import 'concurrency_type.dart';
@@ -39,7 +40,7 @@ class Command {
     final argRecordType = nonFamilyParams.isEmpty
         ? '()'
         : nonFamilyParams.toRecordType();
-    return 'CommandNotifier<$dataType, $argRecordType>';
+    return 'CommandNotifier<$dataType, ${CraftConfig.errorType}, $argRecordType>';
   }
 
   /// State type is always ArgCommandState with the appropriate arg record type
@@ -48,7 +49,7 @@ class Command {
     final argRecordType = nonFamilyParams.isEmpty
         ? '()'
         : nonFamilyParams.toRecordType();
-    return 'ArgCommandState<$dataType, $argRecordType>';
+    return 'ArgCommandState<$dataType, ${CraftConfig.errorType}, $argRecordType>';
   }
 
   /// Returns the nullable version of stateType.
@@ -144,7 +145,7 @@ class Command {
   isAutoDispose: $isAutoDispose,
 );
 
-class $_generatedClassName extends CommandNotifier<$dataType, $argRecordType> {
+class $_generatedClassName extends CommandNotifier<$dataType, ${CraftConfig.errorType}, $argRecordType> {
   $_generatedClassName(this._familyArg);
   final $familyRecordType _familyArg;
 
@@ -164,7 +165,7 @@ $mapErrorOverride}''';
   isAutoDispose: $isAutoDispose,
 );
 
-class $_generatedClassName extends CommandNotifier<$dataType, $argRecordType> {
+class $_generatedClassName extends CommandNotifier<$dataType, ${CraftConfig.errorType}, $argRecordType> {
   @override
   Future<$dataType> action(Ref ref, $argRecordType arg) => ${_buildActionCall()};
 
@@ -376,7 +377,7 @@ class $facadeCommandClassNameRef {
         : '()';
 
     return '''
-class $facadeCommandClassNameWidgetRef implements CommandProviderFacade<${command.dataType}, ${command.nonFamilyParams.isEmpty ? '()' : command.nonFamilyParams.toRecordType()}>, CommandProviderValue<${command.dataType}, ${command.nonFamilyParams.isEmpty ? '()' : command.nonFamilyParams.toRecordType()}> {
+class $facadeCommandClassNameWidgetRef implements CommandProviderFacade<${command.dataType}, ${CraftConfig.errorType}, ${command.nonFamilyParams.isEmpty ? '()' : command.nonFamilyParams.toRecordType()}>, CommandProviderValue<${command.dataType}, ${CraftConfig.errorType}, ${command.nonFamilyParams.isEmpty ? '()' : command.nonFamilyParams.toRecordType()}> {
   $facadeCommandClassNameWidgetRef$constructorParams;
   $instanceField
   $familyField
@@ -409,7 +410,7 @@ class $facadeCommandClassNameWidgetRef implements CommandProviderFacade<${comman
   }
 
   @override
-  CommandProviderFacade<${command.dataType}, ${command.nonFamilyParams.isEmpty ? '()' : command.nonFamilyParams.toRecordType()}> of(WidgetRef ref) => $facadeCommandClassNameWidgetRef(ref${_hasParent ? ', _instance' : ''}${hasFamily ? ', _familyArg' : ''});
+  CommandProviderFacade<${command.dataType}, ${CraftConfig.errorType}, ${command.nonFamilyParams.isEmpty ? '()' : command.nonFamilyParams.toRecordType()}> of(WidgetRef ref) => $facadeCommandClassNameWidgetRef(ref${_hasParent ? ', _instance' : ''}${hasFamily ? ', _familyArg' : ''});
 }''';
   }
 
@@ -520,7 +521,7 @@ class $facadeCommandClassNameWidgetRef implements CommandProviderFacade<${comman
     if (_hasFamily) {
       final familyRecordType = _familyParams.toRecordType();
       return '''
-class $_parentCommandClassName extends CommandNotifier<${command.dataType}, $argRecordType> {
+class $_parentCommandClassName extends CommandNotifier<${command.dataType}, ${CraftConfig.errorType}, $argRecordType> {
   $_parentCommandClassName(this._instance, this._familyArg);
   final ${parent!.name} _instance;
   final $familyRecordType _familyArg;
@@ -537,7 +538,7 @@ $mapErrorOverride}''';
     }
 
     return '''
-class $_parentCommandClassName extends CommandNotifier<${command.dataType}, $argRecordType> {
+class $_parentCommandClassName extends CommandNotifier<${command.dataType}, ${CraftConfig.errorType}, $argRecordType> {
   $_parentCommandClassName(this._instance);
   final ${parent!.name} _instance;
 

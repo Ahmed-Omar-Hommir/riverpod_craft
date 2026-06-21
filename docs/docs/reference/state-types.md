@@ -4,15 +4,17 @@ sidebar_position: 2
 
 # State Types
 
-## `DataState<T>`
+All async state types carry an error type parameter `F`. It defaults to `Object`; configure a global [error mapper](/docs/concepts/error-mapping) and the generator emits your custom type instead (e.g. `DataState<Note, AppError>`).
 
-Represents the state of an async data provider. Used for providers that return `Future<T>` or `Stream<T>`.
+## `DataState<T, F>`
+
+Represents the state of an async data provider. Used for providers that return `Future<T>` or `Stream<T>`. `F` is the error type (`Object` by default).
 
 ```dart
-sealed class DataState<T> {
+sealed class DataState<T, F extends Object> {
   factory DataState.loading();
   factory DataState.data(T data);
-  factory DataState.error(Object error);
+  factory DataState.error(F error);
 }
 ```
 
@@ -49,20 +51,20 @@ state.whenOrNull(
 | `.isData` | `bool` | True if data is available |
 | `.isError` | `bool` | True if in error state |
 | `.dataOrNull` | `T?` | The data, or null |
-| `.errorOrNull` | `Object?` | The error, or null |
+| `.errorOrNull` | `F?` | The error, or null |
 
 ---
 
-## `ArgCommandState<T, ArgT>`
+## `ArgCommandState<T, F, ArgT>`
 
-Represents the state of a command (side effect) with argument tracking. The `ArgT` is a record type of the command's parameters.
+Represents the state of a command (side effect) with argument tracking. `F` is the error type (`Object` by default); `ArgT` is a record type of the command's parameters.
 
 ```dart
-sealed class ArgCommandState<T, ArgT> {
+sealed class ArgCommandState<T, F extends Object, ArgT> {
   factory ArgCommandState.init();
   factory ArgCommandState.loading(ArgT arg);
   factory ArgCommandState.data(ArgT arg, T data);
-  factory ArgCommandState.error(ArgT arg, Object error);
+  factory ArgCommandState.error(ArgT arg, F error);
 }
 ```
 
@@ -88,7 +90,7 @@ state.when(
 | `.isDone` | `bool` | True if data or error |
 | `.arg` | `ArgT?` | The arguments passed to the command |
 | `.data` | `T?` | The result data |
-| `.error` | `Object?` | The error |
+| `.error` | `F?` | The error |
 
 ### Filtering by argument
 
@@ -105,16 +107,16 @@ state.whereArg((arg) => arg.id == noteId)?.whenOrNull(
 
 ---
 
-## `CommandState<T>`
+## `CommandState<T, F, ArgT>`
 
-A simplified command state without argument tracking. Used when the command has no parameters.
+The base command state. `ArgCommandState` extends it; you'll usually work with `ArgCommandState`. `F` is the error type (`Object` by default).
 
 ```dart
-sealed class CommandState<T> {
+sealed class CommandState<T, F extends Object, ArgT extends Record> {
   factory CommandState.init();
   factory CommandState.loading();
   factory CommandState.data(T data);
-  factory CommandState.error(Object error);
+  factory CommandState.error(F error);
 }
 ```
 

@@ -13,7 +13,7 @@ AppError _$errorMapper(Object error) {
   return UnknownError(text, error);
 }
 
-abstract class _$Notes extends DataNotifier<List<Note>, ()> {
+abstract class _$Notes extends DataNotifier<List<Note>, AppError, ()> {
   @override
   bool get isFuture => true;
 
@@ -22,7 +22,7 @@ abstract class _$Notes extends DataNotifier<List<Note>, ()> {
   Future<List<Note>> buildDataWithFuture() => create();
 
   @override
-  Object mapError(Object error) => _$errorMapper(error);
+  AppError mapError(Object error) => _$errorMapper(error);
 
   Future<Note> addNote({
     required String title,
@@ -34,10 +34,12 @@ abstract class _$Notes extends DataNotifier<List<Note>, ()> {
       NotifierProvider<
         CommandNotifier<
           Note,
+          AppError,
           ({String title, String body, NoteCategory category})
         >,
         ArgCommandState<
           Note,
+          AppError,
           ({String title, String body, NoteCategory category})
         >
       >(() => _$AddNoteCommandNotes(this as Notes), isAutoDispose: true);
@@ -48,8 +50,8 @@ abstract class _$Notes extends DataNotifier<List<Note>, ()> {
 
   late final _$deleteNoteCommand =
       NotifierProvider<
-        CommandNotifier<String, ({String id})>,
-        ArgCommandState<String, ({String id})>
+        CommandNotifier<String, AppError, ({String id})>,
+        ArgCommandState<String, AppError, ({String id})>
       >(() => _$DeleteNoteCommandNotes(this as Notes), isAutoDispose: true);
 
   $DeleteNoteCommandFacadeNotesRef get deleteNoteCommand =>
@@ -58,15 +60,15 @@ abstract class _$Notes extends DataNotifier<List<Note>, ()> {
 
   late final _$updateNoteCommand =
       NotifierProvider<
-        CommandNotifier<Note, ({Note note})>,
-        ArgCommandState<Note, ({Note note})>
+        CommandNotifier<Note, AppError, ({Note note})>,
+        ArgCommandState<Note, AppError, ({Note note})>
       >(() => _$UpdateNoteCommandNotes(this as Notes), isAutoDispose: true);
 
   $UpdateNoteCommandFacadeNotesRef get updateNoteCommand =>
       $UpdateNoteCommandFacadeNotesRef(ref, this as Notes);
 }
 
-final _notesProvider = NotifierProvider<Notes, DataState<List<Note>>>(
+final _notesProvider = NotifierProvider<Notes, DataState<List<Note>, AppError>>(
   () => Notes()..arg = (),
   isAutoDispose: true,
 );
@@ -77,22 +79,29 @@ class $NotesFacadeRef {
 
   late final _provider = _notesProvider;
 
-  DataState<List<Note>> read() => _ref.read(_provider);
-  DataState<List<Note>> watch() => _ref.watch(_provider);
+  DataState<List<Note>, AppError> read() => _ref.read(_provider);
+  DataState<List<Note>, AppError> watch() => _ref.watch(_provider);
 
   SelectedRefFacade<R> select<R>(
-    R Function(DataState<List<Note>> state) selector,
+    R Function(DataState<List<Note>, AppError> state) selector,
   ) => SelectedRefFacade(_ref, _provider.select(selector));
 
   void invalidate() => _ref.invalidate(_provider);
 
   void listen(
-    void Function(DataState<List<Note>>? previous, DataState<List<Note>> next)
+    void Function(
+      DataState<List<Note>, AppError>? previous,
+      DataState<List<Note>, AppError> next,
+    )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<DataState<List<Note>>>(_provider, listener, onError: onError);
+    _ref.listen<DataState<List<Note>, AppError>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 
   $AddNoteCommandFacadeNotesRef get addNoteCommand =>
@@ -104,19 +113,21 @@ class $NotesFacadeRef {
 }
 
 class $NotesFacadeWidget
-    implements DataProviderFacade<List<Note>>, DataProviderValue<List<Note>> {
+    implements
+        DataProviderFacade<List<Note>, AppError>,
+        DataProviderValue<List<Note>, AppError> {
   $NotesFacadeWidget(this._ref);
   final WidgetRef _ref;
 
   late final _provider = _notesProvider;
 
   @override
-  DataState<List<Note>> read() => _ref.read(_provider);
+  DataState<List<Note>, AppError> read() => _ref.read(_provider);
   @override
-  DataState<List<Note>> watch() => _ref.watch(_provider);
+  DataState<List<Note>, AppError> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(DataState<List<Note>> state) selector,
+    R Function(DataState<List<Note>, AppError> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
   @override
   void invalidate() => _ref.invalidate(_provider);
@@ -129,16 +140,24 @@ class $NotesFacadeWidget
 
   @override
   void listen(
-    void Function(DataState<List<Note>>? previous, DataState<List<Note>> next)
+    void Function(
+      DataState<List<Note>, AppError>? previous,
+      DataState<List<Note>, AppError> next,
+    )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<DataState<List<Note>>>(_provider, listener, onError: onError);
+    _ref.listen<DataState<List<Note>, AppError>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 
   @override
-  DataProviderFacade<List<Note>> of(WidgetRef ref) => $NotesFacadeWidget(ref);
+  DataProviderFacade<List<Note>, AppError> of(WidgetRef ref) =>
+      $NotesFacadeWidget(ref);
 
   $AddNoteCommandFacadeNotesWidget get addNoteCommand =>
       $AddNoteCommandFacadeNotesWidget(_ref, _ref.read(_provider.notifier));
@@ -152,6 +171,7 @@ class _$AddNoteCommandNotes
     extends
         CommandNotifier<
           Note,
+          AppError,
           ({String title, String body, NoteCategory category})
         > {
   _$AddNoteCommandNotes(this._instance);
@@ -174,10 +194,11 @@ class _$AddNoteCommandNotes
   ActionStrategy get strategy => ActionStrategy.droppable;
 
   @override
-  Object mapError(Object error) => _$errorMapper(error);
+  AppError mapError(Object error) => _$errorMapper(error);
 }
 
-class _$DeleteNoteCommandNotes extends CommandNotifier<String, ({String id})> {
+class _$DeleteNoteCommandNotes
+    extends CommandNotifier<String, AppError, ({String id})> {
   _$DeleteNoteCommandNotes(this._instance);
   final Notes _instance;
 
@@ -192,10 +213,11 @@ class _$DeleteNoteCommandNotes extends CommandNotifier<String, ({String id})> {
   ActionStrategy get strategy => ActionStrategy.droppable;
 
   @override
-  Object mapError(Object error) => _$errorMapper(error);
+  AppError mapError(Object error) => _$errorMapper(error);
 }
 
-class _$UpdateNoteCommandNotes extends CommandNotifier<Note, ({Note note})> {
+class _$UpdateNoteCommandNotes
+    extends CommandNotifier<Note, AppError, ({Note note})> {
   _$UpdateNoteCommandNotes(this._instance);
   final Notes _instance;
 
@@ -210,7 +232,7 @@ class _$UpdateNoteCommandNotes extends CommandNotifier<Note, ({Note note})> {
   ActionStrategy get strategy => ActionStrategy.droppable;
 
   @override
-  Object mapError(Object error) => _$errorMapper(error);
+  AppError mapError(Object error) => _$errorMapper(error);
 }
 
 class $AddNoteCommandFacadeNotesRef {
@@ -221,15 +243,24 @@ class $AddNoteCommandFacadeNotesRef {
 
   late final _command = _instance._$addNoteCommand;
 
-  ArgCommandState<Note, ({String title, String body, NoteCategory category})>
+  ArgCommandState<
+    Note,
+    AppError,
+    ({String title, String body, NoteCategory category})
+  >
   read() => _ref.read(_command);
-  ArgCommandState<Note, ({String title, String body, NoteCategory category})>
+  ArgCommandState<
+    Note,
+    AppError,
+    ({String title, String body, NoteCategory category})
+  >
   watch() => _ref.watch(_command);
 
   SelectedRefFacade<R> select<R>(
     R Function(
       ArgCommandState<
         Note,
+        AppError,
         ({String title, String body, NoteCategory category})
       >
       state,
@@ -252,11 +283,13 @@ class $AddNoteCommandFacadeNotesRef {
     void Function(
       ArgCommandState<
         Note,
+        AppError,
         ({String title, String body, NoteCategory category})
       >?
       previous,
       ArgCommandState<
         Note,
+        AppError,
         ({String title, String body, NoteCategory category})
       >
       next,
@@ -277,11 +310,13 @@ class $DeleteNoteCommandFacadeNotesRef {
 
   late final _command = _instance._$deleteNoteCommand;
 
-  ArgCommandState<String, ({String id})> read() => _ref.read(_command);
-  ArgCommandState<String, ({String id})> watch() => _ref.watch(_command);
+  ArgCommandState<String, AppError, ({String id})> read() =>
+      _ref.read(_command);
+  ArgCommandState<String, AppError, ({String id})> watch() =>
+      _ref.watch(_command);
 
   SelectedRefFacade<R> select<R>(
-    R Function(ArgCommandState<String, ({String id})> state) selector,
+    R Function(ArgCommandState<String, AppError, ({String id})> state) selector,
   ) => SelectedRefFacade(_ref, _command.select(selector));
 
   void run({required String id}) => _ref.read(_command.notifier).add((id: id));
@@ -289,8 +324,8 @@ class $DeleteNoteCommandFacadeNotesRef {
   void retry() => _ref.read(_command.notifier).retry();
   void listen(
     void Function(
-      ArgCommandState<String, ({String id})>? previous,
-      ArgCommandState<String, ({String id})> next,
+      ArgCommandState<String, AppError, ({String id})>? previous,
+      ArgCommandState<String, AppError, ({String id})> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -308,11 +343,12 @@ class $UpdateNoteCommandFacadeNotesRef {
 
   late final _command = _instance._$updateNoteCommand;
 
-  ArgCommandState<Note, ({Note note})> read() => _ref.read(_command);
-  ArgCommandState<Note, ({Note note})> watch() => _ref.watch(_command);
+  ArgCommandState<Note, AppError, ({Note note})> read() => _ref.read(_command);
+  ArgCommandState<Note, AppError, ({Note note})> watch() =>
+      _ref.watch(_command);
 
   SelectedRefFacade<R> select<R>(
-    R Function(ArgCommandState<Note, ({Note note})> state) selector,
+    R Function(ArgCommandState<Note, AppError, ({Note note})> state) selector,
   ) => SelectedRefFacade(_ref, _command.select(selector));
 
   void run({required Note note}) =>
@@ -321,8 +357,8 @@ class $UpdateNoteCommandFacadeNotesRef {
   void retry() => _ref.read(_command.notifier).retry();
   void listen(
     void Function(
-      ArgCommandState<Note, ({Note note})>? previous,
-      ArgCommandState<Note, ({Note note})> next,
+      ArgCommandState<Note, AppError, ({Note note})>? previous,
+      ArgCommandState<Note, AppError, ({Note note})> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -336,10 +372,12 @@ class $AddNoteCommandFacadeNotesWidget
     implements
         CommandProviderFacade<
           Note,
+          AppError,
           ({String title, String body, NoteCategory category})
         >,
         CommandProviderValue<
           Note,
+          AppError,
           ({String title, String body, NoteCategory category})
         > {
   $AddNoteCommandFacadeNotesWidget(this._ref, this._instance);
@@ -350,16 +388,25 @@ class $AddNoteCommandFacadeNotesWidget
   late final _command = _instance._$addNoteCommand;
 
   @override
-  ArgCommandState<Note, ({String title, String body, NoteCategory category})>
+  ArgCommandState<
+    Note,
+    AppError,
+    ({String title, String body, NoteCategory category})
+  >
   read() => _ref.read(_command);
   @override
-  ArgCommandState<Note, ({String title, String body, NoteCategory category})>
+  ArgCommandState<
+    Note,
+    AppError,
+    ({String title, String body, NoteCategory category})
+  >
   watch() => _ref.watch(_command);
 
   SelectedWidgetRefFacade<R> select<R>(
     R Function(
       ArgCommandState<
         Note,
+        AppError,
         ({String title, String body, NoteCategory category})
       >
       state,
@@ -387,11 +434,13 @@ class $AddNoteCommandFacadeNotesWidget
     void Function(
       ArgCommandState<
         Note,
+        AppError,
         ({String title, String body, NoteCategory category})
       >?
       previous,
       ArgCommandState<
         Note,
+        AppError,
         ({String title, String body, NoteCategory category})
       >
       next,
@@ -406,6 +455,7 @@ class $AddNoteCommandFacadeNotesWidget
   @override
   CommandProviderFacade<
     Note,
+    AppError,
     ({String title, String body, NoteCategory category})
   >
   of(WidgetRef ref) => $AddNoteCommandFacadeNotesWidget(ref, _instance);
@@ -413,8 +463,8 @@ class $AddNoteCommandFacadeNotesWidget
 
 class $DeleteNoteCommandFacadeNotesWidget
     implements
-        CommandProviderFacade<String, ({String id})>,
-        CommandProviderValue<String, ({String id})> {
+        CommandProviderFacade<String, AppError, ({String id})>,
+        CommandProviderValue<String, AppError, ({String id})> {
   $DeleteNoteCommandFacadeNotesWidget(this._ref, this._instance);
   final Notes _instance;
 
@@ -423,12 +473,14 @@ class $DeleteNoteCommandFacadeNotesWidget
   late final _command = _instance._$deleteNoteCommand;
 
   @override
-  ArgCommandState<String, ({String id})> read() => _ref.read(_command);
+  ArgCommandState<String, AppError, ({String id})> read() =>
+      _ref.read(_command);
   @override
-  ArgCommandState<String, ({String id})> watch() => _ref.watch(_command);
+  ArgCommandState<String, AppError, ({String id})> watch() =>
+      _ref.watch(_command);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(ArgCommandState<String, ({String id})> state) selector,
+    R Function(ArgCommandState<String, AppError, ({String id})> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _command.select(selector));
 
   void run({required String id}) => _ref.read(_command.notifier).add((id: id));
@@ -441,8 +493,8 @@ class $DeleteNoteCommandFacadeNotesWidget
   @override
   void listen(
     void Function(
-      ArgCommandState<String, ({String id})>? previous,
-      ArgCommandState<String, ({String id})> next,
+      ArgCommandState<String, AppError, ({String id})>? previous,
+      ArgCommandState<String, AppError, ({String id})> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -452,14 +504,14 @@ class $DeleteNoteCommandFacadeNotesWidget
   }
 
   @override
-  CommandProviderFacade<String, ({String id})> of(WidgetRef ref) =>
+  CommandProviderFacade<String, AppError, ({String id})> of(WidgetRef ref) =>
       $DeleteNoteCommandFacadeNotesWidget(ref, _instance);
 }
 
 class $UpdateNoteCommandFacadeNotesWidget
     implements
-        CommandProviderFacade<Note, ({Note note})>,
-        CommandProviderValue<Note, ({Note note})> {
+        CommandProviderFacade<Note, AppError, ({Note note})>,
+        CommandProviderValue<Note, AppError, ({Note note})> {
   $UpdateNoteCommandFacadeNotesWidget(this._ref, this._instance);
   final Notes _instance;
 
@@ -468,12 +520,13 @@ class $UpdateNoteCommandFacadeNotesWidget
   late final _command = _instance._$updateNoteCommand;
 
   @override
-  ArgCommandState<Note, ({Note note})> read() => _ref.read(_command);
+  ArgCommandState<Note, AppError, ({Note note})> read() => _ref.read(_command);
   @override
-  ArgCommandState<Note, ({Note note})> watch() => _ref.watch(_command);
+  ArgCommandState<Note, AppError, ({Note note})> watch() =>
+      _ref.watch(_command);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(ArgCommandState<Note, ({Note note})> state) selector,
+    R Function(ArgCommandState<Note, AppError, ({Note note})> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _command.select(selector));
 
   void run({required Note note}) =>
@@ -487,8 +540,8 @@ class $UpdateNoteCommandFacadeNotesWidget
   @override
   void listen(
     void Function(
-      ArgCommandState<Note, ({Note note})>? previous,
-      ArgCommandState<Note, ({Note note})> next,
+      ArgCommandState<Note, AppError, ({Note note})>? previous,
+      ArgCommandState<Note, AppError, ({Note note})> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -498,7 +551,7 @@ class $UpdateNoteCommandFacadeNotesWidget
   }
 
   @override
-  CommandProviderFacade<Note, ({Note note})> of(WidgetRef ref) =>
+  CommandProviderFacade<Note, AppError, ({Note note})> of(WidgetRef ref) =>
       $UpdateNoteCommandFacadeNotesWidget(ref, _instance);
 }
 

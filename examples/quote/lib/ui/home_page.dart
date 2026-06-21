@@ -48,7 +48,7 @@ void _snack(BuildContext ctx, String msg) =>
 class _QuoteCard extends ConsumerWidget {
   const _QuoteCard({required this.quoteState});
 
-  final DataState<Quote> quoteState;
+  final DataState<Quote, Object> quoteState;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -1,3 +1,4 @@
+import 'package:craft_runner/src/plugin_loader.dart';
 import 'package:craft_runner/src/provider_code_generator.dart';
 
 import 'command_info.dart';
@@ -60,13 +61,17 @@ class ProviderInfo {
     return '';
   }
 
+  /// The error type parameter (`F`) for generated state/notifiers: the
+  /// configured `error_mapper`'s return type, or `Object` by default.
+  String get errorType => CraftConfig.errorType;
+
   String get stateType {
     if (type == ProviderType.sync) {
       return dataType;
     } else if (type == ProviderType.paged) {
-      return 'PagedDataState<$dataType>';
+      return 'PagedDataState<$dataType, $errorType>';
     } else {
-      return 'DataState<$dataType>';
+      return 'DataState<$dataType, $errorType>';
     }
   }
 

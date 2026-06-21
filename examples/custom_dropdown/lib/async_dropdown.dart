@@ -17,7 +17,7 @@ class AsyncDropdown<T> extends ConsumerStatefulWidget {
   });
 
   // providerValue is an accessor for the provider, not the actual provider.
-  final DataProviderValue<List<T>> providerValue;
+  final DataProviderValue<List<T>, Object> providerValue;
   final ValueChanged<T?>? onChanged;
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
   final Widget? hint;
@@ -161,8 +161,8 @@ class _AsyncDropdownState<T> extends ConsumerState<AsyncDropdown<T>> {
 
   Widget _buildMenuContent(
     BuildContext context,
-    DataProviderFacade<List<T>> provider,
-    DataState<List<T>> state,
+    DataProviderFacade<List<T>, Object> provider,
+    DataState<List<T>, Object> state,
     List<T>? items,
     ColorScheme colorScheme,
   ) {

@@ -13,9 +13,9 @@ import 'paginated_response.dart';
 /// The notifier manages page tracking, loading state, and error handling.
 /// Call [fetchNextPage] to load the next page of results (triggered
 /// automatically on build and when the UI reaches the end of the list).
-abstract class PagedDataNotifier<T, Arg extends Record>
-    extends Notifier<PagedDataState<T>>
-    with ErrorMapper {
+abstract class PagedDataNotifier<T, F extends Object, Arg extends Record>
+    extends Notifier<PagedDataState<T, F>>
+    with ErrorMapper<F> {
   /// Family argument set by the generated provider constructor.
   late final Arg arg;
 
@@ -26,11 +26,11 @@ abstract class PagedDataNotifier<T, Arg extends Record>
 
   @override
   /// Initializes the paging state and triggers the first page load.
-  PagedDataState<T> build() {
+  PagedDataState<T, F> build() {
     _pending = false;
 
     Future.microtask(() => fetchNextPage());
-    return PagedDataState(PagingState());
+    return PagedDataState<T, F>(PagingState());
   }
 
   /// Load the next page of results.
@@ -43,14 +43,14 @@ abstract class PagedDataNotifier<T, Arg extends Record>
     if (!s.hasNextPage && s.pages != null && s.pages!.isNotEmpty) return;
 
     _pending = true;
-    state = PagedDataState(s.copyWith(isLoading: true, error: null));
+    state = PagedDataState<T, F>(s.copyWith(isLoading: true, error: null));
 
     final nextPage = (s.keys?.lastOrNull ?? 0) + 1;
 
     try {
       final response = await buildPagedData(nextPage);
 
-      state = PagedDataState(
+      state = PagedDataState<T, F>(
         s.copyWith(
           pages: [...?s.pages, response.results],
           keys: [...?s.keys, nextPage],
@@ -59,7 +59,9 @@ abstract class PagedDataNotifier<T, Arg extends Record>
         ),
       );
     } catch (error) {
-      state = PagedDataState(s.copyWith(error: mapError(error), isLoading: false));
+      state = PagedDataState<T, F>(
+        s.copyWith(error: mapError(error), isLoading: false),
+      );
     } finally {
       _pending = false;
     }
@@ -68,7 +70,7 @@ abstract class PagedDataNotifier<T, Arg extends Record>
   /// Reset to page 1 and re-fetch.
   Future<void> reload() async {
     _pending = false;
-    state = PagedDataState(PagingState());
+    state = PagedDataState<T, F>(PagingState());
     await fetchNextPage();
   }
 }

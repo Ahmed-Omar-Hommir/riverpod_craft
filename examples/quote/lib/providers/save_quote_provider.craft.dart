@@ -4,11 +4,12 @@ part of 'save_quote_provider.dart';
 
 final _$saveQuoteCommand =
     NotifierProvider<
-      CommandNotifier<String, ({String quoteId})>,
-      ArgCommandState<String, ({String quoteId})>
+      CommandNotifier<String, Object, ({String quoteId})>,
+      ArgCommandState<String, Object, ({String quoteId})>
     >(() => _$SaveQuoteCommand(), isAutoDispose: true);
 
-class _$SaveQuoteCommand extends CommandNotifier<String, ({String quoteId})> {
+class _$SaveQuoteCommand
+    extends CommandNotifier<String, Object, ({String quoteId})> {
   @override
   Future<String> action(Ref ref, ({String quoteId}) arg) =>
       saveQuote(ref, quoteId: arg.quoteId);
@@ -27,11 +28,14 @@ class $SaveQuoteCommandFacadeRef {
 
   late final _command = _$saveQuoteCommand;
 
-  ArgCommandState<String, ({String quoteId})> read() => _ref.read(_command);
-  ArgCommandState<String, ({String quoteId})> watch() => _ref.watch(_command);
+  ArgCommandState<String, Object, ({String quoteId})> read() =>
+      _ref.read(_command);
+  ArgCommandState<String, Object, ({String quoteId})> watch() =>
+      _ref.watch(_command);
 
   SelectedRefFacade<R> select<R>(
-    R Function(ArgCommandState<String, ({String quoteId})> state) selector,
+    R Function(ArgCommandState<String, Object, ({String quoteId})> state)
+    selector,
   ) => SelectedRefFacade(_ref, _command.select(selector));
 
   void run({required String quoteId}) =>
@@ -40,8 +44,8 @@ class $SaveQuoteCommandFacadeRef {
   void retry() => _ref.read(_command.notifier).retry();
   void listen(
     void Function(
-      ArgCommandState<String, ({String quoteId})>? previous,
-      ArgCommandState<String, ({String quoteId})> next,
+      ArgCommandState<String, Object, ({String quoteId})>? previous,
+      ArgCommandState<String, Object, ({String quoteId})> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -53,8 +57,8 @@ class $SaveQuoteCommandFacadeRef {
 
 class $SaveQuoteCommandFacadeWidget
     implements
-        CommandProviderFacade<String, ({String quoteId})>,
-        CommandProviderValue<String, ({String quoteId})> {
+        CommandProviderFacade<String, Object, ({String quoteId})>,
+        CommandProviderValue<String, Object, ({String quoteId})> {
   $SaveQuoteCommandFacadeWidget(this._ref);
 
   final WidgetRef _ref;
@@ -62,12 +66,15 @@ class $SaveQuoteCommandFacadeWidget
   late final _command = _$saveQuoteCommand;
 
   @override
-  ArgCommandState<String, ({String quoteId})> read() => _ref.read(_command);
+  ArgCommandState<String, Object, ({String quoteId})> read() =>
+      _ref.read(_command);
   @override
-  ArgCommandState<String, ({String quoteId})> watch() => _ref.watch(_command);
+  ArgCommandState<String, Object, ({String quoteId})> watch() =>
+      _ref.watch(_command);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(ArgCommandState<String, ({String quoteId})> state) selector,
+    R Function(ArgCommandState<String, Object, ({String quoteId})> state)
+    selector,
   ) => SelectedWidgetRefFacade(_ref, _command.select(selector));
 
   void run({required String quoteId}) =>
@@ -81,8 +88,8 @@ class $SaveQuoteCommandFacadeWidget
   @override
   void listen(
     void Function(
-      ArgCommandState<String, ({String quoteId})>? previous,
-      ArgCommandState<String, ({String quoteId})> next,
+      ArgCommandState<String, Object, ({String quoteId})>? previous,
+      ArgCommandState<String, Object, ({String quoteId})> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -92,7 +99,7 @@ class $SaveQuoteCommandFacadeWidget
   }
 
   @override
-  CommandProviderFacade<String, ({String quoteId})> of(WidgetRef ref) =>
+  CommandProviderFacade<String, Object, ({String quoteId})> of(WidgetRef ref) =>
       $SaveQuoteCommandFacadeWidget(ref);
 }
 

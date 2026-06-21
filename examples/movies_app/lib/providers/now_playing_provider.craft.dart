@@ -3,12 +3,12 @@
 part of 'now_playing_provider.dart';
 
 final _nowPlayingProvider =
-    NotifierProvider<$$NowPlaying, DataState<List<Movie>>>(
+    NotifierProvider<$$NowPlaying, DataState<List<Movie>, Object>>(
       () => $$NowPlaying()..arg = (),
       isAutoDispose: true,
     );
 
-class $$NowPlaying extends DataNotifier<List<Movie>, ()> {
+class $$NowPlaying extends DataNotifier<List<Movie>, Object, ()> {
   @override
   bool get isFuture => false;
 
@@ -22,39 +22,48 @@ class $NowPlayingFacadeRef {
 
   late final _provider = _nowPlayingProvider;
 
-  DataState<List<Movie>> read() => _ref.read(_provider);
-  DataState<List<Movie>> watch() => _ref.watch(_provider);
+  DataState<List<Movie>, Object> read() => _ref.read(_provider);
+  DataState<List<Movie>, Object> watch() => _ref.watch(_provider);
 
   SelectedRefFacade<R> select<R>(
-    R Function(DataState<List<Movie>> state) selector,
+    R Function(DataState<List<Movie>, Object> state) selector,
   ) => SelectedRefFacade(_ref, _provider.select(selector));
 
   void invalidate() => _ref.invalidate(_provider);
 
   void listen(
-    void Function(DataState<List<Movie>>? previous, DataState<List<Movie>> next)
+    void Function(
+      DataState<List<Movie>, Object>? previous,
+      DataState<List<Movie>, Object> next,
+    )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<DataState<List<Movie>>>(_provider, listener, onError: onError);
+    _ref.listen<DataState<List<Movie>, Object>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 }
 
 class $NowPlayingFacadeWidget
-    implements DataProviderFacade<List<Movie>>, DataProviderValue<List<Movie>> {
+    implements
+        DataProviderFacade<List<Movie>, Object>,
+        DataProviderValue<List<Movie>, Object> {
   $NowPlayingFacadeWidget(this._ref);
   final WidgetRef _ref;
 
   late final _provider = _nowPlayingProvider;
 
   @override
-  DataState<List<Movie>> read() => _ref.read(_provider);
+  DataState<List<Movie>, Object> read() => _ref.read(_provider);
   @override
-  DataState<List<Movie>> watch() => _ref.watch(_provider);
+  DataState<List<Movie>, Object> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(DataState<List<Movie>> state) selector,
+    R Function(DataState<List<Movie>, Object> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
   @override
   void invalidate() => _ref.invalidate(_provider);
@@ -67,16 +76,23 @@ class $NowPlayingFacadeWidget
 
   @override
   void listen(
-    void Function(DataState<List<Movie>>? previous, DataState<List<Movie>> next)
+    void Function(
+      DataState<List<Movie>, Object>? previous,
+      DataState<List<Movie>, Object> next,
+    )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<DataState<List<Movie>>>(_provider, listener, onError: onError);
+    _ref.listen<DataState<List<Movie>, Object>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 
   @override
-  DataProviderFacade<List<Movie>> of(WidgetRef ref) =>
+  DataProviderFacade<List<Movie>, Object> of(WidgetRef ref) =>
       $NowPlayingFacadeWidget(ref);
 }
 

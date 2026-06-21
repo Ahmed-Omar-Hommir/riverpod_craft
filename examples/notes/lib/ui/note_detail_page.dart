@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_craft/riverpod_craft.dart';
 
+import '../models/app_error.dart';
 import '../models/note.dart';
 import '../providers/note_detail_provider.dart';
 import '../providers/notes_provider.dart';
@@ -129,7 +130,7 @@ class _NoteDetailPageState extends ConsumerState<NoteDetailPage> {
       floatingActionButton: !_isEditing && detailState.isData
           ? FloatingActionButton(
               onPressed: () =>
-                  _startEditing((detailState as DataSuccess<Note>).data),
+                  _startEditing((detailState as DataSuccess<Note, AppError>).data),
               child: const Icon(Icons.edit),
             )
           : null,

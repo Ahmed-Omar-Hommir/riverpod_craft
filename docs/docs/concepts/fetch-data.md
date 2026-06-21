@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Fetch Data
 
-When your provider returns a `Future` or `Stream`, riverpod_craft wraps the result in `DataState<T>` — giving you loading, data, and error states automatically.
+When your provider returns a `Future` or `Stream`, riverpod_craft wraps the result in `DataState<T, F>` — giving you loading, data, and error states automatically. `F` is the error type, `Object` by default (see [Error Mapping](./error-mapping) to make it your own type).
 
 ## Functional Provider
 

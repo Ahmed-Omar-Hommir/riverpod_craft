@@ -10,28 +10,28 @@ abstract class ProviderValue<T> {
 }
 
 /// A value that resolves to a [DataProviderFacade] for a given [WidgetRef].
-abstract class DataProviderValue<T> {
+abstract class DataProviderValue<T, F extends Object> {
   /// Creates a [DataProviderValue].
   const DataProviderValue();
 
   /// Resolves this value into a [DataProviderFacade] scoped to [ref].
-  DataProviderFacade<T> of(WidgetRef ref);
+  DataProviderFacade<T, F> of(WidgetRef ref);
 }
 
 /// A value that resolves to a [PagedProviderFacade] for a given [WidgetRef].
-abstract class PagedProviderValue<T> {
+abstract class PagedProviderValue<T, F extends Object> {
   /// Creates a [PagedProviderValue].
   const PagedProviderValue();
 
   /// Resolves this value into a [PagedProviderFacade] scoped to [ref].
-  PagedProviderFacade<T> of(WidgetRef ref);
+  PagedProviderFacade<T, F> of(WidgetRef ref);
 }
 
 /// A value that resolves to a [CommandProviderFacade] for a given [WidgetRef].
-abstract class CommandProviderValue<T, ArgT extends Record> {
+abstract class CommandProviderValue<T, F extends Object, ArgT extends Record> {
   /// Creates a [CommandProviderValue].
   const CommandProviderValue();
 
   /// Resolves this value into a [CommandProviderFacade] scoped to [ref].
-  CommandProviderFacade<T, ArgT> of(WidgetRef ref);
+  CommandProviderFacade<T, F, ArgT> of(WidgetRef ref);
 }

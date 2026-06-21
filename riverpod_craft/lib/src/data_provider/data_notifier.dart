@@ -16,9 +16,12 @@ import 'async_state/async_state.dart';
 ///
 /// Set [isFuture] to `true` when using [buildDataWithFuture],
 /// or `false` when using [buildDataWithStream].
-abstract class DataNotifier<T, Arg extends Record>
-    extends Notifier<DataState<T>>
-    with ErrorMapper {
+///
+/// [F] is the error type stored in [DataError] — `Object` by default, or your
+/// custom type when a global `error_mapper` is configured.
+abstract class DataNotifier<T, F extends Object, Arg extends Record>
+    extends Notifier<DataState<T, F>>
+    with ErrorMapper<F> {
   /// The argument passed to this notifier, typically used to configure data fetching.
   late final Arg arg;
 
@@ -46,8 +49,8 @@ abstract class DataNotifier<T, Arg extends Record>
   @protected
   void setData(T data) {
     final currentState = state;
-    if (currentState is! DataSuccess<T>) return;
-    state = DataSuccess<T>(data);
+    if (currentState is! DataSuccess<T, F>) return;
+    state = DataSuccess<T, F>(data);
   }
 
   Stream<Result<T>> _buildData(Arg arg) async* {
@@ -78,7 +81,7 @@ abstract class DataNotifier<T, Arg extends Record>
   Future<void> _getData(Arg arg, {bool silent = false}) async {
     _subscription?.cancel();
 
-    if (!silent) state = DataLoading<T>();
+    if (!silent) state = DataLoading<T, F>();
 
     final completer = Completer<void>();
 
@@ -87,9 +90,9 @@ abstract class DataNotifier<T, Arg extends Record>
         (result) {
           switch (result) {
             case Ok<T>(value: final value):
-              state = DataSuccess<T>(value);
+              state = DataSuccess<T, F>(value);
             case Error<T>(error: final e):
-              state = DataError(e);
+              state = DataError<T, F>(e);
           }
 
           if (!completer.isCompleted) {
@@ -97,7 +100,7 @@ abstract class DataNotifier<T, Arg extends Record>
           }
         },
         onError: (e) {
-          if (!silent) state = DataError(mapError(e));
+          if (!silent) state = DataError<T, F>(mapError(e));
 
           if (!completer.isCompleted) {
             completer.completeError(e);
@@ -107,7 +110,7 @@ abstract class DataNotifier<T, Arg extends Record>
 
       ref.onDispose(() => _subscription?.cancel());
     } catch (e) {
-      if (!silent) state = DataError(mapError(e));
+      if (!silent) state = DataError<T, F>(mapError(e));
       if (!completer.isCompleted) {
         completer.completeError(e);
       }
@@ -118,9 +121,9 @@ abstract class DataNotifier<T, Arg extends Record>
 
   /// Builds the initial state by triggering data fetching with [arg].
   @override
-  DataState<T> build() {
+  DataState<T, F> build() {
     _getData(arg);
-    return DataLoading<T>();
+    return DataLoading<T, F>();
   }
 
   /// Re-fetches the data, showing a loading state.

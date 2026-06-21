@@ -3,9 +3,9 @@ part of 'command.dart';
 /// A notifier that executes an asynchronous [action] and exposes its state.
 ///
 /// Subclass this to define a command with a specific [ActionStrategy].
-abstract class CommandNotifier<DataT, Arg extends Record>
-    extends Notifier<ArgCommandState<DataT, Arg>>
-    with ErrorMapper {
+abstract class CommandNotifier<DataT, F extends Object, Arg extends Record>
+    extends Notifier<ArgCommandState<DataT, F, Arg>>
+    with ErrorMapper<F> {
   late final KeepAliveManager _refManager;
 
   /// The concurrency strategy used when multiple actions are triggered.
@@ -22,9 +22,9 @@ abstract class CommandNotifier<DataT, Arg extends Record>
 
   /// Initializes the controller, subscriptions, and keep-alive manager.
   @override
-  ArgCommandState<DataT, Arg> build() {
+  ArgCommandState<DataT, F, Arg> build() {
     _refManager = KeepAliveManager(refs: [ref, ...refs]);
-    _controller = ConcurrentController<DataT, Arg>(
+    _controller = ConcurrentController<DataT, F, Arg>(
       action: (arg) async => action(ref, arg),
       strategy: strategy,
       mapError: mapError,
@@ -53,7 +53,7 @@ abstract class CommandNotifier<DataT, Arg extends Record>
     });
   }
 
-  late final ConcurrentController<DataT, Arg> _controller;
+  late final ConcurrentController<DataT, F, Arg> _controller;
   StreamSubscription? _subscription;
 
   /// Resets the command state to its initial value if the current action is done.

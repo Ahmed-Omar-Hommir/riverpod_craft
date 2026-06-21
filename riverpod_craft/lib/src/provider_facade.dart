@@ -56,12 +56,15 @@ class SelectedWidgetRefFacade<R> {
 // ─── Async base facade ───────────────────────────────────────────────
 
 /// Base facade interface for providers backed by asynchronous state.
-abstract class AsyncProviderFacade<T, ArgT extends Record> {
+///
+/// [F] is the error type — `Object` by default, or your custom type when a
+/// global `error_mapper` is configured.
+abstract class AsyncProviderFacade<T, F extends Object, ArgT extends Record> {
   /// Reads the current async state without subscribing.
-  AsynchronousState<T, ArgT> read();
+  AsynchronousState<T, F, ArgT> read();
 
   /// Watches the async state, rebuilding when it changes.
-  AsynchronousState<T, ArgT> watch();
+  AsynchronousState<T, F, ArgT> watch();
 
   /// Invalidates the provider, causing it to be recomputed.
   void invalidate();
@@ -69,8 +72,8 @@ abstract class AsyncProviderFacade<T, ArgT extends Record> {
   /// Listens to changes in the async state.
   void listen(
     void Function(
-      AsynchronousState<T, ArgT>? previous,
-      AsynchronousState<T, ArgT> next,
+      AsynchronousState<T, F, ArgT>? previous,
+      AsynchronousState<T, F, ArgT> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -78,20 +81,21 @@ abstract class AsyncProviderFacade<T, ArgT extends Record> {
   });
 
   /// Returns a new facade scoped to the given [WidgetRef].
-  AsyncProviderFacade<T, ArgT> of(WidgetRef ref);
+  AsyncProviderFacade<T, F, ArgT> of(WidgetRef ref);
 }
 
 // ─── Data facade ─────────────────────────────────────────────────────
 
 /// Facade for data providers that fetch and cache a single value.
-abstract class DataProviderFacade<T> extends AsyncProviderFacade<T, Record> {
+abstract class DataProviderFacade<T, F extends Object>
+    extends AsyncProviderFacade<T, F, Record> {
   /// Reads the current data state without subscribing.
   @override
-  DataState<T> read();
+  DataState<T, F> read();
 
   /// Watches the data state, rebuilding when it changes.
   @override
-  DataState<T> watch();
+  DataState<T, F> watch();
 
   /// Invalidates the data provider, causing a refetch.
   @override
@@ -106,7 +110,7 @@ abstract class DataProviderFacade<T> extends AsyncProviderFacade<T, Record> {
   /// Listens to changes in the data state.
   @override
   void listen(
-    void Function(DataState<T>? previous, DataState<T> next) listener, {
+    void Function(DataState<T, F>? previous, DataState<T, F> next) listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   });
@@ -115,15 +119,15 @@ abstract class DataProviderFacade<T> extends AsyncProviderFacade<T, Record> {
 // ─── Command facade ──────────────────────────────────────────────────
 
 /// Facade for command providers that execute actions with arguments.
-abstract class CommandProviderFacade<T, ArgT extends Record>
-    extends AsyncProviderFacade<T, ArgT> {
+abstract class CommandProviderFacade<T, F extends Object, ArgT extends Record>
+    extends AsyncProviderFacade<T, F, ArgT> {
   /// Reads the current command state without subscribing.
   @override
-  ArgCommandState<T, ArgT> read();
+  ArgCommandState<T, F, ArgT> read();
 
   /// Watches the command state, rebuilding when it changes.
   @override
-  ArgCommandState<T, ArgT> watch();
+  ArgCommandState<T, F, ArgT> watch();
 
   /// Resets the command state back to idle.
   void reset();
@@ -135,8 +139,8 @@ abstract class CommandProviderFacade<T, ArgT extends Record>
   @override
   void listen(
     void Function(
-      ArgCommandState<T, ArgT>? previous,
-      ArgCommandState<T, ArgT> next,
+      ArgCommandState<T, F, ArgT>? previous,
+      ArgCommandState<T, F, ArgT> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -149,12 +153,12 @@ abstract class CommandProviderFacade<T, ArgT extends Record>
 /// Interface for interacting with a paginated provider's state.
 ///
 /// Generated Widget facades implement this.
-abstract class PagedProviderFacade<T> {
+abstract class PagedProviderFacade<T, F extends Object> {
   /// Reads the current paged data state without subscribing.
-  PagedDataState<T> read();
+  PagedDataState<T, F> read();
 
   /// Watches the paged data state, rebuilding when it changes.
-  PagedDataState<T> watch();
+  PagedDataState<T, F> watch();
 
   /// Fetches the next page of results.
   void fetchNextPage();
@@ -164,7 +168,7 @@ abstract class PagedProviderFacade<T> {
 
   /// Listens to changes in the paged data state.
   void listen(
-    void Function(PagedDataState<T>? previous, PagedDataState<T> next)
+    void Function(PagedDataState<T, F>? previous, PagedDataState<T, F> next)
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,

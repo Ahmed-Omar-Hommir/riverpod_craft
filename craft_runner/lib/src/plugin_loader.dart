@@ -170,6 +170,17 @@ class CraftConfig {
   /// re-exported by a barrel don't produce `ambiguous_export` errors.
   static const errorMapperInlineName = r'_$errorMapper';
 
+  /// The `errorMapper` function's return type (e.g. `Failure`). This becomes
+  /// the error type parameter `F` in generated state and notifiers.
+  static String? errorMapperOutputType;
+
+  /// The error type parameter (`F`) emitted into generated code: the mapper's
+  /// return type when configured, otherwise `Object`.
+  static String get errorType =>
+      hasErrorMapper && errorMapperOutputType != null
+      ? errorMapperOutputType!
+      : 'Object';
+
   /// Parses the mapper file to extract the input type and function body.
   ///
   /// Given a mapper like:
@@ -250,6 +261,8 @@ class CraftConfig {
     for (final declaration in unit.declarations) {
       if (declaration is FunctionDeclaration &&
           declaration.name.lexeme == 'errorMapper') {
+        // Capture the return type — it becomes the error type parameter `F`.
+        errorMapperOutputType = declaration.returnType?.toSource();
         // Rename to a private name so the inlined copy doesn't leak through
         // barrel re-exports. The declared name is the first textual
         // occurrence (after the return type), so replaceFirst is safe.
@@ -265,6 +278,12 @@ class CraftConfig {
       print(
         'Warning: No top-level `errorMapper` function found in '
         '$errorMapperPath',
+      );
+    } else if (errorMapperOutputType == null) {
+      print(
+        'Warning: `errorMapper` in $errorMapperPath has no explicit return '
+        'type; generated error type falls back to `Object`. Annotate it, e.g. '
+        '`Failure errorMapper(Object error) {...}`.',
       );
     }
   }

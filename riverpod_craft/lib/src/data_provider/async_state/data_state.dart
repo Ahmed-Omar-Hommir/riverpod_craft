@@ -1,38 +1,41 @@
 part of 'async_state.dart';
 
 /// Represents the state of an asynchronous data operation without arguments.
-sealed class DataState<T>
+///
+/// [F] is the error type — `Object` by default, or your custom type when a
+/// global `error_mapper` is configured.
+sealed class DataState<T, F extends Object>
     with EquatableMixin
-    implements AsynchronousState<T, Record> {
+    implements AsynchronousState<T, F, Record> {
   const DataState();
 
   /// Creates a loading state.
-  const factory DataState.loading() = DataLoading<T>;
+  const factory DataState.loading() = DataLoading<T, F>;
 
   /// Creates a success state with the given [data].
-  const factory DataState.data(T data) = DataSuccess<T>;
+  const factory DataState.data(T data) = DataSuccess<T, F>;
 
   /// Creates an error state with the given [error].
-  const factory DataState.error(Object error) = DataError<T>;
+  const factory DataState.error(F error) = DataError<T, F>;
 
   @override
   List<Object?> get props => [];
 }
 
 /// The loading substate of [DataState].
-class DataLoading<T> extends DataState<T> {
+class DataLoading<T, F extends Object> extends DataState<T, F> {
   /// Creates a [DataLoading] instance.
   const DataLoading();
 
   @override
-  String toString() => 'DataState<$T>.loading()';
+  String toString() => 'DataState<$T, $F>.loading()';
 
   @override
   List<Object?> get props => [];
 }
 
 /// The success substate of [DataState], holding the resulting data.
-class DataSuccess<T> extends DataState<T> {
+class DataSuccess<T, F extends Object> extends DataState<T, F> {
   /// The successfully loaded data.
   final T data;
 
@@ -40,34 +43,34 @@ class DataSuccess<T> extends DataState<T> {
   const DataSuccess(this.data);
 
   @override
-  String toString() => 'DataState<$T>.data(data: $data)';
+  String toString() => 'DataState<$T, $F>.data(data: $data)';
 
   @override
   List<Object?> get props => [data];
 }
 
-/// The error substate of [DataState], holding the error object.
-class DataError<T> extends DataState<T> {
+/// The error substate of [DataState], holding the typed error object.
+class DataError<T, F extends Object> extends DataState<T, F> {
   /// The error that occurred during the operation.
-  final Object error;
+  final F error;
 
   /// Creates a [DataError] instance with the given [error].
   const DataError(this.error);
 
   @override
-  String toString() => 'DataState<$T>.error(error: $error)';
+  String toString() => 'DataState<$T, $F>.error(error: $error)';
 
   @override
   List<Object?> get props => [error];
 }
 
 /// Convenience methods for pattern-matching and inspecting [DataState].
-extension DataStateExtension<T> on DataState<T> {
+extension DataStateExtension<T, F extends Object> on DataState<T, F> {
   /// Calls the matching callback based on the current state.
   R when<R>({
     required R Function() loading,
     required R Function(T data) data,
-    required R Function(Object error) error,
+    required R Function(F error) error,
   }) {
     return switch (this) {
       DataLoading() => loading(),
@@ -80,7 +83,7 @@ extension DataStateExtension<T> on DataState<T> {
   R maybeWhen<R>({
     R Function()? loading,
     R Function(T data)? data,
-    R Function(Object error)? error,
+    R Function(F error)? error,
     required R Function() orElse,
   }) {
     return switch (this) {
@@ -94,7 +97,7 @@ extension DataStateExtension<T> on DataState<T> {
   R? whenOrNull<R>({
     R Function()? loading,
     R Function(T data)? data,
-    R Function(Object error)? error,
+    R Function(F error)? error,
   }) {
     return switch (this) {
       DataLoading() => loading?.call(),
@@ -105,58 +108,58 @@ extension DataStateExtension<T> on DataState<T> {
 
   /// Calls the matching callback, passing the full substate object.
   R map<R>({
-    required R Function(DataLoading<T> state) loading,
-    required R Function(DataSuccess<T> state) data,
-    required R Function(DataError<T> state) error,
+    required R Function(DataLoading<T, F> state) loading,
+    required R Function(DataSuccess<T, F> state) data,
+    required R Function(DataError<T, F> state) error,
   }) {
     return switch (this) {
-      DataLoading<T>() && final s => loading(s),
-      DataSuccess<T>() && final s => data(s),
-      DataError<T>() && final s => error(s),
+      DataLoading<T, F>() && final s => loading(s),
+      DataSuccess<T, F>() && final s => data(s),
+      DataError<T, F>() && final s => error(s),
     };
   }
 
   /// Like [map], but unhandled states fall through to [orElse].
   R maybeMap<R>({
-    R Function(DataLoading<T> state)? loading,
-    R Function(DataSuccess<T> state)? data,
-    R Function(DataError<T> state)? error,
+    R Function(DataLoading<T, F> state)? loading,
+    R Function(DataSuccess<T, F> state)? data,
+    R Function(DataError<T, F> state)? error,
     required R Function() orElse,
   }) {
     return switch (this) {
-      DataLoading<T>() && final s => loading != null ? loading(s) : orElse(),
-      DataSuccess<T>() && final s => data != null ? data(s) : orElse(),
-      DataError<T>() && final s => error != null ? error(s) : orElse(),
+      DataLoading<T, F>() && final s => loading != null ? loading(s) : orElse(),
+      DataSuccess<T, F>() && final s => data != null ? data(s) : orElse(),
+      DataError<T, F>() && final s => error != null ? error(s) : orElse(),
     };
   }
 
   /// Like [map], but returns `null` for unhandled states.
   R? mapOrNull<R>({
-    R Function(DataLoading<T> state)? loading,
-    R Function(DataSuccess<T> state)? data,
-    R Function(DataError<T> state)? error,
+    R Function(DataLoading<T, F> state)? loading,
+    R Function(DataSuccess<T, F> state)? data,
+    R Function(DataError<T, F> state)? error,
   }) {
     return switch (this) {
-      DataLoading<T>() && final s => loading?.call(s),
-      DataSuccess<T>() && final s => data?.call(s),
-      DataError<T>() && final s => error?.call(s),
+      DataLoading<T, F>() && final s => loading?.call(s),
+      DataSuccess<T, F>() && final s => data?.call(s),
+      DataError<T, F>() && final s => error?.call(s),
     };
   }
 
   /// Whether this state is [DataLoading].
-  bool get isLoading => this is DataLoading<T>;
+  bool get isLoading => this is DataLoading<T, F>;
 
   /// Whether this state is [DataSuccess].
-  bool get isData => this is DataSuccess<T>;
+  bool get isData => this is DataSuccess<T, F>;
 
   /// Whether this state is [DataError].
-  bool get isError => this is DataError<T>;
+  bool get isError => this is DataError<T, F>;
 
   /// Returns the data if this is [DataSuccess], otherwise `null`.
   T? get dataOrNull =>
-      this is DataSuccess<T> ? (this as DataSuccess<T>).data : null;
+      this is DataSuccess<T, F> ? (this as DataSuccess<T, F>).data : null;
 
   /// Returns the error if this is [DataError], otherwise `null`.
-  Object? get errorOrNull =>
-      this is DataError<T> ? (this as DataError<T>).error : null;
+  F? get errorOrNull =>
+      this is DataError<T, F> ? (this as DataError<T, F>).error : null;
 }

@@ -4,12 +4,12 @@ part of 'search_movies_provider.dart';
 
 final _$searchMoviesCommand =
     NotifierProvider<
-      CommandNotifier<List<Movie>, ({String query})>,
-      ArgCommandState<List<Movie>, ({String query})>
+      CommandNotifier<List<Movie>, Object, ({String query})>,
+      ArgCommandState<List<Movie>, Object, ({String query})>
     >(() => _$SearchMoviesCommand(), isAutoDispose: true);
 
 class _$SearchMoviesCommand
-    extends CommandNotifier<List<Movie>, ({String query})> {
+    extends CommandNotifier<List<Movie>, Object, ({String query})> {
   @override
   Future<List<Movie>> action(Ref ref, ({String query}) arg) =>
       searchMovies(ref, query: arg.query);
@@ -28,12 +28,14 @@ class $SearchMoviesCommandFacadeRef {
 
   late final _command = _$searchMoviesCommand;
 
-  ArgCommandState<List<Movie>, ({String query})> read() => _ref.read(_command);
-  ArgCommandState<List<Movie>, ({String query})> watch() =>
+  ArgCommandState<List<Movie>, Object, ({String query})> read() =>
+      _ref.read(_command);
+  ArgCommandState<List<Movie>, Object, ({String query})> watch() =>
       _ref.watch(_command);
 
   SelectedRefFacade<R> select<R>(
-    R Function(ArgCommandState<List<Movie>, ({String query})> state) selector,
+    R Function(ArgCommandState<List<Movie>, Object, ({String query})> state)
+    selector,
   ) => SelectedRefFacade(_ref, _command.select(selector));
 
   void run({required String query}) =>
@@ -42,8 +44,8 @@ class $SearchMoviesCommandFacadeRef {
   void retry() => _ref.read(_command.notifier).retry();
   void listen(
     void Function(
-      ArgCommandState<List<Movie>, ({String query})>? previous,
-      ArgCommandState<List<Movie>, ({String query})> next,
+      ArgCommandState<List<Movie>, Object, ({String query})>? previous,
+      ArgCommandState<List<Movie>, Object, ({String query})> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -55,8 +57,8 @@ class $SearchMoviesCommandFacadeRef {
 
 class $SearchMoviesCommandFacadeWidget
     implements
-        CommandProviderFacade<List<Movie>, ({String query})>,
-        CommandProviderValue<List<Movie>, ({String query})> {
+        CommandProviderFacade<List<Movie>, Object, ({String query})>,
+        CommandProviderValue<List<Movie>, Object, ({String query})> {
   $SearchMoviesCommandFacadeWidget(this._ref);
 
   final WidgetRef _ref;
@@ -64,13 +66,15 @@ class $SearchMoviesCommandFacadeWidget
   late final _command = _$searchMoviesCommand;
 
   @override
-  ArgCommandState<List<Movie>, ({String query})> read() => _ref.read(_command);
+  ArgCommandState<List<Movie>, Object, ({String query})> read() =>
+      _ref.read(_command);
   @override
-  ArgCommandState<List<Movie>, ({String query})> watch() =>
+  ArgCommandState<List<Movie>, Object, ({String query})> watch() =>
       _ref.watch(_command);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(ArgCommandState<List<Movie>, ({String query})> state) selector,
+    R Function(ArgCommandState<List<Movie>, Object, ({String query})> state)
+    selector,
   ) => SelectedWidgetRefFacade(_ref, _command.select(selector));
 
   void run({required String query}) =>
@@ -84,8 +88,8 @@ class $SearchMoviesCommandFacadeWidget
   @override
   void listen(
     void Function(
-      ArgCommandState<List<Movie>, ({String query})>? previous,
-      ArgCommandState<List<Movie>, ({String query})> next,
+      ArgCommandState<List<Movie>, Object, ({String query})>? previous,
+      ArgCommandState<List<Movie>, Object, ({String query})> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -95,8 +99,9 @@ class $SearchMoviesCommandFacadeWidget
   }
 
   @override
-  CommandProviderFacade<List<Movie>, ({String query})> of(WidgetRef ref) =>
-      $SearchMoviesCommandFacadeWidget(ref);
+  CommandProviderFacade<List<Movie>, Object, ({String query})> of(
+    WidgetRef ref,
+  ) => $SearchMoviesCommandFacadeWidget(ref);
 }
 
 extension $SearchMoviesCommandRefEx on Ref {

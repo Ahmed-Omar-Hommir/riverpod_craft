@@ -2,12 +2,13 @@
 // ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
 part of 'random_quote_provider.dart';
 
-final _randomQuoteProvider = NotifierProvider<$$RandomQuote, DataState<Quote>>(
-  () => $$RandomQuote()..arg = (),
-  isAutoDispose: true,
-);
+final _randomQuoteProvider =
+    NotifierProvider<$$RandomQuote, DataState<Quote, Object>>(
+      () => $$RandomQuote()..arg = (),
+      isAutoDispose: true,
+    );
 
-class $$RandomQuote extends DataNotifier<Quote, ()> {
+class $$RandomQuote extends DataNotifier<Quote, Object, ()> {
   @override
   bool get isFuture => true;
 
@@ -21,37 +22,48 @@ class $RandomQuoteFacadeRef {
 
   late final _provider = _randomQuoteProvider;
 
-  DataState<Quote> read() => _ref.read(_provider);
-  DataState<Quote> watch() => _ref.watch(_provider);
+  DataState<Quote, Object> read() => _ref.read(_provider);
+  DataState<Quote, Object> watch() => _ref.watch(_provider);
 
-  SelectedRefFacade<R> select<R>(R Function(DataState<Quote> state) selector) =>
-      SelectedRefFacade(_ref, _provider.select(selector));
+  SelectedRefFacade<R> select<R>(
+    R Function(DataState<Quote, Object> state) selector,
+  ) => SelectedRefFacade(_ref, _provider.select(selector));
 
   void invalidate() => _ref.invalidate(_provider);
 
   void listen(
-    void Function(DataState<Quote>? previous, DataState<Quote> next) listener, {
+    void Function(
+      DataState<Quote, Object>? previous,
+      DataState<Quote, Object> next,
+    )
+    listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<DataState<Quote>>(_provider, listener, onError: onError);
+    _ref.listen<DataState<Quote, Object>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 }
 
 class $RandomQuoteFacadeWidget
-    implements DataProviderFacade<Quote>, DataProviderValue<Quote> {
+    implements
+        DataProviderFacade<Quote, Object>,
+        DataProviderValue<Quote, Object> {
   $RandomQuoteFacadeWidget(this._ref);
   final WidgetRef _ref;
 
   late final _provider = _randomQuoteProvider;
 
   @override
-  DataState<Quote> read() => _ref.read(_provider);
+  DataState<Quote, Object> read() => _ref.read(_provider);
   @override
-  DataState<Quote> watch() => _ref.watch(_provider);
+  DataState<Quote, Object> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(DataState<Quote> state) selector,
+    R Function(DataState<Quote, Object> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
   @override
   void invalidate() => _ref.invalidate(_provider);
@@ -64,15 +76,24 @@ class $RandomQuoteFacadeWidget
 
   @override
   void listen(
-    void Function(DataState<Quote>? previous, DataState<Quote> next) listener, {
+    void Function(
+      DataState<Quote, Object>? previous,
+      DataState<Quote, Object> next,
+    )
+    listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<DataState<Quote>>(_provider, listener, onError: onError);
+    _ref.listen<DataState<Quote, Object>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 
   @override
-  DataProviderFacade<Quote> of(WidgetRef ref) => $RandomQuoteFacadeWidget(ref);
+  DataProviderFacade<Quote, Object> of(WidgetRef ref) =>
+      $RandomQuoteFacadeWidget(ref);
 }
 
 extension RandomQuoteFacadeRefEx on Ref {

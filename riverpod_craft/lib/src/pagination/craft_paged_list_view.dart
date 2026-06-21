@@ -10,13 +10,16 @@ import 'package:riverpod_craft/riverpod_craft.dart';
 /// ```dart
 /// @override
 /// Widget build(BuildContext context, WidgetRef ref) {
-///   return CraftPagedListView<Note>(
+///   return CraftPagedListView(
 ///     providerValue: ref.notesProvider(category: 'work'),
 ///     itemBuilder: (context, note, index) => ListTile(title: Text(note.title)),
 ///   );
 /// }
 /// ```
-class CraftPagedListView<T> extends ConsumerStatefulWidget {
+///
+/// [F] is the error type exposed to the error builders — `Object` by default,
+/// or your custom type when a global `error_mapper` is configured.
+class CraftPagedListView<T, F extends Object> extends ConsumerStatefulWidget {
   /// Creates a [CraftPagedListView] backed by a paginated provider.
   const CraftPagedListView({
     super.key,
@@ -64,7 +67,7 @@ class CraftPagedListView<T> extends ConsumerStatefulWidget {
   ///
   /// Pass the value from your extension:
   /// `ref.notesProvider(category: 'work')`
-  final PagedProviderValue<T> providerValue;
+  final PagedProviderValue<T, F> providerValue;
 
   /// Builds each item in the list.
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
@@ -77,15 +80,13 @@ class CraftPagedListView<T> extends ConsumerStatefulWidget {
   final Widget Function(BuildContext context)? firstPageLoadingBuilder;
 
   /// Widget shown when the first page fails to load.
-  final Widget Function(BuildContext context, Object? error)?
-  firstPageErrorBuilder;
+  final Widget Function(BuildContext context, F? error)? firstPageErrorBuilder;
 
   /// Widget shown while a subsequent page is loading.
   final Widget Function(BuildContext context)? newPageLoadingBuilder;
 
   /// Widget shown when a subsequent page fails to load.
-  final Widget Function(BuildContext context, Object? error)?
-  newPageErrorBuilder;
+  final Widget Function(BuildContext context, F? error)? newPageErrorBuilder;
 
   /// Padding around the list.
   final EdgeInsetsGeometry? padding;
@@ -115,11 +116,12 @@ class CraftPagedListView<T> extends ConsumerStatefulWidget {
   final DragStartBehavior dragStartBehavior;
 
   @override
-  ConsumerState<CraftPagedListView<T>> createState() =>
-      _CraftPagedListViewState<T>();
+  ConsumerState<CraftPagedListView<T, F>> createState() =>
+      _CraftPagedListViewState<T, F>();
 }
 
-class _CraftPagedListViewState<T> extends ConsumerState<CraftPagedListView<T>> {
+class _CraftPagedListViewState<T, F extends Object>
+    extends ConsumerState<CraftPagedListView<T, F>> {
   @override
   Widget build(BuildContext context) {
     final provider = widget.providerValue.of(ref);
@@ -175,7 +177,8 @@ class _CraftPagedListViewState<T> extends ConsumerState<CraftPagedListView<T>> {
 }
 
 /// A paginated sliver list view for use inside [CustomScrollView].
-class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
+class CraftPagedSliverListView<T, F extends Object>
+    extends ConsumerStatefulWidget {
   /// Creates a [CraftPagedSliverListView] backed by a paginated provider.
   const CraftPagedSliverListView({
     super.key,
@@ -202,7 +205,7 @@ class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
   }) : _separatorBuilder = separatorBuilder;
 
   /// The paginated provider value.
-  final PagedProviderValue<T> providerValue;
+  final PagedProviderValue<T, F> providerValue;
 
   /// Builds each item in the list.
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
@@ -215,23 +218,21 @@ class CraftPagedSliverListView<T> extends ConsumerStatefulWidget {
   final Widget Function(BuildContext context)? firstPageLoadingBuilder;
 
   /// Widget shown when the first page fails to load.
-  final Widget Function(BuildContext context, Object? error)?
-  firstPageErrorBuilder;
+  final Widget Function(BuildContext context, F? error)? firstPageErrorBuilder;
 
   /// Widget shown while a subsequent page is loading.
   final Widget Function(BuildContext context)? newPageLoadingBuilder;
 
   /// Widget shown when a subsequent page fails to load.
-  final Widget Function(BuildContext context, Object? error)?
-  newPageErrorBuilder;
+  final Widget Function(BuildContext context, F? error)? newPageErrorBuilder;
 
   @override
-  ConsumerState<CraftPagedSliverListView<T>> createState() =>
-      _CraftPagedSliverListViewState<T>();
+  ConsumerState<CraftPagedSliverListView<T, F>> createState() =>
+      _CraftPagedSliverListViewState<T, F>();
 }
 
-class _CraftPagedSliverListViewState<T>
-    extends ConsumerState<CraftPagedSliverListView<T>> {
+class _CraftPagedSliverListViewState<T, F extends Object>
+    extends ConsumerState<CraftPagedSliverListView<T, F>> {
   @override
   Widget build(BuildContext context) {
     final provider = widget.providerValue.of(ref);

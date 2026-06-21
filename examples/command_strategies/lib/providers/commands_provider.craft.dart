@@ -3,12 +3,12 @@
 part of 'commands_provider.dart';
 
 final _$concurrentTaskCommand =
-    NotifierProvider<CommandNotifier<String, ()>, ArgCommandState<String, ()>>(
-      () => _$ConcurrentTaskCommand(),
-      isAutoDispose: true,
-    );
+    NotifierProvider<
+      CommandNotifier<String, Object, ()>,
+      ArgCommandState<String, Object, ()>
+    >(() => _$ConcurrentTaskCommand(), isAutoDispose: true);
 
-class _$ConcurrentTaskCommand extends CommandNotifier<String, ()> {
+class _$ConcurrentTaskCommand extends CommandNotifier<String, Object, ()> {
   @override
   Future<String> action(Ref ref, () arg) => concurrentTask(ref);
 
@@ -26,11 +26,11 @@ class $ConcurrentTaskCommandFacadeRef {
 
   late final _command = _$concurrentTaskCommand;
 
-  ArgCommandState<String, ()> read() => _ref.read(_command);
-  ArgCommandState<String, ()> watch() => _ref.watch(_command);
+  ArgCommandState<String, Object, ()> read() => _ref.read(_command);
+  ArgCommandState<String, Object, ()> watch() => _ref.watch(_command);
 
   SelectedRefFacade<R> select<R>(
-    R Function(ArgCommandState<String, ()> state) selector,
+    R Function(ArgCommandState<String, Object, ()> state) selector,
   ) => SelectedRefFacade(_ref, _command.select(selector));
 
   void run() => _ref.read(_command.notifier).add(());
@@ -38,8 +38,8 @@ class $ConcurrentTaskCommandFacadeRef {
   void retry() => _ref.read(_command.notifier).retry();
   void listen(
     void Function(
-      ArgCommandState<String, ()>? previous,
-      ArgCommandState<String, ()> next,
+      ArgCommandState<String, Object, ()>? previous,
+      ArgCommandState<String, Object, ()> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -51,8 +51,8 @@ class $ConcurrentTaskCommandFacadeRef {
 
 class $ConcurrentTaskCommandFacadeWidget
     implements
-        CommandProviderFacade<String, ()>,
-        CommandProviderValue<String, ()> {
+        CommandProviderFacade<String, Object, ()>,
+        CommandProviderValue<String, Object, ()> {
   $ConcurrentTaskCommandFacadeWidget(this._ref);
 
   final WidgetRef _ref;
@@ -60,12 +60,12 @@ class $ConcurrentTaskCommandFacadeWidget
   late final _command = _$concurrentTaskCommand;
 
   @override
-  ArgCommandState<String, ()> read() => _ref.read(_command);
+  ArgCommandState<String, Object, ()> read() => _ref.read(_command);
   @override
-  ArgCommandState<String, ()> watch() => _ref.watch(_command);
+  ArgCommandState<String, Object, ()> watch() => _ref.watch(_command);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(ArgCommandState<String, ()> state) selector,
+    R Function(ArgCommandState<String, Object, ()> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _command.select(selector));
 
   void run() => _ref.read(_command.notifier).add(());
@@ -78,8 +78,8 @@ class $ConcurrentTaskCommandFacadeWidget
   @override
   void listen(
     void Function(
-      ArgCommandState<String, ()>? previous,
-      ArgCommandState<String, ()> next,
+      ArgCommandState<String, Object, ()>? previous,
+      ArgCommandState<String, Object, ()> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -89,7 +89,7 @@ class $ConcurrentTaskCommandFacadeWidget
   }
 
   @override
-  CommandProviderFacade<String, ()> of(WidgetRef ref) =>
+  CommandProviderFacade<String, Object, ()> of(WidgetRef ref) =>
       $ConcurrentTaskCommandFacadeWidget(ref);
 }
 
@@ -104,12 +104,12 @@ extension $ConcurrentTaskCommandWidgetRefEx on WidgetRef {
 }
 
 final _$sequentialTaskCommand =
-    NotifierProvider<CommandNotifier<String, ()>, ArgCommandState<String, ()>>(
-      () => _$SequentialTaskCommand(),
-      isAutoDispose: true,
-    );
+    NotifierProvider<
+      CommandNotifier<String, Object, ()>,
+      ArgCommandState<String, Object, ()>
+    >(() => _$SequentialTaskCommand(), isAutoDispose: true);
 
-class _$SequentialTaskCommand extends CommandNotifier<String, ()> {
+class _$SequentialTaskCommand extends CommandNotifier<String, Object, ()> {
   @override
   Future<String> action(Ref ref, () arg) => sequentialTask(ref);
 
@@ -127,11 +127,11 @@ class $SequentialTaskCommandFacadeRef {
 
   late final _command = _$sequentialTaskCommand;
 
-  ArgCommandState<String, ()> read() => _ref.read(_command);
-  ArgCommandState<String, ()> watch() => _ref.watch(_command);
+  ArgCommandState<String, Object, ()> read() => _ref.read(_command);
+  ArgCommandState<String, Object, ()> watch() => _ref.watch(_command);
 
   SelectedRefFacade<R> select<R>(
-    R Function(ArgCommandState<String, ()> state) selector,
+    R Function(ArgCommandState<String, Object, ()> state) selector,
   ) => SelectedRefFacade(_ref, _command.select(selector));
 
   void run() => _ref.read(_command.notifier).add(());
@@ -139,8 +139,8 @@ class $SequentialTaskCommandFacadeRef {
   void retry() => _ref.read(_command.notifier).retry();
   void listen(
     void Function(
-      ArgCommandState<String, ()>? previous,
-      ArgCommandState<String, ()> next,
+      ArgCommandState<String, Object, ()>? previous,
+      ArgCommandState<String, Object, ()> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -152,8 +152,8 @@ class $SequentialTaskCommandFacadeRef {
 
 class $SequentialTaskCommandFacadeWidget
     implements
-        CommandProviderFacade<String, ()>,
-        CommandProviderValue<String, ()> {
+        CommandProviderFacade<String, Object, ()>,
+        CommandProviderValue<String, Object, ()> {
   $SequentialTaskCommandFacadeWidget(this._ref);
 
   final WidgetRef _ref;
@@ -161,12 +161,12 @@ class $SequentialTaskCommandFacadeWidget
   late final _command = _$sequentialTaskCommand;
 
   @override
-  ArgCommandState<String, ()> read() => _ref.read(_command);
+  ArgCommandState<String, Object, ()> read() => _ref.read(_command);
   @override
-  ArgCommandState<String, ()> watch() => _ref.watch(_command);
+  ArgCommandState<String, Object, ()> watch() => _ref.watch(_command);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(ArgCommandState<String, ()> state) selector,
+    R Function(ArgCommandState<String, Object, ()> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _command.select(selector));
 
   void run() => _ref.read(_command.notifier).add(());
@@ -179,8 +179,8 @@ class $SequentialTaskCommandFacadeWidget
   @override
   void listen(
     void Function(
-      ArgCommandState<String, ()>? previous,
-      ArgCommandState<String, ()> next,
+      ArgCommandState<String, Object, ()>? previous,
+      ArgCommandState<String, Object, ()> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -190,7 +190,7 @@ class $SequentialTaskCommandFacadeWidget
   }
 
   @override
-  CommandProviderFacade<String, ()> of(WidgetRef ref) =>
+  CommandProviderFacade<String, Object, ()> of(WidgetRef ref) =>
       $SequentialTaskCommandFacadeWidget(ref);
 }
 
@@ -205,12 +205,12 @@ extension $SequentialTaskCommandWidgetRefEx on WidgetRef {
 }
 
 final _$droppableTaskCommand =
-    NotifierProvider<CommandNotifier<String, ()>, ArgCommandState<String, ()>>(
-      () => _$DroppableTaskCommand(),
-      isAutoDispose: true,
-    );
+    NotifierProvider<
+      CommandNotifier<String, Object, ()>,
+      ArgCommandState<String, Object, ()>
+    >(() => _$DroppableTaskCommand(), isAutoDispose: true);
 
-class _$DroppableTaskCommand extends CommandNotifier<String, ()> {
+class _$DroppableTaskCommand extends CommandNotifier<String, Object, ()> {
   @override
   Future<String> action(Ref ref, () arg) => droppableTask(ref);
 
@@ -228,11 +228,11 @@ class $DroppableTaskCommandFacadeRef {
 
   late final _command = _$droppableTaskCommand;
 
-  ArgCommandState<String, ()> read() => _ref.read(_command);
-  ArgCommandState<String, ()> watch() => _ref.watch(_command);
+  ArgCommandState<String, Object, ()> read() => _ref.read(_command);
+  ArgCommandState<String, Object, ()> watch() => _ref.watch(_command);
 
   SelectedRefFacade<R> select<R>(
-    R Function(ArgCommandState<String, ()> state) selector,
+    R Function(ArgCommandState<String, Object, ()> state) selector,
   ) => SelectedRefFacade(_ref, _command.select(selector));
 
   void run() => _ref.read(_command.notifier).add(());
@@ -240,8 +240,8 @@ class $DroppableTaskCommandFacadeRef {
   void retry() => _ref.read(_command.notifier).retry();
   void listen(
     void Function(
-      ArgCommandState<String, ()>? previous,
-      ArgCommandState<String, ()> next,
+      ArgCommandState<String, Object, ()>? previous,
+      ArgCommandState<String, Object, ()> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -253,8 +253,8 @@ class $DroppableTaskCommandFacadeRef {
 
 class $DroppableTaskCommandFacadeWidget
     implements
-        CommandProviderFacade<String, ()>,
-        CommandProviderValue<String, ()> {
+        CommandProviderFacade<String, Object, ()>,
+        CommandProviderValue<String, Object, ()> {
   $DroppableTaskCommandFacadeWidget(this._ref);
 
   final WidgetRef _ref;
@@ -262,12 +262,12 @@ class $DroppableTaskCommandFacadeWidget
   late final _command = _$droppableTaskCommand;
 
   @override
-  ArgCommandState<String, ()> read() => _ref.read(_command);
+  ArgCommandState<String, Object, ()> read() => _ref.read(_command);
   @override
-  ArgCommandState<String, ()> watch() => _ref.watch(_command);
+  ArgCommandState<String, Object, ()> watch() => _ref.watch(_command);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(ArgCommandState<String, ()> state) selector,
+    R Function(ArgCommandState<String, Object, ()> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _command.select(selector));
 
   void run() => _ref.read(_command.notifier).add(());
@@ -280,8 +280,8 @@ class $DroppableTaskCommandFacadeWidget
   @override
   void listen(
     void Function(
-      ArgCommandState<String, ()>? previous,
-      ArgCommandState<String, ()> next,
+      ArgCommandState<String, Object, ()>? previous,
+      ArgCommandState<String, Object, ()> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -291,7 +291,7 @@ class $DroppableTaskCommandFacadeWidget
   }
 
   @override
-  CommandProviderFacade<String, ()> of(WidgetRef ref) =>
+  CommandProviderFacade<String, Object, ()> of(WidgetRef ref) =>
       $DroppableTaskCommandFacadeWidget(ref);
 }
 
@@ -306,12 +306,12 @@ extension $DroppableTaskCommandWidgetRefEx on WidgetRef {
 }
 
 final _$restartableTaskCommand =
-    NotifierProvider<CommandNotifier<String, ()>, ArgCommandState<String, ()>>(
-      () => _$RestartableTaskCommand(),
-      isAutoDispose: true,
-    );
+    NotifierProvider<
+      CommandNotifier<String, Object, ()>,
+      ArgCommandState<String, Object, ()>
+    >(() => _$RestartableTaskCommand(), isAutoDispose: true);
 
-class _$RestartableTaskCommand extends CommandNotifier<String, ()> {
+class _$RestartableTaskCommand extends CommandNotifier<String, Object, ()> {
   @override
   Future<String> action(Ref ref, () arg) => restartableTask(ref);
 
@@ -329,11 +329,11 @@ class $RestartableTaskCommandFacadeRef {
 
   late final _command = _$restartableTaskCommand;
 
-  ArgCommandState<String, ()> read() => _ref.read(_command);
-  ArgCommandState<String, ()> watch() => _ref.watch(_command);
+  ArgCommandState<String, Object, ()> read() => _ref.read(_command);
+  ArgCommandState<String, Object, ()> watch() => _ref.watch(_command);
 
   SelectedRefFacade<R> select<R>(
-    R Function(ArgCommandState<String, ()> state) selector,
+    R Function(ArgCommandState<String, Object, ()> state) selector,
   ) => SelectedRefFacade(_ref, _command.select(selector));
 
   void run() => _ref.read(_command.notifier).add(());
@@ -341,8 +341,8 @@ class $RestartableTaskCommandFacadeRef {
   void retry() => _ref.read(_command.notifier).retry();
   void listen(
     void Function(
-      ArgCommandState<String, ()>? previous,
-      ArgCommandState<String, ()> next,
+      ArgCommandState<String, Object, ()>? previous,
+      ArgCommandState<String, Object, ()> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -354,8 +354,8 @@ class $RestartableTaskCommandFacadeRef {
 
 class $RestartableTaskCommandFacadeWidget
     implements
-        CommandProviderFacade<String, ()>,
-        CommandProviderValue<String, ()> {
+        CommandProviderFacade<String, Object, ()>,
+        CommandProviderValue<String, Object, ()> {
   $RestartableTaskCommandFacadeWidget(this._ref);
 
   final WidgetRef _ref;
@@ -363,12 +363,12 @@ class $RestartableTaskCommandFacadeWidget
   late final _command = _$restartableTaskCommand;
 
   @override
-  ArgCommandState<String, ()> read() => _ref.read(_command);
+  ArgCommandState<String, Object, ()> read() => _ref.read(_command);
   @override
-  ArgCommandState<String, ()> watch() => _ref.watch(_command);
+  ArgCommandState<String, Object, ()> watch() => _ref.watch(_command);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(ArgCommandState<String, ()> state) selector,
+    R Function(ArgCommandState<String, Object, ()> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _command.select(selector));
 
   void run() => _ref.read(_command.notifier).add(());
@@ -381,8 +381,8 @@ class $RestartableTaskCommandFacadeWidget
   @override
   void listen(
     void Function(
-      ArgCommandState<String, ()>? previous,
-      ArgCommandState<String, ()> next,
+      ArgCommandState<String, Object, ()>? previous,
+      ArgCommandState<String, Object, ()> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -392,7 +392,7 @@ class $RestartableTaskCommandFacadeWidget
   }
 
   @override
-  CommandProviderFacade<String, ()> of(WidgetRef ref) =>
+  CommandProviderFacade<String, Object, ()> of(WidgetRef ref) =>
       $RestartableTaskCommandFacadeWidget(ref);
 }
 

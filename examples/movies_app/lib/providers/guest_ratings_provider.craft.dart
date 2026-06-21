@@ -3,12 +3,12 @@
 part of 'guest_ratings_provider.dart';
 
 final _guestRatingsProvider =
-    NotifierProvider<$$GuestRatings, DataState<Map<int, double>>>(
+    NotifierProvider<$$GuestRatings, DataState<Map<int, double>, Object>>(
       () => $$GuestRatings()..arg = (),
       isAutoDispose: true,
     );
 
-class $$GuestRatings extends DataNotifier<Map<int, double>, ()> {
+class $$GuestRatings extends DataNotifier<Map<int, double>, Object, ()> {
   @override
   bool get isFuture => true;
 
@@ -22,25 +22,25 @@ class $GuestRatingsFacadeRef {
 
   late final _provider = _guestRatingsProvider;
 
-  DataState<Map<int, double>> read() => _ref.read(_provider);
-  DataState<Map<int, double>> watch() => _ref.watch(_provider);
+  DataState<Map<int, double>, Object> read() => _ref.read(_provider);
+  DataState<Map<int, double>, Object> watch() => _ref.watch(_provider);
 
   SelectedRefFacade<R> select<R>(
-    R Function(DataState<Map<int, double>> state) selector,
+    R Function(DataState<Map<int, double>, Object> state) selector,
   ) => SelectedRefFacade(_ref, _provider.select(selector));
 
   void invalidate() => _ref.invalidate(_provider);
 
   void listen(
     void Function(
-      DataState<Map<int, double>>? previous,
-      DataState<Map<int, double>> next,
+      DataState<Map<int, double>, Object>? previous,
+      DataState<Map<int, double>, Object> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<DataState<Map<int, double>>>(
+    _ref.listen<DataState<Map<int, double>, Object>>(
       _provider,
       listener,
       onError: onError,
@@ -50,20 +50,20 @@ class $GuestRatingsFacadeRef {
 
 class $GuestRatingsFacadeWidget
     implements
-        DataProviderFacade<Map<int, double>>,
-        DataProviderValue<Map<int, double>> {
+        DataProviderFacade<Map<int, double>, Object>,
+        DataProviderValue<Map<int, double>, Object> {
   $GuestRatingsFacadeWidget(this._ref);
   final WidgetRef _ref;
 
   late final _provider = _guestRatingsProvider;
 
   @override
-  DataState<Map<int, double>> read() => _ref.read(_provider);
+  DataState<Map<int, double>, Object> read() => _ref.read(_provider);
   @override
-  DataState<Map<int, double>> watch() => _ref.watch(_provider);
+  DataState<Map<int, double>, Object> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(DataState<Map<int, double>> state) selector,
+    R Function(DataState<Map<int, double>, Object> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
   @override
   void invalidate() => _ref.invalidate(_provider);
@@ -77,14 +77,14 @@ class $GuestRatingsFacadeWidget
   @override
   void listen(
     void Function(
-      DataState<Map<int, double>>? previous,
-      DataState<Map<int, double>> next,
+      DataState<Map<int, double>, Object>? previous,
+      DataState<Map<int, double>, Object> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<DataState<Map<int, double>>>(
+    _ref.listen<DataState<Map<int, double>, Object>>(
       _provider,
       listener,
       onError: onError,
@@ -92,7 +92,7 @@ class $GuestRatingsFacadeWidget
   }
 
   @override
-  DataProviderFacade<Map<int, double>> of(WidgetRef ref) =>
+  DataProviderFacade<Map<int, double>, Object> of(WidgetRef ref) =>
       $GuestRatingsFacadeWidget(ref);
 }
 

@@ -2,7 +2,7 @@
 // ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
 part of 'trending_movies_provider.dart';
 
-abstract class _$TrendingMovies extends DataNotifier<List<Movie>, ()> {
+abstract class _$TrendingMovies extends DataNotifier<List<Movie>, Object, ()> {
   @override
   bool get isFuture => true;
 
@@ -14,8 +14,8 @@ abstract class _$TrendingMovies extends DataNotifier<List<Movie>, ()> {
 
   late final _$rateMovieCommand =
       NotifierProvider<
-        CommandNotifier<double, ({int movieId, double rating})>,
-        ArgCommandState<double, ({int movieId, double rating})>
+        CommandNotifier<double, Object, ({int movieId, double rating})>,
+        ArgCommandState<double, Object, ({int movieId, double rating})>
       >(
         () => _$RateMovieCommandTrendingMovies(this as TrendingMovies),
         isAutoDispose: true,
@@ -26,7 +26,7 @@ abstract class _$TrendingMovies extends DataNotifier<List<Movie>, ()> {
 }
 
 final _trendingMoviesProvider =
-    NotifierProvider<TrendingMovies, DataState<List<Movie>>>(
+    NotifierProvider<TrendingMovies, DataState<List<Movie>, Object>>(
       () => TrendingMovies()..arg = (),
       isAutoDispose: true,
     );
@@ -37,22 +37,29 @@ class $TrendingMoviesFacadeRef {
 
   late final _provider = _trendingMoviesProvider;
 
-  DataState<List<Movie>> read() => _ref.read(_provider);
-  DataState<List<Movie>> watch() => _ref.watch(_provider);
+  DataState<List<Movie>, Object> read() => _ref.read(_provider);
+  DataState<List<Movie>, Object> watch() => _ref.watch(_provider);
 
   SelectedRefFacade<R> select<R>(
-    R Function(DataState<List<Movie>> state) selector,
+    R Function(DataState<List<Movie>, Object> state) selector,
   ) => SelectedRefFacade(_ref, _provider.select(selector));
 
   void invalidate() => _ref.invalidate(_provider);
 
   void listen(
-    void Function(DataState<List<Movie>>? previous, DataState<List<Movie>> next)
+    void Function(
+      DataState<List<Movie>, Object>? previous,
+      DataState<List<Movie>, Object> next,
+    )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<DataState<List<Movie>>>(_provider, listener, onError: onError);
+    _ref.listen<DataState<List<Movie>, Object>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 
   $RateMovieCommandFacadeTrendingMoviesRef get rateMovieCommand =>
@@ -63,19 +70,21 @@ class $TrendingMoviesFacadeRef {
 }
 
 class $TrendingMoviesFacadeWidget
-    implements DataProviderFacade<List<Movie>>, DataProviderValue<List<Movie>> {
+    implements
+        DataProviderFacade<List<Movie>, Object>,
+        DataProviderValue<List<Movie>, Object> {
   $TrendingMoviesFacadeWidget(this._ref);
   final WidgetRef _ref;
 
   late final _provider = _trendingMoviesProvider;
 
   @override
-  DataState<List<Movie>> read() => _ref.read(_provider);
+  DataState<List<Movie>, Object> read() => _ref.read(_provider);
   @override
-  DataState<List<Movie>> watch() => _ref.watch(_provider);
+  DataState<List<Movie>, Object> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(DataState<List<Movie>> state) selector,
+    R Function(DataState<List<Movie>, Object> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
   @override
   void invalidate() => _ref.invalidate(_provider);
@@ -88,16 +97,23 @@ class $TrendingMoviesFacadeWidget
 
   @override
   void listen(
-    void Function(DataState<List<Movie>>? previous, DataState<List<Movie>> next)
+    void Function(
+      DataState<List<Movie>, Object>? previous,
+      DataState<List<Movie>, Object> next,
+    )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<DataState<List<Movie>>>(_provider, listener, onError: onError);
+    _ref.listen<DataState<List<Movie>, Object>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 
   @override
-  DataProviderFacade<List<Movie>> of(WidgetRef ref) =>
+  DataProviderFacade<List<Movie>, Object> of(WidgetRef ref) =>
       $TrendingMoviesFacadeWidget(ref);
 
   $RateMovieCommandFacadeTrendingMoviesWidget get rateMovieCommand =>
@@ -108,7 +124,7 @@ class $TrendingMoviesFacadeWidget
 }
 
 class _$RateMovieCommandTrendingMovies
-    extends CommandNotifier<double, ({int movieId, double rating})> {
+    extends CommandNotifier<double, Object, ({int movieId, double rating})> {
   _$RateMovieCommandTrendingMovies(this._instance);
   final TrendingMovies _instance;
 
@@ -131,13 +147,15 @@ class $RateMovieCommandFacadeTrendingMoviesRef {
 
   late final _command = _instance._$rateMovieCommand;
 
-  ArgCommandState<double, ({int movieId, double rating})> read() =>
+  ArgCommandState<double, Object, ({int movieId, double rating})> read() =>
       _ref.read(_command);
-  ArgCommandState<double, ({int movieId, double rating})> watch() =>
+  ArgCommandState<double, Object, ({int movieId, double rating})> watch() =>
       _ref.watch(_command);
 
   SelectedRefFacade<R> select<R>(
-    R Function(ArgCommandState<double, ({int movieId, double rating})> state)
+    R Function(
+      ArgCommandState<double, Object, ({int movieId, double rating})> state,
+    )
     selector,
   ) => SelectedRefFacade(_ref, _command.select(selector));
 
@@ -147,8 +165,8 @@ class $RateMovieCommandFacadeTrendingMoviesRef {
   void retry() => _ref.read(_command.notifier).retry();
   void listen(
     void Function(
-      ArgCommandState<double, ({int movieId, double rating})>? previous,
-      ArgCommandState<double, ({int movieId, double rating})> next,
+      ArgCommandState<double, Object, ({int movieId, double rating})>? previous,
+      ArgCommandState<double, Object, ({int movieId, double rating})> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -160,8 +178,8 @@ class $RateMovieCommandFacadeTrendingMoviesRef {
 
 class $RateMovieCommandFacadeTrendingMoviesWidget
     implements
-        CommandProviderFacade<double, ({int movieId, double rating})>,
-        CommandProviderValue<double, ({int movieId, double rating})> {
+        CommandProviderFacade<double, Object, ({int movieId, double rating})>,
+        CommandProviderValue<double, Object, ({int movieId, double rating})> {
   $RateMovieCommandFacadeTrendingMoviesWidget(this._ref, this._instance);
   final TrendingMovies _instance;
 
@@ -170,14 +188,16 @@ class $RateMovieCommandFacadeTrendingMoviesWidget
   late final _command = _instance._$rateMovieCommand;
 
   @override
-  ArgCommandState<double, ({int movieId, double rating})> read() =>
+  ArgCommandState<double, Object, ({int movieId, double rating})> read() =>
       _ref.read(_command);
   @override
-  ArgCommandState<double, ({int movieId, double rating})> watch() =>
+  ArgCommandState<double, Object, ({int movieId, double rating})> watch() =>
       _ref.watch(_command);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(ArgCommandState<double, ({int movieId, double rating})> state)
+    R Function(
+      ArgCommandState<double, Object, ({int movieId, double rating})> state,
+    )
     selector,
   ) => SelectedWidgetRefFacade(_ref, _command.select(selector));
 
@@ -192,8 +212,8 @@ class $RateMovieCommandFacadeTrendingMoviesWidget
   @override
   void listen(
     void Function(
-      ArgCommandState<double, ({int movieId, double rating})>? previous,
-      ArgCommandState<double, ({int movieId, double rating})> next,
+      ArgCommandState<double, Object, ({int movieId, double rating})>? previous,
+      ArgCommandState<double, Object, ({int movieId, double rating})> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -203,7 +223,7 @@ class $RateMovieCommandFacadeTrendingMoviesWidget
   }
 
   @override
-  CommandProviderFacade<double, ({int movieId, double rating})> of(
+  CommandProviderFacade<double, Object, ({int movieId, double rating})> of(
     WidgetRef ref,
   ) => $RateMovieCommandFacadeTrendingMoviesWidget(ref, _instance);
 }

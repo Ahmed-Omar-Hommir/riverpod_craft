@@ -26,21 +26,21 @@ AppError _$errorMapper(Object error) {
 }
 
 abstract class _$PaginatedNotes
-    extends PagedDataNotifier<Note, ({String? category})> {
+    extends PagedDataNotifier<Note, AppError, ({String? category})> {
   Paged<Note> create(int page, {required String? category});
   @override
   Future<PaginatedResponse<Note>> buildPagedData(int page) async =>
       pagedMapper(await create(page, category: arg.category));
 
   @override
-  Object mapError(Object error) => _$errorMapper(error);
+  AppError mapError(Object error) => _$errorMapper(error);
 
   Future<void> deleteNote({required String id});
 
   late final _$deleteNoteCommand =
       NotifierProvider<
-        CommandNotifier<void, ({String id})>,
-        ArgCommandState<void, ({String id})>
+        CommandNotifier<void, AppError, ({String id})>,
+        ArgCommandState<void, AppError, ({String id})>
       >(
         () => _$DeleteNoteCommandPaginatedNotes(this as PaginatedNotes),
         isAutoDispose: true,
@@ -53,7 +53,7 @@ abstract class _$PaginatedNotes
 final _paginatedNotesProvider =
     NotifierProvider.family<
       PaginatedNotes,
-      PagedDataState<Note>,
+      PagedDataState<Note, AppError>,
       ({String? category})
     >(
       (({String? category}) arg) => PaginatedNotes()..arg = arg,
@@ -67,11 +67,11 @@ class $PaginatedNotesFacadeRef {
 
   late final _provider = _paginatedNotesProvider(_arg);
 
-  PagedDataState<Note> read() => _ref.read(_provider);
-  PagedDataState<Note> watch() => _ref.watch(_provider);
+  PagedDataState<Note, AppError> read() => _ref.read(_provider);
+  PagedDataState<Note, AppError> watch() => _ref.watch(_provider);
 
   SelectedRefFacade<R> select<R>(
-    R Function(PagedDataState<Note> state) selector,
+    R Function(PagedDataState<Note, AppError> state) selector,
   ) => SelectedRefFacade(_ref, _provider.select(selector));
 
   void invalidate() => _ref.invalidate(_provider);
@@ -80,12 +80,19 @@ class $PaginatedNotesFacadeRef {
   Future<void> reload() => _ref.read(_provider.notifier).reload();
 
   void listen(
-    void Function(PagedDataState<Note>? previous, PagedDataState<Note> next)
+    void Function(
+      PagedDataState<Note, AppError>? previous,
+      PagedDataState<Note, AppError> next,
+    )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<PagedDataState<Note>>(_provider, listener, onError: onError);
+    _ref.listen<PagedDataState<Note, AppError>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 
   $DeleteNoteCommandFacadePaginatedNotesRef get deleteNoteCommand =>
@@ -96,18 +103,20 @@ class $PaginatedNotesFacadeRef {
 }
 
 class $PaginatedNotesFacadeWidget
-    implements PagedProviderFacade<Note>, PagedProviderValue<Note> {
+    implements
+        PagedProviderFacade<Note, AppError>,
+        PagedProviderValue<Note, AppError> {
   $PaginatedNotesFacadeWidget(this._ref, this._arg);
   final WidgetRef _ref;
   final ({String? category}) _arg;
 
   late final _provider = _paginatedNotesProvider(_arg);
 
-  PagedDataState<Note> read() => _ref.read(_provider);
-  PagedDataState<Note> watch() => _ref.watch(_provider);
+  PagedDataState<Note, AppError> read() => _ref.read(_provider);
+  PagedDataState<Note, AppError> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(PagedDataState<Note> state) selector,
+    R Function(PagedDataState<Note, AppError> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
   @override
   void invalidate() => _ref.invalidate(_provider);
@@ -118,16 +127,23 @@ class $PaginatedNotesFacadeWidget
   Future<void> reload() => _ref.read(_provider.notifier).reload();
 
   void listen(
-    void Function(PagedDataState<Note>? previous, PagedDataState<Note> next)
+    void Function(
+      PagedDataState<Note, AppError>? previous,
+      PagedDataState<Note, AppError> next,
+    )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<PagedDataState<Note>>(_provider, listener, onError: onError);
+    _ref.listen<PagedDataState<Note, AppError>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 
   @override
-  PagedProviderFacade<Note> of(WidgetRef ref) =>
+  PagedProviderFacade<Note, AppError> of(WidgetRef ref) =>
       $PaginatedNotesFacadeWidget(ref, _arg);
 
   $DeleteNoteCommandFacadePaginatedNotesWidget get deleteNoteCommand =>
@@ -138,7 +154,7 @@ class $PaginatedNotesFacadeWidget
 }
 
 class _$DeleteNoteCommandPaginatedNotes
-    extends CommandNotifier<void, ({String id})> {
+    extends CommandNotifier<void, AppError, ({String id})> {
   _$DeleteNoteCommandPaginatedNotes(this._instance);
   final PaginatedNotes _instance;
 
@@ -153,7 +169,7 @@ class _$DeleteNoteCommandPaginatedNotes
   ActionStrategy get strategy => ActionStrategy.droppable;
 
   @override
-  Object mapError(Object error) => _$errorMapper(error);
+  AppError mapError(Object error) => _$errorMapper(error);
 }
 
 class $DeleteNoteCommandFacadePaginatedNotesRef {
@@ -164,11 +180,12 @@ class $DeleteNoteCommandFacadePaginatedNotesRef {
 
   late final _command = _instance._$deleteNoteCommand;
 
-  ArgCommandState<void, ({String id})> read() => _ref.read(_command);
-  ArgCommandState<void, ({String id})> watch() => _ref.watch(_command);
+  ArgCommandState<void, AppError, ({String id})> read() => _ref.read(_command);
+  ArgCommandState<void, AppError, ({String id})> watch() =>
+      _ref.watch(_command);
 
   SelectedRefFacade<R> select<R>(
-    R Function(ArgCommandState<void, ({String id})> state) selector,
+    R Function(ArgCommandState<void, AppError, ({String id})> state) selector,
   ) => SelectedRefFacade(_ref, _command.select(selector));
 
   void run({required String id}) => _ref.read(_command.notifier).add((id: id));
@@ -176,8 +193,8 @@ class $DeleteNoteCommandFacadePaginatedNotesRef {
   void retry() => _ref.read(_command.notifier).retry();
   void listen(
     void Function(
-      ArgCommandState<void, ({String id})>? previous,
-      ArgCommandState<void, ({String id})> next,
+      ArgCommandState<void, AppError, ({String id})>? previous,
+      ArgCommandState<void, AppError, ({String id})> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -189,8 +206,8 @@ class $DeleteNoteCommandFacadePaginatedNotesRef {
 
 class $DeleteNoteCommandFacadePaginatedNotesWidget
     implements
-        CommandProviderFacade<void, ({String id})>,
-        CommandProviderValue<void, ({String id})> {
+        CommandProviderFacade<void, AppError, ({String id})>,
+        CommandProviderValue<void, AppError, ({String id})> {
   $DeleteNoteCommandFacadePaginatedNotesWidget(this._ref, this._instance);
   final PaginatedNotes _instance;
 
@@ -199,12 +216,13 @@ class $DeleteNoteCommandFacadePaginatedNotesWidget
   late final _command = _instance._$deleteNoteCommand;
 
   @override
-  ArgCommandState<void, ({String id})> read() => _ref.read(_command);
+  ArgCommandState<void, AppError, ({String id})> read() => _ref.read(_command);
   @override
-  ArgCommandState<void, ({String id})> watch() => _ref.watch(_command);
+  ArgCommandState<void, AppError, ({String id})> watch() =>
+      _ref.watch(_command);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(ArgCommandState<void, ({String id})> state) selector,
+    R Function(ArgCommandState<void, AppError, ({String id})> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _command.select(selector));
 
   void run({required String id}) => _ref.read(_command.notifier).add((id: id));
@@ -217,8 +235,8 @@ class $DeleteNoteCommandFacadePaginatedNotesWidget
   @override
   void listen(
     void Function(
-      ArgCommandState<void, ({String id})>? previous,
-      ArgCommandState<void, ({String id})> next,
+      ArgCommandState<void, AppError, ({String id})>? previous,
+      ArgCommandState<void, AppError, ({String id})> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
@@ -228,7 +246,7 @@ class $DeleteNoteCommandFacadePaginatedNotesWidget
   }
 
   @override
-  CommandProviderFacade<void, ({String id})> of(WidgetRef ref) =>
+  CommandProviderFacade<void, AppError, ({String id})> of(WidgetRef ref) =>
       $DeleteNoteCommandFacadePaginatedNotesWidget(ref, _instance);
 }
 

@@ -76,7 +76,7 @@ class _SectionHeader extends StatelessWidget {
 class _NowPlayingCarousel extends StatelessWidget {
   const _NowPlayingCarousel(this.state);
 
-  final DataState<List<Movie>> state;
+  final DataState<List<Movie>, Object> state;
 
   @override
   Widget build(BuildContext context) => SizedBox(
@@ -124,7 +124,7 @@ class _NowPlayingCard extends StatelessWidget {
 class _TrendingGrid extends StatelessWidget {
   const _TrendingGrid(this.state);
 
-  final DataState<List<Movie>> state;
+  final DataState<List<Movie>, Object> state;
 
   @override
   Widget build(BuildContext context) => state.when(

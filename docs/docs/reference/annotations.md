@@ -55,8 +55,10 @@ Stream<List<Message>> messages(Ref ref) => api.messagesStream();
 | Return type | Notifier base class | State type |
 |-------------|-------------------|------------|
 | `T` | `StateDataNotifier` | `T` (sync) |
-| `Future<T>` | `DataNotifier` | `DataState<T>` |
-| `Stream<T>` | `DataNotifier` | `DataState<T>` |
+| `Future<T>` | `DataNotifier` | `DataState<T, F>` |
+| `Stream<T>` | `DataNotifier` | `DataState<T, F>` |
+
+`F` is the error type — `Object` by default, or your custom type when an [error mapper](/docs/concepts/error-mapping) is configured.
 
 ---
 

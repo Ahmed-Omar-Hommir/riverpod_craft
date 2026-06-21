@@ -14,12 +14,13 @@ AppError _$errorMapper(Object error) {
 }
 
 final _noteDetailProvider =
-    NotifierProvider.family<$$NoteDetail, DataState<Note>, ({String id})>(
-      (({String id}) arg) => $$NoteDetail()..arg = arg,
-      isAutoDispose: true,
-    );
+    NotifierProvider.family<
+      $$NoteDetail,
+      DataState<Note, AppError>,
+      ({String id})
+    >((({String id}) arg) => $$NoteDetail()..arg = arg, isAutoDispose: true);
 
-class $$NoteDetail extends DataNotifier<Note, ({String id})> {
+class $$NoteDetail extends DataNotifier<Note, AppError, ({String id})> {
   @override
   bool get isFuture => true;
 
@@ -27,7 +28,7 @@ class $$NoteDetail extends DataNotifier<Note, ({String id})> {
   Future<Note> buildDataWithFuture() => noteDetail(ref, id: arg.id);
 
   @override
-  Object mapError(Object error) => _$errorMapper(error);
+  AppError mapError(Object error) => _$errorMapper(error);
 }
 
 class $NoteDetailFacadeRef {
@@ -37,25 +38,36 @@ class $NoteDetailFacadeRef {
 
   late final _provider = _noteDetailProvider(_arg);
 
-  DataState<Note> read() => _ref.read(_provider);
-  DataState<Note> watch() => _ref.watch(_provider);
+  DataState<Note, AppError> read() => _ref.read(_provider);
+  DataState<Note, AppError> watch() => _ref.watch(_provider);
 
-  SelectedRefFacade<R> select<R>(R Function(DataState<Note> state) selector) =>
-      SelectedRefFacade(_ref, _provider.select(selector));
+  SelectedRefFacade<R> select<R>(
+    R Function(DataState<Note, AppError> state) selector,
+  ) => SelectedRefFacade(_ref, _provider.select(selector));
 
   void invalidate() => _ref.invalidate(_provider);
 
   void listen(
-    void Function(DataState<Note>? previous, DataState<Note> next) listener, {
+    void Function(
+      DataState<Note, AppError>? previous,
+      DataState<Note, AppError> next,
+    )
+    listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<DataState<Note>>(_provider, listener, onError: onError);
+    _ref.listen<DataState<Note, AppError>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 }
 
 class $NoteDetailFacadeWidget
-    implements DataProviderFacade<Note>, DataProviderValue<Note> {
+    implements
+        DataProviderFacade<Note, AppError>,
+        DataProviderValue<Note, AppError> {
   $NoteDetailFacadeWidget(this._ref, this._arg);
   final WidgetRef _ref;
   final ({String id}) _arg;
@@ -63,12 +75,12 @@ class $NoteDetailFacadeWidget
   late final _provider = _noteDetailProvider(_arg);
 
   @override
-  DataState<Note> read() => _ref.read(_provider);
+  DataState<Note, AppError> read() => _ref.read(_provider);
   @override
-  DataState<Note> watch() => _ref.watch(_provider);
+  DataState<Note, AppError> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(DataState<Note> state) selector,
+    R Function(DataState<Note, AppError> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
   @override
   void invalidate() => _ref.invalidate(_provider);
@@ -81,15 +93,23 @@ class $NoteDetailFacadeWidget
 
   @override
   void listen(
-    void Function(DataState<Note>? previous, DataState<Note> next) listener, {
+    void Function(
+      DataState<Note, AppError>? previous,
+      DataState<Note, AppError> next,
+    )
+    listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<DataState<Note>>(_provider, listener, onError: onError);
+    _ref.listen<DataState<Note, AppError>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 
   @override
-  DataProviderFacade<Note> of(WidgetRef ref) =>
+  DataProviderFacade<Note, AppError> of(WidgetRef ref) =>
       $NoteDetailFacadeWidget(ref, _arg);
 }
 

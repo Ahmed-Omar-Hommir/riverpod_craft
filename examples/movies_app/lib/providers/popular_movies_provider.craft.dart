@@ -5,7 +5,7 @@ part of 'popular_movies_provider.dart';
 typedef Paged<T> = Future<PaginatedResponse<T>>;
 
 abstract class _$PopularMovies
-    extends PagedDataNotifier<Movie, ({int? genreId})> {
+    extends PagedDataNotifier<Movie, Object, ({int? genreId})> {
   Paged<Movie> create(int page, {required int? genreId});
   @override
   Future<PaginatedResponse<Movie>> buildPagedData(int page) =>
@@ -15,7 +15,7 @@ abstract class _$PopularMovies
 final _popularMoviesProvider =
     NotifierProvider.family<
       PopularMovies,
-      PagedDataState<Movie>,
+      PagedDataState<Movie, Object>,
       ({int? genreId})
     >(
       (({int? genreId}) arg) => PopularMovies()..arg = arg,
@@ -29,11 +29,11 @@ class $PopularMoviesFacadeRef {
 
   late final _provider = _popularMoviesProvider(_arg);
 
-  PagedDataState<Movie> read() => _ref.read(_provider);
-  PagedDataState<Movie> watch() => _ref.watch(_provider);
+  PagedDataState<Movie, Object> read() => _ref.read(_provider);
+  PagedDataState<Movie, Object> watch() => _ref.watch(_provider);
 
   SelectedRefFacade<R> select<R>(
-    R Function(PagedDataState<Movie> state) selector,
+    R Function(PagedDataState<Movie, Object> state) selector,
   ) => SelectedRefFacade(_ref, _provider.select(selector));
 
   void invalidate() => _ref.invalidate(_provider);
@@ -42,28 +42,37 @@ class $PopularMoviesFacadeRef {
   Future<void> reload() => _ref.read(_provider.notifier).reload();
 
   void listen(
-    void Function(PagedDataState<Movie>? previous, PagedDataState<Movie> next)
+    void Function(
+      PagedDataState<Movie, Object>? previous,
+      PagedDataState<Movie, Object> next,
+    )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<PagedDataState<Movie>>(_provider, listener, onError: onError);
+    _ref.listen<PagedDataState<Movie, Object>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 }
 
 class $PopularMoviesFacadeWidget
-    implements PagedProviderFacade<Movie>, PagedProviderValue<Movie> {
+    implements
+        PagedProviderFacade<Movie, Object>,
+        PagedProviderValue<Movie, Object> {
   $PopularMoviesFacadeWidget(this._ref, this._arg);
   final WidgetRef _ref;
   final ({int? genreId}) _arg;
 
   late final _provider = _popularMoviesProvider(_arg);
 
-  PagedDataState<Movie> read() => _ref.read(_provider);
-  PagedDataState<Movie> watch() => _ref.watch(_provider);
+  PagedDataState<Movie, Object> read() => _ref.read(_provider);
+  PagedDataState<Movie, Object> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(PagedDataState<Movie> state) selector,
+    R Function(PagedDataState<Movie, Object> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
   @override
   void invalidate() => _ref.invalidate(_provider);
@@ -74,16 +83,23 @@ class $PopularMoviesFacadeWidget
   Future<void> reload() => _ref.read(_provider.notifier).reload();
 
   void listen(
-    void Function(PagedDataState<Movie>? previous, PagedDataState<Movie> next)
+    void Function(
+      PagedDataState<Movie, Object>? previous,
+      PagedDataState<Movie, Object> next,
+    )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<PagedDataState<Movie>>(_provider, listener, onError: onError);
+    _ref.listen<PagedDataState<Movie, Object>>(
+      _provider,
+      listener,
+      onError: onError,
+    );
   }
 
   @override
-  PagedProviderFacade<Movie> of(WidgetRef ref) =>
+  PagedProviderFacade<Movie, Object> of(WidgetRef ref) =>
       $PopularMoviesFacadeWidget(ref, _arg);
 }
 

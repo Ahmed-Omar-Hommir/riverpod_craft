@@ -17,7 +17,7 @@ class AsyncPagedDropdown<T> extends ConsumerStatefulWidget {
   });
 
   // providerValue is an accessor for the provider, not the actual provider.
-  final PagedProviderValue<T> providerValue;
+  final PagedProviderValue<T, Object> providerValue;
   final ValueChanged<T?>? onChanged;
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
   final Widget? hint;
@@ -98,7 +98,7 @@ class _AsyncPagedDropdownState<T> extends ConsumerState<AsyncPagedDropdown<T>> {
               child: RefreshIndicator(
                 color: colorScheme.primary,
                 onRefresh: () async => provider.invalidate(),
-                child: CraftPagedListView<T>(
+                child: CraftPagedListView(
                   providerValue: widget.providerValue,
                   itemBuilder: (context, item, index) => InkWell(
                     borderRadius: BorderRadius.circular(8),

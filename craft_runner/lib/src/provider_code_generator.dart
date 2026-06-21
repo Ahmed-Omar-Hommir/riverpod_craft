@@ -7,7 +7,7 @@ import 'package:craft_runner/src/plugin_loader.dart';
 /// (privately renamed) `errorMapper` function. Empty when no mapper is
 /// configured.
 String get mapErrorOverride => CraftConfig.hasErrorMapper
-    ? '\n  @override\n  Object mapError(Object error) => ${CraftConfig.errorMapperInlineName}(error);\n'
+    ? '\n  @override\n  ${CraftConfig.errorType} mapError(Object error) => ${CraftConfig.errorMapperInlineName}(error);\n'
     : '';
 
 class ProviderCodeGenerator {
@@ -101,7 +101,7 @@ ${_buildExtensions()}
           ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await create(page$pagedCreateCall));'
           : 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => create(page$pagedCreateCall);';
       return '''
-abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, $classArgType> {
+abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, ${_info.errorType}, $classArgType> {
   Paged<${_info.dataType}> create(int page${familyParams.isEmpty ? '' : ', $createParamSig'});
   @override
   $buildPagedLine
@@ -119,7 +119,7 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent())
           ? 'buildDataWithFuture'
           : 'buildDataWithStream';
       return '''
-abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, $classArgType> {
+abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, ${_info.errorType}, $classArgType> {
   @override
   bool get isFuture => $isFuture;
 
@@ -199,7 +199,7 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent())
           ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await $pagedFunctionCall);'
           : 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => $pagedFunctionCall;';
       return '''
-class ${_info.notifierType} extends $controllerType<${_info.dataType}, $dataArgType> {
+class ${_info.notifierType} extends $controllerType<${_info.dataType}, ${_info.errorType}, $dataArgType> {
   @override
   $functionalBuildLine
 $mapErrorOverride}''';
@@ -214,7 +214,7 @@ $mapErrorOverride}''';
           ? 'buildDataWithFuture'
           : 'buildDataWithStream';
       return '''
-class ${_info.notifierType} extends $controllerType<${_info.dataType}, $dataArgType> {
+class ${_info.notifierType} extends $controllerType<${_info.dataType}, ${_info.errorType}, $dataArgType> {
   @override
   bool get isFuture => $isFuture;
 
@@ -447,10 +447,10 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
         ? '()'
         : _info.params.toRecordType();
     final implementsClause = _info.type == ProviderType.paged
-        ? ' implements PagedProviderFacade<${_info.dataType}>, PagedProviderValue<${_info.dataType}>'
+        ? ' implements PagedProviderFacade<${_info.dataType}, ${_info.errorType}>, PagedProviderValue<${_info.dataType}, ${_info.errorType}>'
         : _info.type == ProviderType.sync
         ? ' implements ProviderFacade<${_info.dataType}>, ProviderValue<${_info.dataType}>'
-        : ' implements DataProviderFacade<${_info.dataType}>, DataProviderValue<${_info.dataType}>';
+        : ' implements DataProviderFacade<${_info.dataType}, ${_info.errorType}>, DataProviderValue<${_info.dataType}, ${_info.errorType}>';
 
     final overrideAnnotations = _info.type == ProviderType.paged
         ? ''
@@ -460,7 +460,7 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
     final ofMethod = _info.type == ProviderType.paged
         ? '''
   @override
-  PagedProviderFacade<${_info.dataType}> of(WidgetRef ref) =>
+  PagedProviderFacade<${_info.dataType}, ${_info.errorType}> of(WidgetRef ref) =>
       ${_info.facadeClassName}Widget(ref$ofMethodArg);'''
         : _info.type == ProviderType.sync
         ? '''
@@ -469,7 +469,7 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
       ${_info.facadeClassName}Widget(ref$ofMethodArg);'''
         : '''
   @override
-  DataProviderFacade<${_info.dataType}> of(WidgetRef ref) =>
+  DataProviderFacade<${_info.dataType}, ${_info.errorType}> of(WidgetRef ref) =>
       ${_info.facadeClassName}Widget(ref$ofMethodArg);''';
 
     final commandsGetters = _buildCommandGettersWidgetRef();
