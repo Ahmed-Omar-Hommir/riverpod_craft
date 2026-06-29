@@ -1,3 +1,10 @@
+## 0.7.0
+
+- **Generic error type** (breaking): `DataState`, command states and notifiers
+  now carry an error type parameter `F` instead of a fixed `Object`, so provider
+  errors can be mapped to your own failure type via the global error mapper.
+- Synchronized release across the `riverpod_craft` ecosystem.
+
 ## 0.5.0
 
 - Synchronized release across the `riverpod_craft` ecosystem

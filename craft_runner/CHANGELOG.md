@@ -1,3 +1,16 @@
+## 0.7.0
+
+- **Global error mapper** (breaking): generated error types are now a generic
+  parameter `F`, mapped from provider errors via a top-level `errorMapper`
+  function configured by `error_mapper:` in `riverpod_craft.yaml`.
+- Faster watch/codegen on large projects: project-wide passes cache parses and
+  re-parse only changed files; startup scans and the file watcher are scoped to
+  `lib/` + `test/` (instead of the whole project root); generated files are
+  written only when their content changes (idempotent, which also prevents
+  watch-trigger loops).
+- Richer watch logs: per-phase startup timing, the file that triggered each
+  pass, and parsed/cached + written/unchanged counts.
+
 ## 0.6.0
 
 - **YAML-driven plugin loading**: `riverpod_craft.yaml` can now list

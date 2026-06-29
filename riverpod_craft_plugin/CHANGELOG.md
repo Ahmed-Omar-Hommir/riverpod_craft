@@ -1,3 +1,9 @@
+## 0.7.0
+
+- Synchronized release across the `riverpod_craft` ecosystem
+  (`riverpod_craft`, `riverpod_craft_plugin`, `craft_runner`, `retrofit_craft`,
+  `retrofit_craft_plugin`). No functional changes in this package.
+
 ## 0.5.0
 
 - Synchronized release across `riverpod_craft_plugin`, `craft_runner`,
