@@ -12,6 +12,26 @@ class RiverpodCraftCLI {
   /// this to bypass the parent's handoff on the second pass.
   static const _reentryEnvVar = 'CRAFT_RUNNER_REENTRY';
 
+  /// Project subdirectories craft_runner scans and watches. Hand-written
+  /// `_provider.dart` sources and every generated `.craft.dart` live under
+  /// these. Scanning the project root instead recurses into `.dart_tool/`,
+  /// `build/`, `ios/`, `.git/` and the like — on a real Flutter app that is
+  /// ~300k filesystem entries and ~4s per walk (done twice at startup), versus
+  /// a few hundred entries and ~15ms when scoped here.
+  static const List<String> sourceRoots = ['lib', 'test'];
+
+  /// Streams every `.dart` file under the project's [sourceRoots], skipping
+  /// any root that is absent. Replaces the old whole-project recursive walks.
+  static Stream<File> _sourceDartFiles(Directory root) async* {
+    for (final sub in sourceRoots) {
+      final dir = Directory(path.join(root.path, sub));
+      if (!dir.existsSync()) continue;
+      await for (final entity in dir.list(recursive: true, followLinks: false)) {
+        if (entity is File && entity.path.endsWith('.dart')) yield entity;
+      }
+    }
+  }
+
   static Future<void> main(List<String> args) async {
     // Load config from riverpod_craft.yaml if present
     _loadConfig();
@@ -67,11 +87,9 @@ class RiverpodCraftCLI {
     }
 
     print(
-      '🔌 Loaded ${specs.length} plugin(s) from riverpod_craft.yaml: '
-      '${specs.map((s) => s.source).join(', ')}',
+      '🔌 loaded ${specs.length} plugin(s) from riverpod_craft.yaml '
+      '→ handing off to entry.dart',
     );
-    print('   Handing off to .dart_tool/craft_runner/entry.dart');
-    print('');
 
     final result = await Process.start(
       'dart',
@@ -123,24 +141,39 @@ class RiverpodCraftCLI {
 
   /// Starts watch mode to monitor file changes
   static Future<void> _startWatchMode() async {
-    print('🚀 Riverpod Craft - Starting Watch Mode');
-    print('=' * 50);
+    print('🚀 riverpod_craft · watch mode');
 
     final currentDir = Directory.current;
 
+    final sw = Stopwatch()..start();
     await _cleanupExistingFiles(currentDir);
     await _processExistingFiles(currentDir);
     await _runProjectWidePass(currentDir);
-    print('👀 Starting file watcher...');
-    final watcher = currentDir.watch(recursive: true);
 
-    watcher.listen((event) async {
-      await _handleFileEvent(event.path);
-    });
+    // Watch only the source roots. A recursive watch on the project root also
+    // delivers (then filters) every `.dart_tool/` and `build/` churn event.
+    final watched = <String>[];
+    for (final sub in sourceRoots) {
+      final dir = Directory(path.join(currentDir.path, sub));
+      if (!dir.existsSync()) continue;
+      dir.watch(recursive: true).listen((event) async {
+        await _handleFileEvent(event.path);
+      });
+      watched.add('$sub/');
+    }
+
+    print(
+      '✅ ready in ${sw.elapsedMilliseconds}ms · watching ${watched.join(', ')}',
+    );
   }
 
   /// Debounce timer for project-wide passes triggered by watch events.
   static Timer? _projectWideDebounce;
+
+  /// Last logged trigger path + time, used to collapse the burst of duplicate
+  /// file-system events macOS delivers for a single save into one `✎` line.
+  static String? _lastTriggerPath;
+  static DateTime _lastTriggerAt = DateTime.fromMillisecondsSinceEpoch(0);
 
   /// Schedules a project-wide regeneration if any project-wide plugin is
   /// registered, debounced 250ms so a save-storm produces at most one pass.
@@ -199,10 +232,10 @@ class RiverpodCraftCLI {
       return;
     }
 
-    print('🔄 Generating: ${path.basename(file.path)}');
+    print('🔄 generating ${path.relative(file.path, from: Directory.current.path)}');
 
     final contents = await file.readAsString();
-    await FileProcessor.processProviderFile(contents, file);
+    await FileProcessor.processProviderFile(contents, file, log: true);
     await _runProjectWidePass(Directory.current);
   }
 
@@ -211,11 +244,8 @@ class RiverpodCraftCLI {
     final currentDir = Directory.current;
 
     final List<File> generatedFiles = [];
-    await for (final entity in currentDir.list(
-      recursive: true,
-      followLinks: false,
-    )) {
-      if (entity is File && entity.path.endsWith('.craft.dart')) {
+    await for (final entity in _sourceDartFiles(currentDir)) {
+      if (entity.path.endsWith('.craft.dart')) {
         generatedFiles.add(entity);
       }
     }
@@ -360,25 +390,36 @@ class RiverpodCraftCLI {
   static Future<void> _handleFileEvent(String eventPath) async {
     final normalized = path.normalize(eventPath);
 
-    // Skip generator outputs.
-    if (normalized.endsWith('.craft.dart') ||
+    // Skip non-Dart files and generator outputs.
+    if (!normalized.endsWith('.dart') ||
+        normalized.endsWith('.craft.dart') ||
         normalized.endsWith('.g.dart') ||
         normalized.endsWith('.freezed.dart')) {
       return;
     }
 
+    // Show the trigger so the cause of the pass below is visible at a glance
+    // (and any unexpected churn is easy to spot) — collapsing the duplicate
+    // events macOS fires for a single save into one line.
+    final now = DateTime.now();
+    final isDuplicate = normalized == _lastTriggerPath &&
+        now.difference(_lastTriggerAt).inMilliseconds < 300;
+    _lastTriggerPath = normalized;
+    _lastTriggerAt = now;
+    if (!isDuplicate) {
+      print('✎ ${path.relative(eventPath, from: Directory.current.path)}');
+    }
+
     if (normalized.endsWith('_provider.dart')) {
       final file = File(eventPath);
       if (await file.exists()) {
-        await FileProcessor.processFileIfChanged(file);
+        await FileProcessor.processFileIfChanged(file, log: true);
       }
     }
 
-    // Project-wide plugins watch every .dart file under lib/. Debounce so
-    // a burst of saves produces at most one regeneration.
-    if (normalized.endsWith('.dart')) {
-      _scheduleProjectWidePass(Directory.current);
-    }
+    // Project-wide plugins observe every source file. Debounce so a burst of
+    // saves produces at most one regeneration.
+    _scheduleProjectWidePass(Directory.current);
   }
 
   static void _showHelp() {
@@ -419,33 +460,41 @@ Custom Plugins:
   }
 
   static Future<void> _cleanupExistingFiles(Directory directory) async {
+    final sw = Stopwatch()..start();
     final List<File> generatedFiles = [];
-    await for (final entity in directory.list(recursive: true, followLinks: false)) {
-      if (entity is File && entity.path.endsWith('.craft.dart')) {
+    await for (final entity in _sourceDartFiles(directory)) {
+      if (entity.path.endsWith('.craft.dart')) {
         generatedFiles.add(entity);
       }
     }
 
-    if (generatedFiles.isNotEmpty) {
-      print('🧹 Cleaning up ${generatedFiles.length} existing generated files...');
-      for (final file in generatedFiles) {
-        await file.delete();
-      }
+    if (generatedFiles.isEmpty) return;
+    for (final file in generatedFiles) {
+      await file.delete();
     }
+    print(
+      '🧹 cleaned ${generatedFiles.length} stale output(s) · '
+      '${sw.elapsedMilliseconds}ms',
+    );
   }
 
   static Future<void> _processExistingFiles(Directory directory) async {
+    final sw = Stopwatch()..start();
     final List<File> files = [];
-    await for (final entity in directory.list(recursive: true, followLinks: false)) {
-      if (entity is File && entity.path.endsWith('_provider.dart')) {
+    await for (final entity in _sourceDartFiles(directory)) {
+      if (entity.path.endsWith('_provider.dart')) {
         files.add(entity);
       }
     }
 
     if (files.isNotEmpty) {
-      print('🔄 Processing ${files.length} existing files...');
+      // Batch startup pass: stay quiet per-file and print one summary below.
       await Future.wait(
         files.map((file) => FileProcessor.processFileIfChanged(file)),
+      );
+      print(
+        '🔄 processed ${files.length} provider file(s) · '
+        '${sw.elapsedMilliseconds}ms',
       );
     }
   }

@@ -32,13 +32,12 @@ Future<void> runWithPlugins(
   List<ProjectWideCraftPlugin> projectWidePlugins = const [],
 }) async {
   if (plugins.isNotEmpty) {
-    final ids = plugins.map((p) => p.id).join(', ');
-    print('🔌 Registered ${plugins.length} per-file plugin(s): $ids');
+    print('🔌 plugins · per-file: ${plugins.map((p) => p.id).join(', ')}');
   }
   if (projectWidePlugins.isNotEmpty) {
-    final ids = projectWidePlugins.map((p) => p.id).join(', ');
     print(
-      '🌐 Registered ${projectWidePlugins.length} project-wide plugin(s): $ids',
+      '🌐 plugins · project-wide: '
+      '${projectWidePlugins.map((p) => p.id).join(', ')}',
     );
   }
   FileProcessor.registerPlugins(plugins);

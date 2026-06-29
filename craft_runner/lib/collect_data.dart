@@ -186,8 +186,7 @@ List<ParameterInfo> _extractParameters(FormalParameterList? parameters) {
     String type = 'dynamic';
     String? defaultValue;
     bool isPositional = param.isPositional;
-    bool isRequired =
-        param.isRequired || // covers required positional
+    bool isRequired = param.isRequired || // covers required positional
         (param is DefaultFormalParameter &&
             param.requiredKeyword != null); // covers required named
     String name = param.name?.lexeme ?? '';
@@ -221,15 +220,15 @@ List<ParameterInfo> _extractParameters(FormalParameterList? parameters) {
     // Detect @family annotation on parameter
     final metadata = (param is DefaultFormalParameter)
         ? ((param.parameter is SimpleFormalParameter)
-              ? (param.parameter as SimpleFormalParameter).metadata
-              : (param.parameter is FieldFormalParameter)
-              ? (param.parameter as FieldFormalParameter).metadata
-              : null)
+            ? (param.parameter as SimpleFormalParameter).metadata
+            : (param.parameter is FieldFormalParameter)
+                ? (param.parameter as FieldFormalParameter).metadata
+                : null)
         : (param is SimpleFormalParameter)
-        ? param.metadata
-        : (param is FieldFormalParameter)
-        ? param.metadata
-        : null;
+            ? param.metadata
+            : (param is FieldFormalParameter)
+                ? param.metadata
+                : null;
     if (metadata != null && metadata.any((a) => a.name.name == 'family')) {
       isFamily = true;
     }

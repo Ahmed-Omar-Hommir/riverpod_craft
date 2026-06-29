@@ -65,8 +65,15 @@ class FileProcessor {
   static ProjectWideProcessor get projectWideProcessor =>
       _projectWideProcessor;
 
-  /// Processes file only if it has changed
-  static Future<void> processFileIfChanged(File file) async {
+  /// Processes file only if it has changed.
+  ///
+  /// Pass `log: true` (watch events, single-file `generate`) to emit a one-line
+  /// `🔧 <output> · <ms>` when a `.craft.dart` is actually written. The startup
+  /// batch leaves it `false` and prints a single summary line instead.
+  static Future<void> processFileIfChanged(
+    File file, {
+    bool log = false,
+  }) async {
     final filePath = file.path;
     final lastModified = await file.lastModified();
 
@@ -78,10 +85,15 @@ class FileProcessor {
 
     final contents = await file.readAsString();
 
-    await processProviderFile(contents, file);
+    await processProviderFile(contents, file, log: log);
   }
 
-  static Future<void> processProviderFile(String contents, File file) async {
+  static Future<void> processProviderFile(
+    String contents,
+    File file, {
+    bool log = false,
+  }) async {
+    final sw = Stopwatch()..start();
     try {
       var effectiveContents = contents;
       if (_fileContentCache[file.path] == effectiveContents) {
@@ -165,7 +177,18 @@ class FileProcessor {
       );
 
       final formatted = formatter.format(fullContent);
-      await File(generatedFilePath).writeAsString(formatted);
+      // Only write when the generated part actually changed; a no-op rewrite
+      // would needlessly re-trigger the IDE analyzer (and any file watcher).
+      final genFile = File(generatedFilePath);
+      if (!await genFile.exists() || await genFile.readAsString() != formatted) {
+        await genFile.writeAsString(formatted);
+        if (log) {
+          print(
+            '   🔧 ${p.relative(generatedFilePath, from: Directory.current.path)}'
+            ' · ${sw.elapsedMilliseconds}ms',
+          );
+        }
+      }
     } on FileSystemException catch (e) {
       print('FileSystemException: ${e.message}, path = ${e.path}');
     } catch (e) {
