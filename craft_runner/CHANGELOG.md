@@ -1,3 +1,10 @@
+## 0.7.1
+
+- Fix: widen the `riverpod_craft_plugin` dependency to `^0.7.0` so craft_runner
+  resolves alongside the rest of the 0.7.x ecosystem. 0.7.0 shipped with
+  `^0.5.0`, which made version solving fail for any project that also depended
+  on `riverpod_craft_plugin: 0.7.0`.
+
 ## 0.7.0
 
 - **Global error mapper** (breaking): generated error types are now a generic

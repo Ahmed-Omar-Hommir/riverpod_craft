@@ -1,3 +1,9 @@
+## 0.7.1
+
+- Fix: widen the `riverpod_craft_plugin` (and dev `craft_runner`) dependencies
+  to `^0.7.0` so this plugin resolves alongside the rest of the 0.7.x ecosystem.
+  0.7.0 shipped with `^0.5.0`, which caused version-solving failures.
+
 ## 0.7.0
 
 - Synchronized release across the `riverpod_craft` ecosystem. No functional
