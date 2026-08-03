@@ -31,6 +31,19 @@ class $RandomQuoteFacadeRef {
 
   void invalidate() => _ref.invalidate(_provider);
 
+  Future<Quote> future({bool watch = false, bool forceRefetch = false}) {
+    if (!watch) {
+      return _ref.read(_provider.notifier).future(forceRefetch: forceRefetch);
+    }
+    return DataWatchHandle<Quote, Object>(
+      read: () => _ref.read(_provider),
+      reload: () => _ref.read(_provider.notifier).reload(),
+      listen: (listener) => _ref.listen(_provider, listener),
+      invalidateSelf: () => _ref.invalidateSelf(),
+      awaitValue: () => _ref.read(_provider.notifier).awaitValue(),
+    ).future(forceRefetch: forceRefetch);
+  }
+
   void listen(
     void Function(
       DataState<Quote, Object>? previous,
@@ -73,6 +86,8 @@ class $RandomQuoteFacadeWidget
 
   @override
   Future<void> silentReload() => _ref.watch(_provider.notifier).silentReload();
+  Future<Quote> future({bool forceRefetch = false}) =>
+      _ref.read(_provider.notifier).future(forceRefetch: forceRefetch);
 
   @override
   void listen(

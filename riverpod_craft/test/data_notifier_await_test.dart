@@ -1,0 +1,195 @@
+import 'dart:async';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:riverpod_craft/riverpod_craft.dart';
+
+/// Controllable async source: each load pulls the next queued completer, so the
+/// test drives the Loading -> Data / Failure transitions by hand.
+final List<Completer<int>> loads = [];
+
+class SourceNotifier extends DataNotifier<int, Object, ()> {
+  @override
+  bool get isFuture => true;
+
+  @override
+  Future<int> buildDataWithFuture() {
+    final completer = Completer<int>();
+    loads.add(completer);
+    return completer.future;
+  }
+}
+
+final sourceProvider = NotifierProvider<SourceNotifier, DataState<int, Object>>(
+  () => SourceNotifier()..arg = (),
+);
+
+/// Dependent that awaits the source via `.watch.future` — hand-wired
+/// [DataWatchHandle] exactly as the generator emits it.
+int dependentBuilds = 0;
+bool watchForceRefetch = false;
+
+class DependentNotifier extends DataNotifier<int, Object, ()> {
+  @override
+  bool get isFuture => true;
+
+  @override
+  Future<int> buildDataWithFuture() async {
+    dependentBuilds++;
+    final handle = DataWatchHandle<int, Object>(
+      read: () => ref.read(sourceProvider),
+      reload: () => ref.read(sourceProvider.notifier).reload(),
+      listen: (listener) => ref.listen(sourceProvider, listener),
+      invalidateSelf: () => ref.invalidateSelf(),
+      awaitValue: () => ref.read(sourceProvider.notifier).awaitValue(),
+    );
+    final value = await handle.future(forceRefetch: watchForceRefetch);
+    return value * 10;
+  }
+}
+
+final dependentProvider =
+    NotifierProvider<DependentNotifier, DataState<int, Object>>(
+      () => DependentNotifier()..arg = (),
+    );
+
+Future<void> flush() => Future<void>.delayed(Duration.zero);
+
+void main() {
+  setUp(() {
+    loads.clear();
+    dependentBuilds = 0;
+    watchForceRefetch = false;
+  });
+
+  group('DataNotifier.future()', () {
+    test('returns cached data without a new load', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      container.read(sourceProvider);
+      await flush();
+      loads[0].complete(1);
+      await flush();
+
+      final value = await container.read(sourceProvider.notifier).future();
+      expect(value, 1);
+      expect(loads.length, 1);
+    });
+
+    test('awaits an in-flight load', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      container.read(sourceProvider);
+      await flush();
+
+      final future = container.read(sourceProvider.notifier).future();
+      loads[0].complete(7);
+      expect(await future, 7);
+    });
+
+    test('forceRefetch reloads and returns the fresh value', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      container.read(sourceProvider);
+      await flush();
+      loads[0].complete(1);
+      await flush();
+
+      final future = container
+          .read(sourceProvider.notifier)
+          .future(forceRefetch: true);
+      await flush();
+      expect(loads.length, 2);
+      loads[1].complete(2);
+      expect(await future, 2);
+    });
+
+    test('retries when the state is an error', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      container.read(sourceProvider);
+      await flush();
+      loads[0].completeError(Exception('boom'));
+      await flush();
+      expect(container.read(sourceProvider).isError, isTrue);
+
+      final future = container.read(sourceProvider.notifier).future();
+      await flush();
+      expect(loads.length, 2);
+      loads[1].complete(9);
+      expect(await future, 9);
+    });
+
+    test('throws the error when the fetch fails', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      container.read(sourceProvider);
+      await flush();
+
+      final future = container.read(sourceProvider.notifier).future();
+      loads[0].completeError(Exception('nope'));
+      await expectLater(future, throwsA(isA<Exception>()));
+    });
+  });
+
+  group('.watch.future selective rebuild', () {
+    test('no rebuild on Loading->Data, rebuild on Done->Loading', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      container.listen(dependentProvider, (_, _) {});
+      await flush();
+
+      // Built once, awaiting the source's first load.
+      expect(dependentBuilds, 1);
+
+      loads[0].complete(1);
+      await flush();
+      // Resolved with 10 — NO rebuild on the awaited Loading->Data.
+      expect(dependentBuilds, 1);
+      expect(
+        container.read(dependentProvider),
+        const DataSuccess<int, Object>(10),
+      );
+
+      // Reloading the source (Data->Loading) rebuilds the dependent once...
+      container.invalidate(sourceProvider);
+      await flush();
+      expect(dependentBuilds, 2);
+
+      // ...and the subsequent Loading->Data does NOT rebuild again.
+      loads[1].complete(2);
+      await flush();
+      expect(dependentBuilds, 2);
+      expect(
+        container.read(dependentProvider),
+        const DataSuccess<int, Object>(20),
+      );
+    });
+
+    test('forceRefetch reloads the source without self-invalidating', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      // Prime the source with cached data.
+      container.read(sourceProvider);
+      await flush();
+      loads[0].complete(1);
+      await flush();
+
+      // The dependent force-refetches through watch.future.
+      watchForceRefetch = true;
+      container.listen(dependentProvider, (_, _) {});
+      await flush();
+      // Built once; forced a fresh source load despite the cached value...
+      expect(dependentBuilds, 1);
+      expect(loads.length, 2);
+
+      loads[1].complete(2);
+      await flush();
+      // ...and did NOT rebuild from its own forced Done->Loading.
+      expect(dependentBuilds, 1);
+      expect(
+        container.read(dependentProvider),
+        const DataSuccess<int, Object>(20),
+      );
+    });
+  });
+}

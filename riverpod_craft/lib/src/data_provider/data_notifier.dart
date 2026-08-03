@@ -27,6 +27,9 @@ abstract class DataNotifier<T, F, Arg extends Record>
 
   StreamSubscription? _subscription;
 
+  /// Completes when the current in-flight load settles (to data or error).
+  Future<void>? _inFlight;
+
   /// Set to `true` to use [buildDataWithFuture], `false` to use [buildDataWithStream].
   @protected
   bool get isFuture;
@@ -84,6 +87,7 @@ abstract class DataNotifier<T, F, Arg extends Record>
     if (!silent) state = DataLoading<T, F>();
 
     final completer = Completer<void>();
+    _inFlight = completer.future;
 
     try {
       _subscription = _buildData(arg).listen(
@@ -131,4 +135,44 @@ abstract class DataNotifier<T, F, Arg extends Record>
 
   /// Re-fetches the data without transitioning to a loading state.
   Future<void> silentReload() => _getData(arg, silent: true);
+
+  /// Awaits the resolved value: returns it if the state is (or becomes)
+  /// [DataSuccess], or throws the [DataError] error [F] if it fails. If a load
+  /// is in flight, waits for it to settle first.
+  Future<T> awaitValue() async {
+    final inFlight = _inFlight;
+    if (inFlight != null) {
+      try {
+        await inFlight;
+      } catch (_) {
+        // The outcome is reflected in [state]; read it below.
+      }
+    }
+
+    final settled = state;
+    if (settled is DataSuccess<T, F>) return settled.data;
+    if (settled is DataError<T, F>) throw settled.error as Object;
+
+    // Loading with no in-flight load (e.g. never built): kick one off.
+    await reload();
+    final resolved = state;
+    if (resolved is DataSuccess<T, F>) return resolved.data;
+    if (resolved is DataError<T, F>) throw resolved.error as Object;
+    throw StateError('DataNotifier.awaitValue: state did not resolve');
+  }
+
+  /// Awaits the value with cache/refetch control:
+  /// - returns the cached value when already [DataSuccess] and not [forceRefetch];
+  /// - reloads first when [forceRefetch] is set or the state is [DataError];
+  /// - otherwise awaits the in-flight load.
+  ///
+  /// Throws the mapped error [F] if the fetch fails.
+  Future<T> future({bool forceRefetch = false}) async {
+    final current = state;
+    if (current is DataSuccess<T, F> && !forceRefetch) return current.data;
+    if (forceRefetch || current is DataError<T, F>) {
+      await reload();
+    }
+    return awaitValue();
+  }
 }
