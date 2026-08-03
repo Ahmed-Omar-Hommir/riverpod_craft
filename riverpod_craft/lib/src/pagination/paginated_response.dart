@@ -1,49 +1,37 @@
-/// A paginated API response containing one page of results.
+/// A single page of results for key/cursor-based pagination.
 ///
-/// Your `create(int page, ...)` method returns `Paged<T>` which is a
-/// `Future<PaginatedResponse<T>>`.
-///
-/// ```dart
-/// @provider
-/// class Notes extends _$Notes {
-///   @override
-///   Paged<Note> create(int page) async {
-///     final response = await http.get('https://api.example.com/notes?page=$page');
-///     final data = jsonDecode(response.body);
-///     return PaginatedResponse(
-///       results: (data['items'] as List).map((e) => Note.fromJson(e)).toList(),
-///       currentPage: page,
-///       total: data['total'],
-///       lastPage: data['lastPage'],
-///     );
-///   }
-/// }
-/// ```
-class PaginatedResponse<T> {
-  /// Creates a [PaginatedResponse] with the given page of [results].
+/// [nextPageKey] is the key used to fetch the *following* page; return `null`
+/// to signal this is the last page. [hasMorePages] is derived from it, so the
+/// contract is: **`null` next key ⟺ no more pages.**
+class PaginatedResponse<T, PageKey> {
   const PaginatedResponse({
+    required this.nextPageKey,
     required this.results,
-    required this.currentPage,
-    required this.total,
-    required this.lastPage,
-    this.pageSize = 20,
+    this.meta,
   });
+
+  /// Key for the next page, or `null` when this is the last page.
+  final PageKey? nextPageKey;
 
   /// Items on this page.
   final List<T> results;
 
-  /// The current page number (1-indexed).
-  final int currentPage;
+  final MetaInfo? meta;
+}
 
-  /// Items per page.
-  final int pageSize;
-
-  /// Total number of items across all pages.
-  final int total;
-
-  /// The last page number.
-  final int lastPage;
-
-  /// Whether more pages are available after this one.
-  bool get hasMorePages => currentPage < lastPage;
+class MetaInfo<PageKey> {
+  const MetaInfo({
+    this.pageSize,
+    this.totalPages,
+    this.totalItems,
+    this.lastPage,
+    this.extra,
+    this.pageKey,
+  });
+  final int? pageSize;
+  final int? totalPages;
+  final int? totalItems;
+  final int? lastPage;
+  final PageKey? pageKey;
+  final Map<dynamic, dynamic>? extra;
 }

@@ -2,7 +2,14 @@
 // ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
 part of 'countries_provider.dart';
 
-typedef Paged<T> = Future<PaginatedResponse<T>>;
+typedef Paged<T> = Future<CountriesPage<T>>;
+
+PaginatedResponse<T, int> pagedMapper<T>(CountriesPage<T> data) {
+  return PaginatedResponse(
+    results: data.results,
+    nextPageKey: data.page < data.lastPage ? data.page + 1 : null,
+  );
+}
 
 final _featuredCountryProvider =
     NotifierProvider<$$FeaturedCountry, List<String>>(
@@ -183,15 +190,18 @@ extension CountriesFacadeWidgetRefEx on WidgetRef {
 }
 
 final _countriesPagedProvider =
-    NotifierProvider<$$CountriesPaged, PagedDataState<String, Object>>(
+    NotifierProvider<$$CountriesPaged, PagedDataState<String, Object, int>>(
       () => $$CountriesPaged()..arg = (),
       isAutoDispose: true,
     );
 
-class $$CountriesPaged extends PagedDataNotifier<String, Object, ()> {
+class $$CountriesPaged extends PagedDataNotifier<String, Object, (), int> {
   @override
-  Future<PaginatedResponse<String>> buildPagedData(int page) =>
-      countriesPaged(ref, page);
+  final int firstPageKey = 1;
+
+  @override
+  Future<PaginatedResponse<String, int>> buildPagedData(int page) async =>
+      pagedMapper(await countriesPaged(ref, page));
 }
 
 class $CountriesPagedFacadeRef {
@@ -200,11 +210,11 @@ class $CountriesPagedFacadeRef {
 
   late final _provider = _countriesPagedProvider;
 
-  PagedDataState<String, Object> read() => _ref.read(_provider);
-  PagedDataState<String, Object> watch() => _ref.watch(_provider);
+  PagedDataState<String, Object, int> read() => _ref.read(_provider);
+  PagedDataState<String, Object, int> watch() => _ref.watch(_provider);
 
   SelectedRefFacade<R> select<R>(
-    R Function(PagedDataState<String, Object> state) selector,
+    R Function(PagedDataState<String, Object, int> state) selector,
   ) => SelectedRefFacade(_ref, _provider.select(selector));
 
   void invalidate() => _ref.invalidate(_provider);
@@ -214,14 +224,14 @@ class $CountriesPagedFacadeRef {
 
   void listen(
     void Function(
-      PagedDataState<String, Object>? previous,
-      PagedDataState<String, Object> next,
+      PagedDataState<String, Object, int>? previous,
+      PagedDataState<String, Object, int> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<PagedDataState<String, Object>>(
+    _ref.listen<PagedDataState<String, Object, int>>(
       _provider,
       listener,
       onError: onError,
@@ -231,18 +241,18 @@ class $CountriesPagedFacadeRef {
 
 class $CountriesPagedFacadeWidget
     implements
-        PagedProviderFacade<String, Object>,
-        PagedProviderValue<String, Object> {
+        PagedProviderFacade<String, Object, int>,
+        PagedProviderValue<String, Object, int> {
   $CountriesPagedFacadeWidget(this._ref);
   final WidgetRef _ref;
 
   late final _provider = _countriesPagedProvider;
 
-  PagedDataState<String, Object> read() => _ref.read(_provider);
-  PagedDataState<String, Object> watch() => _ref.watch(_provider);
+  PagedDataState<String, Object, int> read() => _ref.read(_provider);
+  PagedDataState<String, Object, int> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(PagedDataState<String, Object> state) selector,
+    R Function(PagedDataState<String, Object, int> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
   @override
   void invalidate() => _ref.invalidate(_provider);
@@ -254,14 +264,14 @@ class $CountriesPagedFacadeWidget
 
   void listen(
     void Function(
-      PagedDataState<String, Object>? previous,
-      PagedDataState<String, Object> next,
+      PagedDataState<String, Object, int>? previous,
+      PagedDataState<String, Object, int> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<PagedDataState<String, Object>>(
+    _ref.listen<PagedDataState<String, Object, int>>(
       _provider,
       listener,
       onError: onError,
@@ -269,7 +279,7 @@ class $CountriesPagedFacadeWidget
   }
 
   @override
-  PagedProviderFacade<String, Object> of(WidgetRef ref) =>
+  PagedProviderFacade<String, Object, int> of(WidgetRef ref) =>
       $CountriesPagedFacadeWidget(ref);
 }
 

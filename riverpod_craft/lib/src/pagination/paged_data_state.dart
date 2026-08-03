@@ -1,44 +1,27 @@
 import 'package:equatable/equatable.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-/// The state of a paginated provider.
-///
-/// Wraps [PagingState] from `infinite_scroll_pagination` v5 and exposes
-/// convenient getters and mutation methods for working with paginated data.
-///
-/// [F] is the error type — `Object` by default, or your custom type when a
-/// global `error_mapper` is configured.
-class PagedDataState<T, F> with EquatableMixin {
-  /// Creates a [PagedDataState] wrapping the given [pagingState].
+class PagedDataState<T, F, PageKey> with EquatableMixin {
   const PagedDataState(this.pagingState);
 
-  /// The underlying paging state — pass this to `PagedListView`.
-  final PagingState<int, T> pagingState;
+  final PagingState<PageKey, T> pagingState;
 
-  /// All items loaded so far (flat list from all pages).
   List<T>? get items => pagingState.items;
 
-  /// Whether the first page is loading (no items yet, no error).
   bool get isLoading =>
       pagingState.isLoading && (items == null || items!.isEmpty);
 
-  /// Whether a subsequent page is currently loading.
   bool get isNextPageLoading =>
       pagingState.isLoading && items != null && items!.isNotEmpty;
 
-  /// Whether more pages are available.
   bool get hasNextPage => pagingState.hasNextPage;
 
-  /// The typed error if any.
   F? get error => pagingState.error as F?;
 
-  /// Whether there is an error.
   bool get hasError => error != null;
 
-  /// Whether the first page failed.
   bool get isFirstPageError => hasError && (items == null || items!.isEmpty);
 
-  /// Whether the list is empty (loaded at least once but no items).
   bool get isEmpty =>
       items != null && items!.isEmpty && !isLoading && !hasError;
 
@@ -46,29 +29,18 @@ class PagedDataState<T, F> with EquatableMixin {
   List<Object?> get props => [pagingState];
 }
 
-/// Mutation methods for [PagedDataState].
-///
-/// These return a new state — assign back to `state`:
-/// ```dart
-/// state = state.removeWhere((note) => note.id == id);
-/// ```
-extension PagedDataStateX<T, F> on PagedDataState<T, F> {
-  List<List<T>> get _pages => pagingState.pages ?? [];
+extension PagedDataStateX<T, F, PageKey> on PagedDataState<T, F, PageKey> {
+  PagingState<PageKey, T> get _state => pagingState;
 
-  /// Add an item to the front of the list.
-  PagedDataState<T, F> prependItem(T item) {
-    final pages = _pages;
-    if (pages.isEmpty) {
-      return PagedDataState<T, F>(
-        pagingState.copyWith(
-          pages: [
-            [item],
-          ],
-        ),
-      );
-    }
-    return PagedDataState<T, F>(
-      pagingState.copyWith(
+  PagedDataState<T, F, PageKey> _copy(PagingState<PageKey, T> next) =>
+      PagedDataState<T, F, PageKey>(next);
+
+  /// Add [item] to the front of the first page.
+  PagedDataState<T, F, PageKey> prependItem(T item) {
+    final pages = _state.pages;
+    if (pages == null || pages.isEmpty) return this;
+    return _copy(
+      _state.copyWith(
         pages: [
           [item, ...pages.first],
           ...pages.skip(1),
@@ -77,20 +49,12 @@ extension PagedDataStateX<T, F> on PagedDataState<T, F> {
     );
   }
 
-  /// Add an item to the end of the list.
-  PagedDataState<T, F> appendItem(T item) {
-    final pages = _pages;
-    if (pages.isEmpty) {
-      return PagedDataState<T, F>(
-        pagingState.copyWith(
-          pages: [
-            [item],
-          ],
-        ),
-      );
-    }
-    return PagedDataState<T, F>(
-      pagingState.copyWith(
+  /// Add [item] to the end of the last page.
+  PagedDataState<T, F, PageKey> appendItem(T item) {
+    final pages = _state.pages;
+    if (pages == null || pages.isEmpty) return this;
+    return _copy(
+      _state.copyWith(
         pages: [
           ...pages.take(pages.length - 1),
           [...pages.last, item],
@@ -99,12 +63,12 @@ extension PagedDataStateX<T, F> on PagedDataState<T, F> {
     );
   }
 
-  /// Remove all items matching [test].
-  PagedDataState<T, F> removeWhere(bool Function(T item) test) {
-    final pages = _pages;
-    if (pages.isEmpty) return this;
-    return PagedDataState<T, F>(
-      pagingState.copyWith(
+  /// Remove every item matching [test].
+  PagedDataState<T, F, PageKey> removeWhere(bool Function(T item) test) {
+    final pages = _state.pages;
+    if (pages == null) return this;
+    return _copy(
+      _state.copyWith(
         pages: pages
             .map((page) => page.where((item) => !test(item)).toList())
             .toList(),
@@ -112,37 +76,40 @@ extension PagedDataStateX<T, F> on PagedDataState<T, F> {
     );
   }
 
-  /// Update all items matching [test] using [update].
-  PagedDataState<T, F> updateWhere(
+  /// Update every item matching [test] using [update].
+  PagedDataState<T, F, PageKey> updateWhere(
     bool Function(T item) test,
     T Function(T item) update,
   ) {
-    final pages = _pages;
-    if (pages.isEmpty) return this;
-    return PagedDataState<T, F>(
-      pagingState.copyWith(
+    final pages = _state.pages;
+    if (pages == null) return this;
+    return _copy(
+      _state.copyWith(
         pages: pages
-            .map((page) => page.map((i) => test(i) ? update(i) : i).toList())
+            .map(
+              (page) =>
+                  page.map((item) => test(item) ? update(item) : item).toList(),
+            )
             .toList(),
       ),
     );
   }
 
   /// Update the first item matching [test] using [update].
-  PagedDataState<T, F> updateFirstWhere(
+  PagedDataState<T, F, PageKey> updateFirstWhere(
     bool Function(T item) test,
     T Function(T item) update,
   ) {
-    final pages = _pages;
-    if (pages.isEmpty) return this;
-    bool found = false;
-    return PagedDataState<T, F>(
-      pagingState.copyWith(
+    final pages = _state.pages;
+    if (pages == null) return this;
+    var updated = false;
+    return _copy(
+      _state.copyWith(
         pages: pages
             .map(
               (page) => page.map((item) {
-                if (!found && test(item)) {
-                  found = true;
+                if (!updated && test(item)) {
+                  updated = true;
                   return update(item);
                 }
                 return item;
@@ -153,16 +120,34 @@ extension PagedDataStateX<T, F> on PagedDataState<T, F> {
     );
   }
 
-  /// Replace all items with [newItems].
-  PagedDataState<T, F> replaceAll(List<T> newItems) {
-    return PagedDataState<T, F>(pagingState.copyWith(pages: [newItems]));
+  /// Remove the item at the flattened [index], keeping the page structure.
+  PagedDataState<T, F, PageKey> removeAt(int index) {
+    final pages = _state.pages;
+    if (pages == null || index < 0) return this;
+
+    var offset = index;
+    var removed = false;
+    final next = <List<T>>[];
+    for (final page in pages) {
+      if (!removed && offset < page.length) {
+        next.add([...page]..removeAt(offset));
+        removed = true;
+      } else {
+        if (!removed) offset -= page.length;
+        next.add(page);
+      }
+    }
+    if (!removed) return this; // index out of range
+    return _copy(_state.copyWith(pages: next));
   }
 
-  /// Remove the item at [index].
-  PagedDataState<T, F> removeAt(int index) {
-    final allItems = items;
-    if (allItems == null || index < 0 || index >= allItems.length) return this;
-    final updated = [...allItems]..removeAt(index);
-    return PagedDataState<T, F>(pagingState.copyWith(pages: [updated]));
+  /// Replace all items with [newItems], collapsing them into a single page.
+  ///
+  /// Reuses the first existing page key so `pages`/`keys` stay aligned; a no-op
+  /// on an empty state, which has no key to anchor to.
+  PagedDataState<T, F, PageKey> replaceAll(List<T> newItems) {
+    final keys = _state.keys;
+    if (keys == null || keys.isEmpty) return this;
+    return _copy(_state.copyWith(pages: [newItems], keys: [keys.first]));
   }
 }

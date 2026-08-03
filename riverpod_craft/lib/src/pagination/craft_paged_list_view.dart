@@ -19,7 +19,7 @@ import 'package:riverpod_craft/riverpod_craft.dart';
 ///
 /// [F] is the error type exposed to the error builders — `Object` by default,
 /// or your custom type when a global `error_mapper` is configured.
-class CraftPagedListView<T, F> extends ConsumerStatefulWidget {
+class CraftPagedListView<T, F, PageKey> extends ConsumerStatefulWidget {
   /// Creates a [CraftPagedListView] backed by a paginated provider.
   const CraftPagedListView({
     super.key,
@@ -67,7 +67,7 @@ class CraftPagedListView<T, F> extends ConsumerStatefulWidget {
   ///
   /// Pass the value from your extension:
   /// `ref.notesProvider(category: 'work')`
-  final PagedProviderValue<T, F> providerValue;
+  final PagedProviderValue<T, F, PageKey> providerValue;
 
   /// Builds each item in the list.
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
@@ -116,12 +116,12 @@ class CraftPagedListView<T, F> extends ConsumerStatefulWidget {
   final DragStartBehavior dragStartBehavior;
 
   @override
-  ConsumerState<CraftPagedListView<T, F>> createState() =>
-      _CraftPagedListViewState<T, F>();
+  ConsumerState<CraftPagedListView<T, F, PageKey>> createState() =>
+      _CraftPagedListViewState<T, F, PageKey>();
 }
 
-class _CraftPagedListViewState<T, F>
-    extends ConsumerState<CraftPagedListView<T, F>> {
+class _CraftPagedListViewState<T, F, PageKey>
+    extends ConsumerState<CraftPagedListView<T, F, PageKey>> {
   @override
   Widget build(BuildContext context) {
     final provider = widget.providerValue.of(ref);
@@ -142,7 +142,7 @@ class _CraftPagedListViewState<T, F>
     );
 
     if (widget._separatorBuilder != null) {
-      return PagedListView<int, T>.separated(
+      return PagedListView<PageKey, T>.separated(
         state: state.pagingState,
         fetchNextPage: provider.fetchNextPage,
         builderDelegate: delegate,
@@ -159,7 +159,7 @@ class _CraftPagedListViewState<T, F>
       );
     }
 
-    return PagedListView<int, T>(
+    return PagedListView<PageKey, T>(
       state: state.pagingState,
       fetchNextPage: provider.fetchNextPage,
       builderDelegate: delegate,
@@ -177,7 +177,7 @@ class _CraftPagedListViewState<T, F>
 }
 
 /// A paginated sliver list view for use inside [CustomScrollView].
-class CraftPagedSliverListView<T, F> extends ConsumerStatefulWidget {
+class CraftPagedSliverListView<T, F, PageKey> extends ConsumerStatefulWidget {
   /// Creates a [CraftPagedSliverListView] backed by a paginated provider.
   const CraftPagedSliverListView({
     super.key,
@@ -204,7 +204,7 @@ class CraftPagedSliverListView<T, F> extends ConsumerStatefulWidget {
   }) : _separatorBuilder = separatorBuilder;
 
   /// The paginated provider value.
-  final PagedProviderValue<T, F> providerValue;
+  final PagedProviderValue<T, F, PageKey> providerValue;
 
   /// Builds each item in the list.
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
@@ -226,12 +226,12 @@ class CraftPagedSliverListView<T, F> extends ConsumerStatefulWidget {
   final Widget Function(BuildContext context, F? error)? newPageErrorBuilder;
 
   @override
-  ConsumerState<CraftPagedSliverListView<T, F>> createState() =>
-      _CraftPagedSliverListViewState<T, F>();
+  ConsumerState<CraftPagedSliverListView<T, F, PageKey>> createState() =>
+      _CraftPagedSliverListViewState<T, F, PageKey>();
 }
 
-class _CraftPagedSliverListViewState<T, F>
-    extends ConsumerState<CraftPagedSliverListView<T, F>> {
+class _CraftPagedSliverListViewState<T, F, PageKey>
+    extends ConsumerState<CraftPagedSliverListView<T, F, PageKey>> {
   @override
   Widget build(BuildContext context) {
     final provider = widget.providerValue.of(ref);
@@ -252,7 +252,7 @@ class _CraftPagedSliverListViewState<T, F>
     );
 
     if (widget._separatorBuilder != null) {
-      return PagedSliverList<int, T>.separated(
+      return PagedSliverList<PageKey, T>.separated(
         state: state.pagingState,
         fetchNextPage: provider.fetchNextPage,
         builderDelegate: delegate,
@@ -260,7 +260,7 @@ class _CraftPagedSliverListViewState<T, F>
       );
     }
 
-    return PagedSliverList<int, T>(
+    return PagedSliverList<PageKey, T>(
       state: state.pagingState,
       fetchNextPage: provider.fetchNextPage,
       builderDelegate: delegate,

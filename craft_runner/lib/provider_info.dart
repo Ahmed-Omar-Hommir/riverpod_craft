@@ -33,6 +33,7 @@ class ProviderInfo {
     this.hasPagedMapper = false,
     this.allProviderVarNames = const [],
     this.publicMethods = const [],
+    this.pageKeyType = 'int',
   }) : _dataType = dataType;
 
   final String name;
@@ -49,6 +50,21 @@ class ProviderInfo {
   final List<String> allProviderVarNames;
   final List<PublicMethod> publicMethods;
 
+  /// The page-key type of a paged provider (the type of the `page` param).
+  /// `int` for page-number pagination, or a nullable type (e.g. `String?`)
+  /// for cursor pagination.
+  final String pageKeyType;
+
+  /// The initial page key, derived from [pageKeyType]: `int` → `1`, a nullable
+  /// type → `null`. Other (non-int, non-nullable) types are unsupported and
+  /// return `null` here — the developer must use a nullable key and the
+  /// generator leaves `firstPageKey` abstract for them to provide.
+  String? get firstPageKey {
+    if (pageKeyType == 'int') return '1';
+    if (pageKeyType.endsWith('?')) return 'null';
+    return null;
+  }
+
   bool get hasArg => params.isNotEmpty;
 
   String get dataType => _dataType;
@@ -57,7 +73,9 @@ class ProviderInfo {
     if (type == ProviderType.sync) return dataType;
     if (type == ProviderType.future) return 'Future<$dataType>';
     if (type == ProviderType.stream) return 'Stream<$dataType>';
-    if (type == ProviderType.paged) return 'Future<PaginatedResponse<$dataType>>';
+    if (type == ProviderType.paged) {
+      return 'Future<PaginatedResponse<$dataType, $pageKeyType>>';
+    }
     return '';
   }
 
@@ -69,7 +87,7 @@ class ProviderInfo {
     if (type == ProviderType.sync) {
       return dataType;
     } else if (type == ProviderType.paged) {
-      return 'PagedDataState<$dataType, $errorType>';
+      return 'PagedDataState<$dataType, $errorType, $pageKeyType>';
     } else {
       return 'DataState<$dataType, $errorType>';
     }

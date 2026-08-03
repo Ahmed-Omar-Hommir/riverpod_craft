@@ -4,13 +4,10 @@ part of 'paginated_notes_provider.dart';
 
 typedef Paged<T> = Future<ApiPagedResponse<T>>;
 
-PaginatedResponse<T> pagedMapper<T>(ApiPagedResponse<T> data) {
+PaginatedResponse<T, int> pagedMapper<T>(ApiPagedResponse<T> data) {
   return PaginatedResponse(
     results: data.items,
-    currentPage: data.page,
-    total: data.totalItems,
-    lastPage: data.totalPages,
-    pageSize: data.perPage,
+    nextPageKey: data.page < data.totalPages ? data.page + 1 : null,
   );
 }
 
@@ -26,10 +23,13 @@ AppError _$errorMapper(Object error) {
 }
 
 abstract class _$PaginatedNotes
-    extends PagedDataNotifier<Note, AppError, ({String? category})> {
+    extends PagedDataNotifier<Note, AppError, ({String? category}), int> {
+  @override
+  final int firstPageKey = 1;
+
   Paged<Note> create(int page, {required String? category});
   @override
-  Future<PaginatedResponse<Note>> buildPagedData(int page) async =>
+  Future<PaginatedResponse<Note, int>> buildPagedData(int page) async =>
       pagedMapper(await create(page, category: arg.category));
 
   @override
@@ -53,7 +53,7 @@ abstract class _$PaginatedNotes
 final _paginatedNotesProvider =
     NotifierProvider.family<
       PaginatedNotes,
-      PagedDataState<Note, AppError>,
+      PagedDataState<Note, AppError, int>,
       ({String? category})
     >(
       (({String? category}) arg) => PaginatedNotes()..arg = arg,
@@ -67,11 +67,11 @@ class $PaginatedNotesFacadeRef {
 
   late final _provider = _paginatedNotesProvider(_arg);
 
-  PagedDataState<Note, AppError> read() => _ref.read(_provider);
-  PagedDataState<Note, AppError> watch() => _ref.watch(_provider);
+  PagedDataState<Note, AppError, int> read() => _ref.read(_provider);
+  PagedDataState<Note, AppError, int> watch() => _ref.watch(_provider);
 
   SelectedRefFacade<R> select<R>(
-    R Function(PagedDataState<Note, AppError> state) selector,
+    R Function(PagedDataState<Note, AppError, int> state) selector,
   ) => SelectedRefFacade(_ref, _provider.select(selector));
 
   void invalidate() => _ref.invalidate(_provider);
@@ -81,14 +81,14 @@ class $PaginatedNotesFacadeRef {
 
   void listen(
     void Function(
-      PagedDataState<Note, AppError>? previous,
-      PagedDataState<Note, AppError> next,
+      PagedDataState<Note, AppError, int>? previous,
+      PagedDataState<Note, AppError, int> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<PagedDataState<Note, AppError>>(
+    _ref.listen<PagedDataState<Note, AppError, int>>(
       _provider,
       listener,
       onError: onError,
@@ -104,19 +104,19 @@ class $PaginatedNotesFacadeRef {
 
 class $PaginatedNotesFacadeWidget
     implements
-        PagedProviderFacade<Note, AppError>,
-        PagedProviderValue<Note, AppError> {
+        PagedProviderFacade<Note, AppError, int>,
+        PagedProviderValue<Note, AppError, int> {
   $PaginatedNotesFacadeWidget(this._ref, this._arg);
   final WidgetRef _ref;
   final ({String? category}) _arg;
 
   late final _provider = _paginatedNotesProvider(_arg);
 
-  PagedDataState<Note, AppError> read() => _ref.read(_provider);
-  PagedDataState<Note, AppError> watch() => _ref.watch(_provider);
+  PagedDataState<Note, AppError, int> read() => _ref.read(_provider);
+  PagedDataState<Note, AppError, int> watch() => _ref.watch(_provider);
 
   SelectedWidgetRefFacade<R> select<R>(
-    R Function(PagedDataState<Note, AppError> state) selector,
+    R Function(PagedDataState<Note, AppError, int> state) selector,
   ) => SelectedWidgetRefFacade(_ref, _provider.select(selector));
   @override
   void invalidate() => _ref.invalidate(_provider);
@@ -128,14 +128,14 @@ class $PaginatedNotesFacadeWidget
 
   void listen(
     void Function(
-      PagedDataState<Note, AppError>? previous,
-      PagedDataState<Note, AppError> next,
+      PagedDataState<Note, AppError, int>? previous,
+      PagedDataState<Note, AppError, int> next,
     )
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    _ref.listen<PagedDataState<Note, AppError>>(
+    _ref.listen<PagedDataState<Note, AppError, int>>(
       _provider,
       listener,
       onError: onError,
@@ -143,7 +143,7 @@ class $PaginatedNotesFacadeWidget
   }
 
   @override
-  PagedProviderFacade<Note, AppError> of(WidgetRef ref) =>
+  PagedProviderFacade<Note, AppError, int> of(WidgetRef ref) =>
       $PaginatedNotesFacadeWidget(ref, _arg);
 
   $DeleteNoteCommandFacadePaginatedNotesWidget get deleteNoteCommand =>

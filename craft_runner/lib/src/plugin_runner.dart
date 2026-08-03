@@ -84,6 +84,7 @@ class PluginRunner {
         hasPagedMapper: info.hasPagedMapper,
         allProviderVarNames: allVarNames,
         publicMethods: info.publicMethods,
+        pageKeyType: info.pageKeyType,
       );
       results[idx] = PluginCollectionResult(
         plugin: results[idx].plugin,

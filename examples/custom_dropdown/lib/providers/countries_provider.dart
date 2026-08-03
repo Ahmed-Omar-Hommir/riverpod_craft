@@ -1,5 +1,7 @@
 import 'package:riverpod_craft/riverpod_craft.dart';
 
+import '../models/countries_page.dart';
+
 part 'countries_provider.craft.dart';
 
 @provider
@@ -115,10 +117,5 @@ Paged<String> countriesPaged(Ref ref, int page) async {
     end.clamp(0, allCountries.length),
   );
 
-  return PaginatedResponse(
-    results: results,
-    currentPage: page,
-    total: allCountries.length,
-    lastPage: lastPage,
-  );
+  return CountriesPage(results: results, page: page, lastPage: lastPage);
 }

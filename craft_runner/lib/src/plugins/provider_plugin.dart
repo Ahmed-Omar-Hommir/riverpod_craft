@@ -42,11 +42,13 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
     final createMethod = classInfo.findMethod('create');
     if (createMethod == null) return null;
 
-    final hasPageParam = createMethod.params.any((p) =>
-      p.isPositional && p.type == 'int' && p.name == 'page',
-    );
+    final pageParam = createMethod.params
+        .where((p) => p.isPositional && p.name == 'page')
+        .firstOrNull;
+    final hasPageParam = pageParam != null;
     final providerType = getProviderType(createMethod.returnType, hasPageParam: hasPageParam);
     final dataType = extractGenericType(createMethod.returnType, isPaged: providerType == ProviderType.paged);
+    final pageKeyType = pageParam?.type ?? 'int';
 
     // Create method params become family params
     var familyParams = createMethod.params
@@ -62,12 +64,12 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
         )
         .toList();
 
-    // For paged providers, strip the first positional `int page` param
+    // For paged providers, strip the positional `page` param
     // — it's managed internally by PagedDataNotifier
     if (providerType == ProviderType.paged) {
-      familyParams = familyParams.where((p) =>
-        !(p.isPositional && p.type == 'int' && p.name == 'page'),
-      ).toList();
+      familyParams = familyParams
+          .where((p) => !(p.isPositional && p.name == 'page'))
+          .toList();
     }
 
     final commands = extractCommands(classInfo);
@@ -83,6 +85,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
       commands: commands,
       publicMethods: publicMethods,
       hasPagedMapper: providerType == ProviderType.paged && CraftConfig.hasPagedMapper,
+      pageKeyType: pageKeyType,
     );
   }
 
@@ -107,18 +110,17 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
       params.remove(firstPositional);
     }
 
-    final hasPageParam = params.any((p) =>
-      p.isPositional && p.type == 'int' && p.name == 'page',
-    );
+    final pageParam = params
+        .where((p) => p.isPositional && p.name == 'page')
+        .firstOrNull;
+    final hasPageParam = pageParam != null;
     final providerType = getProviderType(functionInfo.returnType, hasPageParam: hasPageParam);
     final dataType = extractGenericType(functionInfo.returnType, isPaged: providerType == ProviderType.paged);
+    final pageKeyType = pageParam?.type ?? 'int';
 
-    // For paged providers, strip the `int page` param — managed internally
-    if (providerType == ProviderType.paged) {
-      final pageParam = params.where((p) =>
-        p.isPositional && p.type == 'int' && p.name == 'page',
-      ).firstOrNull;
-      if (pageParam != null) params.remove(pageParam);
+    // For paged providers, strip the `page` param — managed internally
+    if (providerType == ProviderType.paged && pageParam != null) {
+      params.remove(pageParam);
     }
 
     final functionName = functionInfo.name;
@@ -136,6 +138,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
       isSettable: functionInfo.hasAnnotation('settable'),
       hasPagedMapper: providerType == ProviderType.paged && CraftConfig.hasPagedMapper,
       publicMethods: const <PublicMethod>[],
+      pageKeyType: pageKeyType,
     );
   }
 

@@ -153,12 +153,12 @@ abstract class CommandProviderFacade<T, F, ArgT extends Record>
 /// Interface for interacting with a paginated provider's state.
 ///
 /// Generated Widget facades implement this.
-abstract class PagedProviderFacade<T, F> {
+abstract class PagedProviderFacade<T, F, PageKey> {
   /// Reads the current paged data state without subscribing.
-  PagedDataState<T, F> read();
+  PagedDataState<T, F, PageKey> read();
 
   /// Watches the paged data state, rebuilding when it changes.
-  PagedDataState<T, F> watch();
+  PagedDataState<T, F, PageKey> watch();
 
   /// Fetches the next page of results.
   void fetchNextPage();
@@ -168,7 +168,7 @@ abstract class PagedProviderFacade<T, F> {
 
   /// Listens to changes in the paged data state.
   void listen(
-    void Function(PagedDataState<T, F>? previous, PagedDataState<T, F> next)
+    void Function(PagedDataState<T, F, PageKey>? previous, PagedDataState<T, F, PageKey> next)
     listener, {
     void Function(Object, StackTrace)? onError,
     bool fireImmediately = false,

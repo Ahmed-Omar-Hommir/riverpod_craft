@@ -96,13 +96,17 @@ ${_buildExtensions()}
 
     // For PagedDataNotifier: buildPagedData(int page) delegates to create(page, ...familyParams...)
     if (_info.type == ProviderType.paged) {
+      final pk = _info.pageKeyType;
       final pagedCreateCall = familyParams.isEmpty ? '' : ', ${createCallArgs}';
       final buildPagedLine = _info.hasPagedMapper
-          ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await create(page$pagedCreateCall));'
-          : 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => create(page$pagedCreateCall);';
+          ? 'Future<PaginatedResponse<${_info.dataType}, $pk>> buildPagedData($pk page) async => pagedMapper(await create(page$pagedCreateCall));'
+          : 'Future<PaginatedResponse<${_info.dataType}, $pk>> buildPagedData($pk page) => create(page$pagedCreateCall);';
+      final firstPageKeyBlock = _info.firstPageKey == null
+          ? ''
+          : '  @override\n  final $pk firstPageKey = ${_info.firstPageKey};\n\n';
       return '''
-abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, ${_info.errorType}, $classArgType> {
-  Paged<${_info.dataType}> create(int page${familyParams.isEmpty ? '' : ', $createParamSig'});
+abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, ${_info.errorType}, $classArgType, $pk> {
+$firstPageKeyBlock  Paged<${_info.dataType}> create($pk page${familyParams.isEmpty ? '' : ', $createParamSig'});
   @override
   $buildPagedLine
 $mapErrorOverride
@@ -195,12 +199,16 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent())
       final pagedFunctionCall =
           '${_info.functionName}(${pagedPieces.join(', ')})';
 
+      final pk = _info.pageKeyType;
       final functionalBuildLine = _info.hasPagedMapper
-          ? 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) async => pagedMapper(await $pagedFunctionCall);'
-          : 'Future<PaginatedResponse<${_info.dataType}>> buildPagedData(int page) => $pagedFunctionCall;';
+          ? 'Future<PaginatedResponse<${_info.dataType}, $pk>> buildPagedData($pk page) async => pagedMapper(await $pagedFunctionCall);'
+          : 'Future<PaginatedResponse<${_info.dataType}, $pk>> buildPagedData($pk page) => $pagedFunctionCall;';
+      final firstPageKeyBlock = _info.firstPageKey == null
+          ? ''
+          : '  @override\n  final $pk firstPageKey = ${_info.firstPageKey};\n\n';
       return '''
-class ${_info.notifierType} extends $controllerType<${_info.dataType}, ${_info.errorType}, $dataArgType> {
-  @override
+class ${_info.notifierType} extends $controllerType<${_info.dataType}, ${_info.errorType}, $dataArgType, $pk> {
+$firstPageKeyBlock  @override
   $functionalBuildLine
 $mapErrorOverride}''';
     }
@@ -447,7 +455,7 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
         ? '()'
         : _info.params.toRecordType();
     final implementsClause = _info.type == ProviderType.paged
-        ? ' implements PagedProviderFacade<${_info.dataType}, ${_info.errorType}>, PagedProviderValue<${_info.dataType}, ${_info.errorType}>'
+        ? ' implements PagedProviderFacade<${_info.dataType}, ${_info.errorType}, ${_info.pageKeyType}>, PagedProviderValue<${_info.dataType}, ${_info.errorType}, ${_info.pageKeyType}>'
         : _info.type == ProviderType.sync
         ? ' implements ProviderFacade<${_info.dataType}>, ProviderValue<${_info.dataType}>'
         : ' implements DataProviderFacade<${_info.dataType}, ${_info.errorType}>, DataProviderValue<${_info.dataType}, ${_info.errorType}>';
@@ -460,7 +468,7 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
     final ofMethod = _info.type == ProviderType.paged
         ? '''
   @override
-  PagedProviderFacade<${_info.dataType}, ${_info.errorType}> of(WidgetRef ref) =>
+  PagedProviderFacade<${_info.dataType}, ${_info.errorType}, ${_info.pageKeyType}> of(WidgetRef ref) =>
       ${_info.facadeClassName}Widget(ref$ofMethodArg);'''
         : _info.type == ProviderType.sync
         ? '''

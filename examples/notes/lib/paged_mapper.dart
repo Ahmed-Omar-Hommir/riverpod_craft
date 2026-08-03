@@ -8,12 +8,9 @@ import 'models/api_paged_response.dart';
 ///
 /// The code generator wraps every paged provider's create() with this mapper,
 /// so you never manually convert ApiPagedResponse → PaginatedResponse.
-PaginatedResponse<T> pagedMapper<T>(ApiPagedResponse<T> data) {
+PaginatedResponse<T, int> pagedMapper<T>(ApiPagedResponse<T> data) {
   return PaginatedResponse(
     results: data.items,
-    currentPage: data.page,
-    total: data.totalItems,
-    lastPage: data.totalPages,
-    pageSize: data.perPage,
+    nextPageKey: data.page < data.totalPages ? data.page + 1 : null,
   );
 }

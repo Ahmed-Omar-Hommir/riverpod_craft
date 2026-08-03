@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:riverpod/riverpod.dart';
 
@@ -5,37 +6,29 @@ import '../error_mapper.dart';
 import 'paged_data_state.dart';
 import 'paginated_response.dart';
 
-/// Base class for paginated providers.
-///
-/// Extend this in your generated code — your `create(int page, ...)` method
-/// maps to [buildPagedData].
-///
-/// The notifier manages page tracking, loading state, and error handling.
-/// Call [fetchNextPage] to load the next page of results (triggered
-/// automatically on build and when the UI reaches the end of the list).
-abstract class PagedDataNotifier<T, F, Arg extends Record>
-    extends Notifier<PagedDataState<T, F>>
+abstract class PagedDataNotifier<T, F, Arg extends Record, PageKey>
+    extends Notifier<PagedDataState<T, F, PageKey>>
     with ErrorMapper<F> {
-  /// Family argument set by the generated provider constructor.
   late final Arg arg;
 
-  /// Implement this — fetch a single page of data.
-  Future<PaginatedResponse<T>> buildPagedData(int page);
+  Future<PaginatedResponse<T, PageKey>> buildPagedData(PageKey pageKey);
 
   bool _pending = false;
 
+  @protected
+  abstract final PageKey firstPageKey;
+
+  PageKey? _nextPageKey;
+
   @override
-  /// Initializes the paging state and triggers the first page load.
-  PagedDataState<T, F> build() {
+  PagedDataState<T, F, PageKey> build() {
     _pending = false;
+    _nextPageKey = null;
 
     Future.microtask(() => fetchNextPage());
-    return PagedDataState<T, F>(PagingState());
+    return PagedDataState<T, F, PageKey>(PagingState());
   }
 
-  /// Load the next page of results.
-  ///
-  /// Safe to call multiple times — concurrent calls are guarded.
   Future<void> fetchNextPage() async {
     if (_pending) return;
     final s = state.pagingState;
@@ -43,23 +36,29 @@ abstract class PagedDataNotifier<T, F, Arg extends Record>
     if (!s.hasNextPage && s.pages != null && s.pages!.isNotEmpty) return;
 
     _pending = true;
-    state = PagedDataState<T, F>(s.copyWith(isLoading: true, error: null));
+    state = PagedDataState<T, F, PageKey>(
+      s.copyWith(isLoading: true, error: null),
+    );
 
-    final nextPage = (s.keys?.lastOrNull ?? 0) + 1;
+    final isFirstPage = s.pages == null;
+
+    final pageKey = isFirstPage ? firstPageKey : _nextPageKey;
 
     try {
-      final response = await buildPagedData(nextPage);
+      final response = await buildPagedData(pageKey as PageKey);
 
-      state = PagedDataState<T, F>(
+      _nextPageKey = response.nextPageKey;
+
+      state = PagedDataState<T, F, PageKey>(
         s.copyWith(
           pages: [...?s.pages, response.results],
-          keys: [...?s.keys, nextPage],
-          hasNextPage: response.hasMorePages,
+          keys: [...?s.keys, pageKey],
+          hasNextPage: response.nextPageKey != null,
           isLoading: false,
         ),
       );
     } catch (error) {
-      state = PagedDataState<T, F>(
+      state = PagedDataState<T, F, PageKey>(
         s.copyWith(error: mapError(error), isLoading: false),
       );
     } finally {
@@ -67,10 +66,10 @@ abstract class PagedDataNotifier<T, F, Arg extends Record>
     }
   }
 
-  /// Reset to page 1 and re-fetch.
   Future<void> reload() async {
     _pending = false;
-    state = PagedDataState<T, F>(PagingState());
+    _nextPageKey = null;
+    state = PagedDataState<T, F, PageKey>(PagingState());
     await fetchNextPage();
   }
 }

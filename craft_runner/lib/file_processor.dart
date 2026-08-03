@@ -151,7 +151,9 @@ class FileProcessor {
 
       // Check if file has paged providers
       final hasPaged = generatedContent.contains('PagedDataNotifier');
-      final pagedPreamble = hasPaged ? _buildPagedPreamble() : '';
+      final pagedPreamble = hasPaged
+          ? _buildPagedPreamble(generatedContent)
+          : '';
 
       // Inline the global error mapper function when a generated notifier
       // routes its errors through it.
@@ -200,7 +202,7 @@ class FileProcessor {
   ///
   /// With mapper: typedef + inlined pagedMapper function.
   /// Without mapper: typedef defaults to PaginatedResponse<T>.
-  static String _buildPagedPreamble() {
+  static String _buildPagedPreamble(String generatedContent) {
     if (CraftConfig.hasPagedMapper && CraftConfig.pagedMapperInputType != null) {
       final inputType = CraftConfig.pagedMapperInputType!;
       final mapperFn = CraftConfig.pagedMapperFunctionSource ?? '';
@@ -211,7 +213,12 @@ typedef Paged<T> = Future<$inputType<T>>;
 $mapperFn
 ''';
     }
-    return '\ntypedef Paged<T> = Future<PaginatedResponse<T>>;\n';
+    // No-mapper: bake the provider's page-key type into the typedef so it
+    // matches `buildPagedData`. The key type is the type of the generated
+    // `firstPageKey` field (falls back to `int`).
+    final pageKeyType =
+        RegExp(r'final (\S+) firstPageKey').firstMatch(generatedContent)?.group(1) ?? 'int';
+    return '\ntypedef Paged<T> = Future<PaginatedResponse<T, $pageKeyType>>;\n';
   }
 
   /// Inlines the global `errorMapper` function (from `error_mapper` in

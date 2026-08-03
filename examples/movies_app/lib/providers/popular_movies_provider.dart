@@ -1,6 +1,7 @@
 import 'package:riverpod_craft/riverpod_craft.dart';
 
 import '../models/movie.dart';
+import '../models/movies_page.dart';
 import '../services/dio_client.dart';
 import '../utils/http_utils.dart';
 
@@ -20,14 +21,12 @@ class PopularMovies extends _$PopularMovies {
     );
     validateResponse(response);
     final data = response.data;
-    return PaginatedResponse(
+    return MoviesPage(
       results: (data['results'] as List)
           .map((e) => Movie.fromJson(e as Map<String, dynamic>))
           .toList(),
-      currentPage: data['page'] as int,
-      total: data['total_results'] as int,
-      lastPage: data['total_pages'] as int,
-      pageSize: 20,
+      page: data['page'] as int,
+      totalPages: data['total_pages'] as int,
     );
   }
 }

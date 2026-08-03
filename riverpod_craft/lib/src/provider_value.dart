@@ -19,12 +19,12 @@ abstract class DataProviderValue<T, F> {
 }
 
 /// A value that resolves to a [PagedProviderFacade] for a given [WidgetRef].
-abstract class PagedProviderValue<T, F> {
+abstract class PagedProviderValue<T, F, PageKey> {
   /// Creates a [PagedProviderValue].
   const PagedProviderValue();
 
   /// Resolves this value into a [PagedProviderFacade] scoped to [ref].
-  PagedProviderFacade<T, F> of(WidgetRef ref);
+  PagedProviderFacade<T, F, PageKey> of(WidgetRef ref);
 }
 
 /// A value that resolves to a [CommandProviderFacade] for a given [WidgetRef].
