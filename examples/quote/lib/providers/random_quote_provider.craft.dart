@@ -40,7 +40,6 @@ class $RandomQuoteFacadeRef {
       reload: () => _ref.read(_provider.notifier).reload(),
       listen: (listener) => _ref.listen(_provider, listener),
       invalidateSelf: () => _ref.invalidateSelf(),
-      awaitValue: () => _ref.read(_provider.notifier).awaitValue(),
     ).future(forceRefetch: forceRefetch);
   }
 

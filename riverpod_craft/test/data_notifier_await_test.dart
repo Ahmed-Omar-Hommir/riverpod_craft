@@ -40,7 +40,6 @@ class DependentNotifier extends DataNotifier<int, Object, ()> {
       reload: () => ref.read(sourceProvider.notifier).reload(),
       listen: (listener) => ref.listen(sourceProvider, listener),
       invalidateSelf: () => ref.invalidateSelf(),
-      awaitValue: () => ref.read(sourceProvider.notifier).awaitValue(),
     );
     final value = await handle.future(forceRefetch: watchForceRefetch);
     return value * 10;
@@ -189,6 +188,35 @@ void main() {
       expect(
         container.read(dependentProvider),
         const DataSuccess<int, Object>(20),
+      );
+    });
+
+    test('survives the source being invalidated twice mid-load', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      container.listen(dependentProvider, (_, _) {});
+      await flush();
+      loads[0].complete(1);
+      await flush();
+      expect(
+        container.read(dependentProvider),
+        const DataSuccess<int, Object>(10),
+      );
+
+      // Invalidate the source twice — the first disposes the notifier the
+      // dependent is awaiting; the second (Loading->Loading) does not rebuild
+      // the dependent. It must still resolve off the live notifier.
+      container.invalidate(sourceProvider);
+      container.invalidate(sourceProvider);
+      await flush();
+
+      for (final load in loads) {
+        if (!load.isCompleted) load.complete(5);
+      }
+      await flush();
+      expect(
+        container.read(dependentProvider),
+        const DataSuccess<int, Object>(50),
       );
     });
   });
