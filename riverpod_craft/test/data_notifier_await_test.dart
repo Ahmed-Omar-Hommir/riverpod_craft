@@ -17,7 +17,35 @@ class SourceNotifier extends DataNotifier<int, Object, ()> {
     loads.add(completer);
     return completer.future;
   }
+
+  // Directly emit a new data value (Data -> Data', no loading transition).
+  void emit(int value) => state = DataState.data(value);
 }
+
+/// Dependent that awaits a *selected* slice (the tens digit) of the source.
+int selectDependentBuilds = 0;
+
+class SelectDependentNotifier extends DataNotifier<int, Object, ()> {
+  @override
+  bool get isFuture => true;
+
+  @override
+  Future<int> buildDataWithFuture() {
+    selectDependentBuilds++;
+    final handle = DataWatchHandle<int, Object>(
+      read: () => ref.read(sourceProvider),
+      reload: () => ref.read(sourceProvider.notifier).reload(),
+      listen: (listener) => ref.listen(sourceProvider, listener),
+      invalidateSelf: () => ref.invalidateSelf(),
+    );
+    return handle.future<int>((data) => data ~/ 10);
+  }
+}
+
+final selectDependentProvider =
+    NotifierProvider<SelectDependentNotifier, DataState<int, Object>>(
+      () => SelectDependentNotifier()..arg = (),
+    );
 
 final sourceProvider = NotifierProvider<SourceNotifier, DataState<int, Object>>(
   () => SourceNotifier()..arg = (),
@@ -41,7 +69,10 @@ class DependentNotifier extends DataNotifier<int, Object, ()> {
       listen: (listener) => ref.listen(sourceProvider, listener),
       invalidateSelf: () => ref.invalidateSelf(),
     );
-    final value = await handle.future(forceRefetch: watchForceRefetch);
+    final value = await handle.future<int>(
+      (data) => data,
+      forceRefetch: watchForceRefetch,
+    );
     return value * 10;
   }
 }
@@ -57,6 +88,7 @@ void main() {
   setUp(() {
     loads.clear();
     dependentBuilds = 0;
+    selectDependentBuilds = 0;
     watchForceRefetch = false;
   });
 
@@ -217,6 +249,34 @@ void main() {
       expect(
         container.read(dependentProvider),
         const DataSuccess<int, Object>(50),
+      );
+    });
+
+    test('select() rebuilds only when the selected value changes', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      container.listen(selectDependentProvider, (_, _) {});
+      await flush();
+      loads[0].complete(20);
+      await flush();
+      expect(selectDependentBuilds, 1);
+      expect(
+        container.read(selectDependentProvider),
+        const DataSuccess<int, Object>(2),
+      );
+
+      // 20 -> 25: same tens digit → no rebuild.
+      container.read(sourceProvider.notifier).emit(25);
+      await flush();
+      expect(selectDependentBuilds, 1);
+
+      // 25 -> 30: tens digit changed → rebuild.
+      container.read(sourceProvider.notifier).emit(30);
+      await flush();
+      expect(selectDependentBuilds, 2);
+      expect(
+        container.read(selectDependentProvider),
+        const DataSuccess<int, Object>(3),
       );
     });
   });

@@ -291,20 +291,19 @@ class ${_info.notifierType} extends $controllerType<${_info.dataType}, $syncArgT
   Future<void> reload() => _ref.read(_provider.notifier).reload();'''
         : '';
 
-    // Future providers get `future({watch, forceRefetch})` — one-shot by
-    // default, or a selective reactive dependency when `watch: true`.
+    // Future providers get a `future` accessor: `.read()` (one-shot),
+    // `.watch()` (reactive), and `.select(...)` to await a derived value.
     final futureMethod = _info.type == ProviderType.future
-        ? '''Future<${_info.dataType}> future({bool watch = false, bool forceRefetch = false}) {
-    if (!watch) {
-      return _ref.read(_provider.notifier).future(forceRefetch: forceRefetch);
-    }
-    return DataWatchHandle<${_info.dataType}, ${_info.errorType}>(
+        ? '''DataFuture<${_info.dataType}, ${_info.errorType}> get future => DataFuture(
+    DataWatchHandle<${_info.dataType}, ${_info.errorType}>(
       read: () => _ref.read(_provider),
       reload: () => _ref.read(_provider.notifier).reload(),
       listen: (listener) => _ref.listen(_provider, listener),
       invalidateSelf: () => _ref.invalidateSelf(),
-    ).future(forceRefetch: forceRefetch);
-  }'''
+    ),
+    (forceRefetch) =>
+        _ref.read(_provider.notifier).future(forceRefetch: forceRefetch),
+  );'''
         : '';
 
     return '''
@@ -463,14 +462,6 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
   Future<void> silentReload() =>
       _ref.watch(_provider.notifier).silentReload();''';
 
-    // Future providers also expose a one-shot `future({forceRefetch})`.
-    final widgetFutureMethod = _info.type == ProviderType.future
-        ? '''
-
-  Future<${_info.dataType}> future({bool forceRefetch = false}) =>
-      _ref.read(_provider.notifier).future(forceRefetch: forceRefetch);'''
-        : '';
-
     // Add setState for sync providers only with @settable
     final setStateMethod = _info.type == ProviderType.sync && _info.isSettable
         ? 'void setState(${_info.dataType} value) => _ref.read(_provider.notifier).state = value;'
@@ -520,7 +511,7 @@ class ${_info.facadeClassName}Widget$implementsClause {
 
   SelectedWidgetRefFacade<R> select<R>(R Function(${_info.stateType} state) selector) =>
       SelectedWidgetRefFacade(_ref, _provider.select(selector));
-$asyncMethods$widgetFutureMethod
+$asyncMethods
 
   $setStateMethod
 
