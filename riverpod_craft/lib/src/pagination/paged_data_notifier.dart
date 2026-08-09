@@ -85,4 +85,15 @@ abstract class PagedDataNotifier<T, F, Arg extends Record, PageKey>
     state = PagedDataState<T, F, PageKey>(PagingState());
     await fetchNextPage();
   }
+
+  /// Re-attempts the page fetch that just failed — the first page or a next
+  /// page — without discarding already-loaded pages. No-op unless the list is
+  /// in an error state (use [reload] to restart from the first page).
+  ///
+  /// A failed fetch never advances `_nextPageKey`/`pages`, so re-running
+  /// [fetchNextPage] targets the same page that failed.
+  Future<void> retry() async {
+    if (!state.hasError) return;
+    await fetchNextPage();
+  }
 }

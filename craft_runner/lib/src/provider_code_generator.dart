@@ -298,7 +298,8 @@ class ${_info.notifierType} extends $controllerType<${_info.dataType}, $syncArgT
     final pagedMethods = _info.type == ProviderType.paged
         ? '''
   void fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
-  Future<void> reload() => _ref.read(_provider.notifier).reload();'''
+  Future<void> reload() => _ref.read(_provider.notifier).reload();
+  Future<void> retry() => _ref.read(_provider.notifier).retry();'''
         : '';
 
     // Future providers get a `future` accessor: `.read()` (one-shot),
@@ -456,7 +457,9 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
   @override
   void fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
 
-  Future<void> reload() => _ref.read(_provider.notifier).reload();'''
+  Future<void> reload() => _ref.read(_provider.notifier).reload();
+
+  Future<void> retry() => _ref.read(_provider.notifier).retry();'''
         : _info.type == ProviderType.sync
         ? '''
   @override

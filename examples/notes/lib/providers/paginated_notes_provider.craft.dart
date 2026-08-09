@@ -78,6 +78,7 @@ class $PaginatedNotesFacadeRef {
 
   void fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
   Future<void> reload() => _ref.read(_provider.notifier).reload();
+  Future<void> retry() => _ref.read(_provider.notifier).retry();
 
   void listen(
     void Function(
@@ -125,6 +126,8 @@ class $PaginatedNotesFacadeWidget
   void fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
 
   Future<void> reload() => _ref.read(_provider.notifier).reload();
+
+  Future<void> retry() => _ref.read(_provider.notifier).retry();
 
   void listen(
     void Function(
