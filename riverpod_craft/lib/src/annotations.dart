@@ -61,3 +61,13 @@ class SettableAnnotation {
 
 /// Annotation to generate a `setState()` method on the provider facade.
 const settable = SettableAnnotation();
+
+/// Marks a provider to opt out of the global `providerInit` hook.
+@protected
+class NoInitAnnotation {
+  /// Creates a [NoInitAnnotation].
+  const NoInitAnnotation();
+}
+
+/// Annotation to skip the global `providerInit` hook for a provider.
+const noInit = NoInitAnnotation();

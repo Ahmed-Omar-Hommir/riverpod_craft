@@ -30,6 +30,7 @@ class ProviderInfo {
     this.functionName,
     this.requiresRef = false,
     this.isSettable = false,
+    this.isNoInit = false,
     this.hasPagedMapper = false,
     this.allProviderVarNames = const [],
     this.publicMethods = const [],
@@ -46,6 +47,10 @@ class ProviderInfo {
   final String? functionName;
   final bool requiresRef;
   final bool isSettable;
+
+  /// Whether the provider opts out of the global `providerInit` hook (`@noInit`).
+  final bool isNoInit;
+
   final bool hasPagedMapper;
   final List<String> allProviderVarNames;
   final List<PublicMethod> publicMethods;

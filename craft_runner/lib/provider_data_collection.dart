@@ -25,6 +25,7 @@ class ProviderDataCollection {
             functionName: p.functionName,
             requiresRef: p.requiresRef,
             isSettable: p.isSettable,
+            isNoInit: p.isNoInit,
             hasPagedMapper: p.hasPagedMapper,
             allProviderVarNames: allVars,
             publicMethods: p.publicMethods,

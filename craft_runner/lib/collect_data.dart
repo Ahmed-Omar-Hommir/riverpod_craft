@@ -19,6 +19,7 @@ ProviderDataCollection collectData(ParseStringResult content) {
 
       final className = declaration.name.lexeme;
       final isKeepAlive = _hasAnnotation(declaration.metadata, 'keepAlive');
+      final isNoInit = _hasAnnotation(declaration.metadata, 'noInit');
 
       final createMethod = _findCreateMethod(declaration);
       if (createMethod == null) continue;
@@ -53,6 +54,7 @@ ProviderDataCollection collectData(ParseStringResult content) {
           name: className,
           dataType: dataType,
           isKeepAlive: isKeepAlive,
+          isNoInit: isNoInit,
           type: providerType,
           params: familyParams,
           commands: commands,
@@ -72,6 +74,7 @@ ProviderDataCollection collectData(ParseStringResult content) {
       final functionName = declaration.name.lexeme;
       final isKeepAlive = _hasAnnotation(metadata, 'keepAlive');
       final isSettable = _hasAnnotation(metadata, 'settable');
+      final isNoInit = _hasAnnotation(metadata, 'noInit');
       final providerType = _getProviderTypeFunction(declaration);
       final dataType = _extractGenericTypeFunction(declaration);
 
@@ -93,6 +96,7 @@ ProviderDataCollection collectData(ParseStringResult content) {
           name: functionName[0].toUpperCase() + functionName.substring(1),
           dataType: dataType,
           isKeepAlive: isKeepAlive,
+          isNoInit: isNoInit,
           type: providerType,
           params: params,
           commands: const [],

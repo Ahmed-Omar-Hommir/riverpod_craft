@@ -94,6 +94,11 @@ ${_buildExtensions()}
     // Call args from arg record: arg.field1, arg.field2, ... respecting named params
     final createCallArgs = familyParams.fromRecordToFunctionCall();
 
+    // `@noInit` opts the notifier out of the global providerInit hook.
+    final noInitOverride = _info.isNoInit
+        ? '\n  @override\n  Future<void> init() async {}\n'
+        : '';
+
     // For PagedDataNotifier: buildPagedData(int page) delegates to create(page, ...familyParams...)
     if (_info.type == ProviderType.paged) {
       final pk = _info.pageKeyType;
@@ -109,7 +114,7 @@ abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, ${_in
 $firstPageKeyBlock  Paged<${_info.dataType}> create($pk page${familyParams.isEmpty ? '' : ', $createParamSig'});
   @override
   $buildPagedLine
-$mapErrorOverride
+$mapErrorOverride$noInitOverride
 ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent()).join('\n')}
 }''';
     }
@@ -130,7 +135,7 @@ abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, ${_in
   ${_info.returnName} create($createParamSig);
   @override
   ${_info.returnName} $buildMethodName() => create($dataCreateCall);
-$mapErrorOverride
+$mapErrorOverride$noInitOverride
 ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent()).join('\n')}
 }''';
     }
@@ -187,6 +192,11 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent())
 
     final functionCall = '${_info.functionName}(${pieces.join(', ')})';
 
+    // `@noInit` opts the notifier out of the global providerInit hook.
+    final noInitOverride = _info.isNoInit
+        ? '\n  @override\n  Future<void> init() async {}\n'
+        : '';
+
     // For PagedDataNotifier (paged): buildPagedData(int page) delegates to function(ref, page, ...args)
     if (_info.type == ProviderType.paged) {
       final dataArgType = _info.params.isNotEmpty ? nonFamilyRecordType : '()';
@@ -210,7 +220,7 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent())
 class ${_info.notifierType} extends $controllerType<${_info.dataType}, ${_info.errorType}, $dataArgType, $pk> {
 $firstPageKeyBlock  @override
   $functionalBuildLine
-$mapErrorOverride}''';
+$mapErrorOverride$noInitOverride}''';
     }
 
     // For DataNotifier (Future/Stream): use isFuture getter and buildDataWithFuture()/buildDataWithStream()
@@ -228,7 +238,7 @@ class ${_info.notifierType} extends $controllerType<${_info.dataType}, ${_info.e
 
   @override
   ${_info.returnName} $buildMethodName() => $functionCall;
-$mapErrorOverride}''';
+$mapErrorOverride$noInitOverride}''';
     }
 
     // For StateDataNotifier (sync providers) - use same pattern as Future/Stream

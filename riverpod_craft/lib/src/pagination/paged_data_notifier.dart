@@ -3,6 +3,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../error_mapper.dart';
+import '../provider_init.dart';
 import 'paged_data_state.dart';
 import 'paginated_response.dart';
 
@@ -20,12 +21,24 @@ abstract class PagedDataNotifier<T, F, Arg extends Record, PageKey>
 
   PageKey? _nextPageKey;
 
+  /// Runs once per notifier instance, before the first page fetch. Defaults to
+  /// the globally-registered [RiverpodCraft.providerInit]; the generator
+  /// overrides it to a no-op for providers annotated `@noInit`.
+  @protected
+  Future<void> init() async {
+    final hook = RiverpodCraft.providerInit;
+    if (hook != null) await hook(ref, this, arg);
+  }
+
   @override
   PagedDataState<T, F, PageKey> build() {
     _pending = false;
     _nextPageKey = null;
 
-    Future.microtask(() => fetchNextPage());
+    Future.microtask(() async {
+      await init();
+      await fetchNextPage();
+    });
     return PagedDataState<T, F, PageKey>(PagingState());
   }
 

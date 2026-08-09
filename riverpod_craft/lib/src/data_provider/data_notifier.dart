@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../error_mapper.dart';
+import '../provider_init.dart';
 import '../result.dart';
 import 'async_state/async_state.dart';
 
@@ -123,11 +124,25 @@ abstract class DataNotifier<T, F, Arg extends Record>
     return completer.future;
   }
 
+  /// Runs once per notifier instance, before the first fetch. Defaults to the
+  /// globally-registered [RiverpodCraft.providerInit]; the generator overrides
+  /// it to a no-op for providers annotated `@noInit`.
+  @protected
+  Future<void> init() async {
+    final hook = RiverpodCraft.providerInit;
+    if (hook != null) await hook(ref, this, arg);
+  }
+
   /// Builds the initial state by triggering data fetching with [arg].
   @override
   DataState<T, F> build() {
-    _getData(arg);
+    _bootstrap();
     return DataLoading<T, F>();
+  }
+
+  Future<void> _bootstrap() async {
+    await init();
+    await _getData(arg);
   }
 
   /// Re-fetches the data, showing a loading state.
