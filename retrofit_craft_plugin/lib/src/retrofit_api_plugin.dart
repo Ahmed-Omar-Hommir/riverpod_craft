@@ -40,6 +40,9 @@ class RetrofitApiPlugin implements ProjectWideCraftPlugin {
   String get id => 'retrofit_api';
 
   @override
+  List<String> get sourceRoots => const ['lib'];
+
+  @override
   void reset() {
     _scanner.reset();
     _loadedConfig = _explicitConfig;

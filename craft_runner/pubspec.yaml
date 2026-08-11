@@ -21,5 +21,12 @@ dev_dependencies:
   lints: ^5.0.0
   test: ^1.24.0
 
+# Local monorepo dev — stripped at `dart pub publish`. Required so craft_runner
+# builds against the in-repo riverpod_craft_plugin (which adds the `sourceRoots`
+# member) until that version is on pub.dev. Mirrors retrofit_craft_plugin.
+dependency_overrides:
+  riverpod_craft_plugin:
+    path: ../riverpod_craft_plugin
+
 executables:
   craft_runner: craft_runner

@@ -9,8 +9,10 @@ import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
 
 /// Drives a full-project pass over the registered [ProjectWideCraftPlugin]s.
 ///
-/// Walks every Dart file under `lib/` (skipping generator outputs), invokes
-/// each plugin's [ProjectWideCraftPlugin.collectFromUnit], then writes each
+/// Walks every Dart file under the union of the plugins' [sourceRoots]
+/// (default `lib/`, skipping generator outputs), feeds each parsed unit to the
+/// plugins that requested its enclosing root via
+/// [ProjectWideCraftPlugin.collectFromUnit], then writes each
 /// `{path: contents}` entry returned by [ProjectWideCraftPlugin.generate]
 /// after prepending the `GENERATED CODE` header and running `dart_style`.
 ///
@@ -56,8 +58,7 @@ class ProjectWideProcessor {
   }
 
   Future<void> _runOnce(String rootDir) async {
-    final libDir = Directory(p.join(rootDir, 'lib'));
-    if (!libDir.existsSync()) return;
+    final roots = {for (final plugin in _plugins) ...plugin.sourceRoots};
 
     final sw = Stopwatch()..start();
     var parsedCount = 0;
@@ -67,45 +68,54 @@ class ProjectWideProcessor {
     }
 
     final seen = <String>{};
-    await for (final entity in libDir.list(recursive: true, followLinks: false)) {
-      if (entity is! File) continue;
-      final path = entity.path;
-      if (!path.endsWith('.dart')) continue;
-      if (path.endsWith('.craft.dart') ||
-          path.endsWith('.g.dart') ||
-          path.endsWith('.freezed.dart')) {
-        continue;
-      }
-      seen.add(path);
+    for (final root in roots) {
+      final dir = Directory(p.join(rootDir, root));
+      if (!dir.existsSync()) continue;
 
-      // Reuse the cached parse when the file is byte-for-byte unchanged since
-      // the last pass (mtime + size match). A FileStat is a single cheap
-      // syscall; the analyzer parse it lets us skip is ~100x more expensive.
-      final stat = entity.statSync();
-      final cached = _parseCache[path];
-      final ParseStringResult parsed;
-      if (cached != null &&
-          cached.modified == stat.modified &&
-          cached.size == stat.size) {
-        parsed = cached.result;
-      } else {
-        final String content;
-        try {
-          content = await entity.readAsString();
-        } on FileSystemException {
+      await for (final entity in dir.list(recursive: true, followLinks: false)) {
+        if (entity is! File) continue;
+        final path = entity.path;
+        if (!path.endsWith('.dart')) continue;
+        if (path.endsWith('.craft.dart') ||
+            path.endsWith('.g.dart') ||
+            path.endsWith('.freezed.dart')) {
           continue;
         }
-        final result = parseString(content: content, throwIfDiagnostics: false);
-        _parseCache[path] = _ParseCacheEntry(stat.modified, stat.size, result);
-        parsed = result;
-        parsedCount++;
-      }
+        seen.add(path);
 
-      for (final plugin in _plugins) {
-        try {
-          plugin.collectFromUnit(parsed, path);
-        } catch (e) {
-          print('Project-wide plugin "${plugin.id}" failed on $path: $e');
+        // Reuse the cached parse when the file is byte-for-byte unchanged since
+        // the last pass (mtime + size match). A FileStat is a single cheap
+        // syscall; the analyzer parse it lets us skip is ~100x more expensive.
+        final stat = entity.statSync();
+        final cached = _parseCache[path];
+        final ParseStringResult parsed;
+        if (cached != null &&
+            cached.modified == stat.modified &&
+            cached.size == stat.size) {
+          parsed = cached.result;
+        } else {
+          final String content;
+          try {
+            content = await entity.readAsString();
+          } on FileSystemException {
+            continue;
+          }
+          final result = parseString(
+            content: content,
+            throwIfDiagnostics: false,
+          );
+          _parseCache[path] = _ParseCacheEntry(stat.modified, stat.size, result);
+          parsed = result;
+          parsedCount++;
+        }
+
+        for (final plugin in _plugins) {
+          if (!plugin.sourceRoots.contains(root)) continue;
+          try {
+            plugin.collectFromUnit(parsed, path);
+          } catch (e) {
+            print('Project-wide plugin "${plugin.id}" failed on $path: $e');
+          }
         }
       }
     }

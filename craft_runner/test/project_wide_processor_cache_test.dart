@@ -16,6 +16,9 @@ class _RecordingPlugin implements ProjectWideCraftPlugin {
   String get id => 'recording';
 
   @override
+  List<String> get sourceRoots => const ['lib'];
+
+  @override
   void reset() {
     _current = {};
     passes.add(_current);
@@ -107,6 +110,8 @@ class _CapturePlugin implements ProjectWideCraftPlugin {
 
   @override
   String get id => 'capture';
+  @override
+  List<String> get sourceRoots => const ['lib'];
   @override
   void reset() {}
   @override
