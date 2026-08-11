@@ -91,16 +91,59 @@ class RiverpodCraftCLI {
       '→ handing off to entry.dart',
     );
 
-    final result = await Process.start(
+    final exitCode = await _runEntry(entryFile, args, rootDir);
+    if (exitCode != 0) exit(exitCode);
+    return true;
+  }
+
+  /// Runs the generated entry script by compiling it to a kernel snapshot and
+  /// executing that directly.
+  ///
+  /// A raw `dart run <file>` re-runs dependency resolution + native-asset build
+  /// hooks and JIT-compiles the whole plugin graph (including the large
+  /// `analyzer` package) on every launch. Running a precompiled snapshot skips
+  /// all of that — no build-hook step, and the plugin graph is compiled once.
+  /// Recompiled every launch (the compile itself does not run build hooks) so a
+  /// plugin-source edit is never served stale. Falls back to `dart run` if the
+  /// snapshot can't be produced.
+  static Future<int> _runEntry(
+    File entryFile,
+    List<String> args,
+    String rootDir,
+  ) async {
+    final snapshot = File(path.setExtension(entryFile.path, '.dill'));
+    final compiled = await _compileEntry(entryFile, snapshot, rootDir);
+    final proc = await Process.start(
       'dart',
-      ['run', entryFile.path, ...args],
+      compiled ? [snapshot.path, ...args] : ['run', entryFile.path, ...args],
       mode: ProcessStartMode.inheritStdio,
       environment: {_reentryEnvVar: 'true'},
       workingDirectory: rootDir,
     );
-    final exitCode = await result.exitCode;
-    if (exitCode != 0) exit(exitCode);
-    return true;
+    return proc.exitCode;
+  }
+
+  static Future<bool> _compileEntry(
+    File entryFile,
+    File snapshot,
+    String rootDir,
+  ) async {
+    try {
+      final result = await Process.run(
+        'dart',
+        ['compile', 'kernel', entryFile.path, '-o', snapshot.path],
+        workingDirectory: rootDir,
+      );
+      if (result.exitCode == 0 && snapshot.existsSync()) return true;
+      stderr.writeln(
+        'craft_runner: entry snapshot compile failed; using `dart run`.\n'
+        '${(result.stdout as String).trim()}\n'
+        '${(result.stderr as String).trim()}',
+      );
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 
   /// Build the source of `.dart_tool/craft_runner/entry.dart`. Each plugin
