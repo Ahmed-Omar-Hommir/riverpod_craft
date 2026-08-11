@@ -116,6 +116,17 @@ class $CountriesFacadeRef {
 
   void invalidate() => _ref.invalidate(_provider);
 
+  DataFuture<List<String>, Object> get future => DataFuture(
+    DataWatchHandle<List<String>, Object>(
+      read: () => _ref.read(_provider),
+      reload: () => _ref.read(_provider.notifier).reload(),
+      listen: (listener) => _ref.listen(_provider, listener),
+      invalidateSelf: () => _ref.invalidateSelf(),
+    ),
+    (forceRefetch) =>
+        _ref.read(_provider.notifier).future(forceRefetch: forceRefetch),
+  );
+
   void listen(
     void Function(
       DataState<List<String>, Object>? previous,
@@ -221,6 +232,7 @@ class $CountriesPagedFacadeRef {
 
   void fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
   Future<void> reload() => _ref.read(_provider.notifier).reload();
+  Future<void> retry() => _ref.read(_provider.notifier).retry();
 
   void listen(
     void Function(
@@ -261,6 +273,8 @@ class $CountriesPagedFacadeWidget
   void fetchNextPage() => _ref.read(_provider.notifier).fetchNextPage();
 
   Future<void> reload() => _ref.read(_provider.notifier).reload();
+
+  Future<void> retry() => _ref.read(_provider.notifier).retry();
 
   void listen(
     void Function(

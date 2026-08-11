@@ -21,9 +21,12 @@ dev_dependencies:
   retrofit_craft_plugin:
     path: ../../retrofit_craft_plugin
 
-# Local-only overrides: while riverpod_craft_plugin 0.4.0 is unpublished,
-# anything that depends on it (craft_runner, retrofit_craft_plugin) needs
-# to resolve to the in-repo source. Remove after the publish chain lands.
+
+# Local monorepo dev: unify the cross-referenced toolkit packages to in-repo paths.
 dependency_overrides:
-  riverpod_craft_plugin:
-    path: ../../riverpod_craft_plugin
+  craft_runner:
+    path: ../../craft_runner
+  retrofit_craft_plugin:
+    path: ../../retrofit_craft_plugin
+  retrofit_craft:
+    path: ../../retrofit_craft
