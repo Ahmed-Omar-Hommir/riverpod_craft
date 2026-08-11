@@ -4,7 +4,7 @@ import 'package:yaml/yaml.dart';
 
 /// Configuration for the retrofit_craft plugin.
 ///
-/// Read from the `retrofit_craft:` section of `riverpod_craft.yaml`. All
+/// Read from the `retrofit_craft:` section of `craft_runner.yaml`. All
 /// fields are optional; sensible defaults apply.
 class RetrofitCraftConfig {
   const RetrofitCraftConfig({
@@ -42,19 +42,19 @@ class RetrofitCraftConfig {
   /// `root_class_name`: name of the generated root class (default `AppApi`).
   final String rootClassName;
 
-  /// Loads `retrofit_craft:` from `riverpod_craft.yaml` in [directory]
+  /// Loads `retrofit_craft:` from `craft_runner.yaml` in [directory]
   /// (defaults to the current working directory). Returns a default config
   /// if the file or section is missing.
   static RetrofitCraftConfig load([Directory? directory]) {
     final dir = directory ?? Directory.current;
-    final configFile = File('${dir.path}/riverpod_craft.yaml');
+    final configFile = File('${dir.path}/craft_runner.yaml');
     if (!configFile.existsSync()) return const RetrofitCraftConfig();
 
     final dynamic raw;
     try {
       raw = loadYaml(configFile.readAsStringSync());
     } catch (e) {
-      print('retrofit_craft: failed to parse riverpod_craft.yaml: $e');
+      print('retrofit_craft: failed to parse craft_runner.yaml: $e');
       return const RetrofitCraftConfig();
     }
     if (raw is! YamlMap) return const RetrofitCraftConfig();

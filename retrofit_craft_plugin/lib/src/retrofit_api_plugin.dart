@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:analyzer/dart/analysis/results.dart' show ParseStringResult;
 import 'package:path/path.dart' as p;
-import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
+import 'package:craft_runner/craft_runner.dart';
 
 import 'api_generator.dart';
 import 'api_scanner.dart';

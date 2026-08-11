@@ -1,6 +1,6 @@
-import 'package:craft_runner/parameters_converter.dart';
-import 'package:craft_runner/provider_info.dart';
-import 'package:craft_runner/src/plugin_loader.dart';
+import 'package:riverpod_craft_plugin/parameters_converter.dart';
+import 'package:riverpod_craft_plugin/provider_info.dart';
+import 'package:riverpod_craft_plugin/src/craft_config.dart';
 
 /// The `mapError` override emitted into generated notifiers when a global
 /// `error_mapper` is configured. Routes every caught error through the inlined

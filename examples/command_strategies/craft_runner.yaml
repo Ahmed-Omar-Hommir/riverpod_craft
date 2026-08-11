@@ -1,0 +1,2 @@
+plugins:
+  - riverpod_craft_plugin:RiverpodGeneratorPlugin

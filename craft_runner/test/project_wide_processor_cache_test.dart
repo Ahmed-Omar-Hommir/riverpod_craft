@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:analyzer/dart/analysis/results.dart';
+import 'package:craft_runner/craft_runner.dart';
 import 'package:craft_runner/src/project_wide_processor.dart';
-import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
 import 'package:test/test.dart';
 
 /// Records, per pass, which file paths it was fed and whether each came with a

@@ -1,16 +1,12 @@
 import 'dart:io';
 
-import 'package:analyzer/dart/analysis/utilities.dart';
-import 'package:analyzer/dart/ast/ast.dart';
 import 'package:yaml/yaml.dart';
 
-/// One plugin entry declared in `riverpod_craft.yaml`'s `plugins:` list.
+/// One plugin entry declared in `craft_runner.yaml`'s `plugins:` list.
 ///
 /// Format: `<package_name>:<ClassName>`. The class must have a no-arg
-/// constructor and implement either `RiverpodCraftPlugin<T>` (per-file)
-/// or `ProjectWideCraftPlugin`. The CLI uses a runtime `is` check in the
-/// generated entry script to route each instance to the right
-/// registration call.
+/// constructor and implement `ProjectWideCraftPlugin`. The CLI instantiates
+/// each entry in the generated entry script and registers it.
 class PluginSpec {
   const PluginSpec({required this.package, required this.className});
 
@@ -30,16 +26,16 @@ class PluginSpec {
   String get importUri => 'package:$package/$package.dart';
 }
 
-/// Loads plugin configuration from `riverpod_craft.yaml`.
+/// Loads plugin configuration from `craft_runner.yaml`.
 ///
-/// The config file format (preferred since 0.6.0):
+/// The config file format:
 /// ```yaml
 /// plugins:
 ///   - retrofit_craft_plugin:RetrofitApiPlugin
 ///   - another_package:AnotherPlugin
 /// ```
 class PluginLoader {
-  /// Reads `riverpod_craft.yaml` and returns each `<package>:<ClassName>`
+  /// Reads `craft_runner.yaml` and returns each `<package>:<ClassName>`
   /// entry as a raw string. Returns an empty list if the config or block
   /// is absent.
   static List<String> loadPluginPaths([Directory? directory]) =>
@@ -50,7 +46,7 @@ class PluginLoader {
   /// skipped with a warning.
   static List<PluginSpec> loadPluginSpecs([Directory? directory]) {
     final dir = directory ?? Directory.current;
-    final configFile = File('${dir.path}/riverpod_craft.yaml');
+    final configFile = File('${dir.path}/craft_runner.yaml');
     if (!configFile.existsSync()) return [];
 
     try {
@@ -67,7 +63,7 @@ class PluginLoader {
       }
       return specs;
     } catch (e) {
-      print('Warning: Failed to parse riverpod_craft.yaml: $e');
+      print('Warning: Failed to parse craft_runner.yaml: $e');
       return [];
     }
   }
@@ -94,197 +90,9 @@ class PluginLoader {
     return PluginSpec(package: pkg, className: cls);
   }
 
-  /// Reads the `paged_provider_mapper` path from `riverpod_craft.yaml`.
-  ///
-  /// Returns `null` if not configured.
-  static String? loadPagedMapperPath([Directory? directory]) {
-    final dir = directory ?? Directory.current;
-    final configFile = File('${dir.path}/riverpod_craft.yaml');
-
-    if (!configFile.existsSync()) return null;
-
-    try {
-      final content = configFile.readAsStringSync();
-      final yaml = loadYaml(content);
-
-      if (yaml is! YamlMap) return null;
-
-      final mapper = yaml['paged_provider_mapper'];
-      return mapper is String ? mapper : null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  /// Reads the `error_mapper` path from `riverpod_craft.yaml`.
-  ///
-  /// Returns `null` if not configured.
-  static String? loadErrorMapperPath([Directory? directory]) {
-    final dir = directory ?? Directory.current;
-    final configFile = File('${dir.path}/riverpod_craft.yaml');
-
-    if (!configFile.existsSync()) return null;
-
-    try {
-      final content = configFile.readAsStringSync();
-      final yaml = loadYaml(content);
-
-      if (yaml is! YamlMap) return null;
-
-      final mapper = yaml['error_mapper'];
-      return mapper is String ? mapper : null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  /// Checks if a `riverpod_craft.yaml` config file exists.
+  /// Checks if a `craft_runner.yaml` config file exists.
   static bool hasConfig([Directory? directory]) {
     final dir = directory ?? Directory.current;
-    return File('${dir.path}/riverpod_craft.yaml').existsSync();
-  }
-}
-
-/// Global config populated at CLI startup.
-class CraftConfig {
-  static String? pagedMapperPath;
-  static bool get hasPagedMapper => pagedMapperPath != null;
-
-  /// The raw input type name from the mapper function (e.g., "ApiPagedResponse").
-  static String? pagedMapperInputType;
-
-  /// The full source of the `pagedMapper` function, to inline in `.craft.dart`.
-  static String? pagedMapperFunctionSource;
-
-  /// Path to the global error mapper file, from `error_mapper` in the config.
-  static String? errorMapperPath;
-  static bool get hasErrorMapper => errorMapperPath != null;
-
-  /// The full source of the `errorMapper` function, to inline in `.craft.dart`.
-  /// The function is renamed to [errorMapperInlineName] so the inlined copy
-  /// stays private and never collides through barrel re-exports.
-  static String? errorMapperFunctionSource;
-
-  /// Private name the user's `errorMapper` is inlined under in each generated
-  /// `.craft.dart`. Leading `_` keeps it library-private so files that are
-  /// re-exported by a barrel don't produce `ambiguous_export` errors.
-  static const errorMapperInlineName = r'_$errorMapper';
-
-  /// The `errorMapper` function's return type (e.g. `Failure`). This becomes
-  /// the error type parameter `F` in generated state and notifiers.
-  static String? errorMapperOutputType;
-
-  /// The error type parameter (`F`) emitted into generated code: the mapper's
-  /// return type when configured, otherwise `Object`.
-  static String get errorType =>
-      hasErrorMapper && errorMapperOutputType != null
-      ? errorMapperOutputType!
-      : 'Object';
-
-  /// Parses the mapper file to extract the input type and function body.
-  ///
-  /// Given a mapper like:
-  /// ```dart
-  /// PaginatedResponse<T> pagedMapper<T>(ApiPagedResponse<T> data) { ... }
-  /// ```
-  /// Extracts:
-  /// - `pagedMapperInputType` = "ApiPagedResponse"
-  /// - `pagedMapperFunctionSource` = the full function source code
-  static void parseMapperFile() {
-    if (pagedMapperPath == null) return;
-
-    final file = File(pagedMapperPath!);
-    if (!file.existsSync()) {
-      print('Warning: Mapper file not found: $pagedMapperPath');
-      return;
-    }
-
-    final content = file.readAsStringSync();
-    final result = parseString(content: content);
-    final unit = result.unit;
-
-    // Find the `pagedMapper` function
-    for (final declaration in unit.declarations) {
-      if (declaration is FunctionDeclaration &&
-          declaration.name.lexeme == 'pagedMapper') {
-        // Store the full function source
-        pagedMapperFunctionSource = declaration.toSource();
-
-        // Extract input type from first param
-        final params = declaration.functionExpression.parameters?.parameters;
-        if (params != null && params.isNotEmpty) {
-          final firstParam = params.first;
-          String? paramType;
-
-          if (firstParam is SimpleFormalParameter) {
-            paramType = firstParam.type?.toSource();
-          } else if (firstParam is DefaultFormalParameter) {
-            final inner = firstParam.parameter;
-            if (inner is SimpleFormalParameter) {
-              paramType = inner.type?.toSource();
-            }
-          }
-
-          if (paramType != null) {
-            // Strip generic: "ApiPagedResponse<T>" → "ApiPagedResponse"
-            final genericIdx = paramType.indexOf('<');
-            pagedMapperInputType =
-                genericIdx > 0 ? paramType.substring(0, genericIdx) : paramType;
-          }
-        }
-        break;
-      }
-    }
-  }
-
-  /// Parses the error mapper file to extract the `errorMapper` function source.
-  ///
-  /// Given a mapper like:
-  /// ```dart
-  /// AppError errorMapper(Object error) { ... }
-  /// ```
-  /// Stores the full function source in [errorMapperFunctionSource] so it can
-  /// be inlined into generated `.craft.dart` files.
-  static void parseErrorMapperFile() {
-    if (errorMapperPath == null) return;
-
-    final file = File(errorMapperPath!);
-    if (!file.existsSync()) {
-      print('Warning: Error mapper file not found: $errorMapperPath');
-      return;
-    }
-
-    final content = file.readAsStringSync();
-    final result = parseString(content: content);
-    final unit = result.unit;
-
-    for (final declaration in unit.declarations) {
-      if (declaration is FunctionDeclaration &&
-          declaration.name.lexeme == 'errorMapper') {
-        // Capture the return type — it becomes the error type parameter `F`.
-        errorMapperOutputType = declaration.returnType?.toSource();
-        // Rename to a private name so the inlined copy doesn't leak through
-        // barrel re-exports. The declared name is the first textual
-        // occurrence (after the return type), so replaceFirst is safe.
-        errorMapperFunctionSource = declaration.toSource().replaceFirst(
-          'errorMapper',
-          errorMapperInlineName,
-        );
-        break;
-      }
-    }
-
-    if (errorMapperFunctionSource == null) {
-      print(
-        'Warning: No top-level `errorMapper` function found in '
-        '$errorMapperPath',
-      );
-    } else if (errorMapperOutputType == null) {
-      print(
-        'Warning: `errorMapper` in $errorMapperPath has no explicit return '
-        'type; generated error type falls back to `Object`. Annotate it, e.g. '
-        '`Failure errorMapper(Object error) {...}`.',
-      );
-    }
+    return File('${dir.path}/craft_runner.yaml').existsSync();
   }
 }

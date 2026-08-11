@@ -1,0 +1,6 @@
+plugins:
+  - riverpod_craft_plugin:RiverpodGeneratorPlugin
+
+riverpod_craft:
+  paged_provider_mapper: lib/paged_mapper.dart
+  error_mapper: lib/error_mapper.dart

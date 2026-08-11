@@ -5,7 +5,8 @@ import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
-import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
+
+import 'project_wide_plugin.dart';
 
 /// Drives a full-project pass over the registered [ProjectWideCraftPlugin]s.
 ///
@@ -148,10 +149,15 @@ class ProjectWideProcessor {
         final outPath = p.isAbsolute(entry.key)
             ? entry.key
             : p.join(rootDir, entry.key);
+        // A plugin may emit its own `// GENERATED CODE` header (e.g. a `part of`
+        // file needs a different header than a standalone library). Only add the
+        // standard header when the content doesn't already carry one.
         final wrapped =
-            '// GENERATED CODE - DO NOT MODIFY BY HAND\n'
-            '// ignore_for_file: directives_ordering,unnecessary_import,library_private_types_in_public_api\n'
-            '${entry.value}';
+            entry.value.startsWith('// GENERATED CODE - DO NOT MODIFY BY HAND')
+            ? entry.value
+            : '// GENERATED CODE - DO NOT MODIFY BY HAND\n'
+                  '// ignore_for_file: directives_ordering,unnecessary_import,library_private_types_in_public_api\n'
+                  '${entry.value}';
         String formatted;
         try {
           formatted = formatter.format(wrapped);

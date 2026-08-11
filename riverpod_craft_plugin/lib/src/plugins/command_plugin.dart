@@ -1,7 +1,7 @@
 import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
 
-import 'package:craft_runner/command_info.dart';
-import 'package:craft_runner/concurrency_type.dart';
+import 'package:riverpod_craft_plugin/command_info.dart';
+import 'package:riverpod_craft_plugin/concurrency_type.dart';
 
 /// Built-in plugin that handles top-level `@command` functions.
 ///

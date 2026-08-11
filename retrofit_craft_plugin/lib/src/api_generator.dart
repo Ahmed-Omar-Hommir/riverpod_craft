@@ -42,7 +42,7 @@ GenerateResult generateAppApi({
     if (entryRef == null) {
       diagnostics.add(
         '${api.className}: @Api has no entry: and no default_entry is '
-        'configured in riverpod_craft.yaml.',
+        'configured in craft_runner.yaml.',
       );
       continue;
     }
@@ -60,7 +60,7 @@ GenerateResult generateAppApi({
         diagnostics.add(
           '${api.className}: @Api uses dot-shorthand `.${entryRef.name}` for '
           'entry but no Entry registry was discovered. Configure '
-          '`entry_path` in riverpod_craft.yaml, or write the prefix '
+          '`entry_path` in craft_runner.yaml, or write the prefix '
           'explicitly (e.g. `Entry.${entryRef.name}`).',
         );
         continue;
@@ -70,7 +70,7 @@ GenerateResult generateAppApi({
           '${api.className}: @Api uses dot-shorthand `.${entryRef.name}` for '
           'entry but multiple Entry-like registries were discovered '
           '(${resolved.candidates.join(", ")}). Set `entry_path` in '
-          'riverpod_craft.yaml to disambiguate.',
+          'craft_runner.yaml to disambiguate.',
         );
         continue;
       }
@@ -121,7 +121,7 @@ GenerateResult generateAppApi({
         diagnostics.add(
           '${api.className}: @Api uses dot-shorthand `.${versionRef.name}` '
           'for version but no Version registry was discovered. Configure '
-          '`version_path` in riverpod_craft.yaml, or write the prefix '
+          '`version_path` in craft_runner.yaml, or write the prefix '
           'explicitly (e.g. `Version.${versionRef.name}`).',
         );
         continue;
@@ -131,7 +131,7 @@ GenerateResult generateAppApi({
           '${api.className}: @Api uses dot-shorthand `.${versionRef.name}` '
           'for version but multiple Version-like registries were discovered '
           '(${resolved.candidates.join(", ")}). Set `version_path` in '
-          'riverpod_craft.yaml to disambiguate.',
+          'craft_runner.yaml to disambiguate.',
         );
         continue;
       }

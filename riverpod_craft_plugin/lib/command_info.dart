@@ -1,7 +1,7 @@
-import 'package:craft_runner/parameters_converter.dart';
-import 'package:craft_runner/provider_info.dart';
-import 'package:craft_runner/src/plugin_loader.dart';
-import 'package:craft_runner/src/provider_code_generator.dart';
+import 'package:riverpod_craft_plugin/parameters_converter.dart';
+import 'package:riverpod_craft_plugin/provider_info.dart';
+import 'package:riverpod_craft_plugin/src/craft_config.dart';
+import 'package:riverpod_craft_plugin/src/provider_code_generator.dart';
 
 import 'concurrency_type.dart';
 import 'parameter_info.dart';

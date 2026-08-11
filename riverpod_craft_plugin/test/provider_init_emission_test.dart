@@ -1,4 +1,4 @@
-import 'package:craft_runner/provider_info.dart';
+import 'package:riverpod_craft_plugin/provider_info.dart';
 import 'package:test/test.dart';
 
 ProviderInfo _make({

@@ -1,9 +1,9 @@
 import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
 
-import 'package:craft_runner/command_info.dart';
-import 'package:craft_runner/concurrency_type.dart';
-import 'package:craft_runner/provider_info.dart';
-import 'package:craft_runner/src/plugin_loader.dart';
+import 'package:riverpod_craft_plugin/command_info.dart';
+import 'package:riverpod_craft_plugin/concurrency_type.dart';
+import 'package:riverpod_craft_plugin/provider_info.dart';
+import 'package:riverpod_craft_plugin/src/craft_config.dart';
 
 /// Built-in plugin that handles `@provider` annotations.
 ///
