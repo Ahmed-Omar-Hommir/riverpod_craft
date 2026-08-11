@@ -33,17 +33,16 @@ class $MovieDetailFacadeRef {
 
   void invalidate() => _ref.invalidate(_provider);
 
-  Future<Movie> future({bool watch = false, bool forceRefetch = false}) {
-    if (!watch) {
-      return _ref.read(_provider.notifier).future(forceRefetch: forceRefetch);
-    }
-    return DataWatchHandle<Movie, Object>(
+  DataFuture<Movie, Object> get future => DataFuture(
+    DataWatchHandle<Movie, Object>(
       read: () => _ref.read(_provider),
       reload: () => _ref.read(_provider.notifier).reload(),
       listen: (listener) => _ref.listen(_provider, listener),
       invalidateSelf: () => _ref.invalidateSelf(),
-    ).future(forceRefetch: forceRefetch);
-  }
+    ),
+    (forceRefetch) =>
+        _ref.read(_provider.notifier).future(forceRefetch: forceRefetch),
+  );
 
   void listen(
     void Function(
@@ -88,8 +87,6 @@ class $MovieDetailFacadeWidget
 
   @override
   Future<void> silentReload() => _ref.watch(_provider.notifier).silentReload();
-  Future<Movie> future({bool forceRefetch = false}) =>
-      _ref.read(_provider.notifier).future(forceRefetch: forceRefetch);
 
   @override
   void listen(

@@ -47,17 +47,16 @@ class $NoteDetailFacadeRef {
 
   void invalidate() => _ref.invalidate(_provider);
 
-  Future<Note> future({bool watch = false, bool forceRefetch = false}) {
-    if (!watch) {
-      return _ref.read(_provider.notifier).future(forceRefetch: forceRefetch);
-    }
-    return DataWatchHandle<Note, AppError>(
+  DataFuture<Note, AppError> get future => DataFuture(
+    DataWatchHandle<Note, AppError>(
       read: () => _ref.read(_provider),
       reload: () => _ref.read(_provider.notifier).reload(),
       listen: (listener) => _ref.listen(_provider, listener),
       invalidateSelf: () => _ref.invalidateSelf(),
-    ).future(forceRefetch: forceRefetch);
-  }
+    ),
+    (forceRefetch) =>
+        _ref.read(_provider.notifier).future(forceRefetch: forceRefetch),
+  );
 
   void listen(
     void Function(
@@ -102,8 +101,6 @@ class $NoteDetailFacadeWidget
 
   @override
   Future<void> silentReload() => _ref.watch(_provider.notifier).silentReload();
-  Future<Note> future({bool forceRefetch = false}) =>
-      _ref.read(_provider.notifier).future(forceRefetch: forceRefetch);
 
   @override
   void listen(

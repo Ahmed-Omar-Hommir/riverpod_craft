@@ -22,5 +22,12 @@ dev_dependencies:
   craft_runner:
     path: ../../craft_runner
 
+# craft_runner (path) depends on the in-repo riverpod_craft_plugin, but its own
+# overrides don't propagate to this root package — pin it here so `sourceRoots`
+# resolves. Local dev only.
+dependency_overrides:
+  riverpod_craft_plugin:
+    path: ../../riverpod_craft_plugin
+
 flutter:
   uses-material-design: true
