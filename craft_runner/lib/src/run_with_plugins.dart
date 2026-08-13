@@ -22,5 +22,5 @@ Future<void> runWithPlugins(
     print('🌐 plugins · project-wide: ${plugins.map((p) => p.id).join(', ')}');
   }
   FileProcessor.registerProjectWidePlugins(plugins);
-  await RiverpodCraftCLI.main(args);
+  await CraftRunnerCli.main(args);
 }

@@ -7,8 +7,8 @@ import 'package:craft_runner/src/plugin_loader.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as path;
 
-/// Main entry point for the Riverpod Craft CLI tool
-class RiverpodCraftCLI {
+/// Main entry point for the craft_runner CLI.
+class CraftRunnerCli {
   /// Reentry guard env var. The auto-generated entry script re-invokes
   /// the same `dart run` chain, which would loop forever; the child sets
   /// this to bypass the parent's handoff on the second pass.
@@ -26,8 +26,8 @@ class RiverpodCraftCLI {
   static String? _sessionFingerprint;
 
   /// Project subdirectories craft_runner scans and watches. Hand-written
-  /// `_provider.dart` sources and every generated `.craft.dart` live under
-  /// these. Scanning the project root instead recurses into `.dart_tool/`,
+  /// sources and every generated `.craft.dart` live under these. Scanning the
+  /// project root instead recurses into `.dart_tool/`,
   /// `build/`, `ios/`, `.git/` and the like — on a real Flutter app that is
   /// ~300k filesystem entries and ~4s per walk (done twice at startup), versus
   /// a few hundred entries and ~15ms when scoped here.
@@ -177,7 +177,7 @@ class RiverpodCraftCLI {
 
   /// Starts watch mode to monitor file changes
   static Future<void> _startWatchMode() async {
-    print('🚀 riverpod_craft · watch mode');
+    print('🚀 craft_runner · watch mode');
 
     final currentDir = Directory.current;
 
@@ -322,7 +322,7 @@ class RiverpodCraftCLI {
     }
     // Generator code (incl. any plugin's own config handling) is captured by the
     // entry-snapshot hash; plugin config files that live under lib/ (e.g. a
-    // riverpod error/paged mapper) are caught by the generic source-mtime scan.
+    // a plugin's mapper) are caught by the generic source-mtime scan.
     return 'entry:$entryHash|'
         'yaml:${await _hashFile(File(path.join(dir.path, 'craft_runner.yaml')))}';
   }
@@ -360,7 +360,7 @@ class RiverpodCraftCLI {
       case 'generate':
         if (args.length < 2) {
           print('❌ Error: Please specify a file path');
-          print('Usage: riverpod_craft generate <file_path>');
+          print('Usage: craft_runner generate <file_path>');
           return;
         }
         final filePath = args[1];
@@ -582,14 +582,14 @@ class RiverpodCraftCLI {
 
   static void _showHelp() {
     print('''
-🚀 Riverpod Craft - Code Generation Tool
+🚀 craft_runner - Code Generation Tool
 
 Usage:
-  riverpod_craft [command] [options]
+  craft_runner [command] [options]
 
 Commands:
   watch                 Start watching for file changes (default)
-  generate              Generate a single provider file
+  generate              Run a single pass (regenerates outputs)
   clean                 Remove all generated .craft.dart files
   init                  Initialize project (install dependencies & VS Code extension)
   help                  Show this help message
@@ -601,19 +601,11 @@ Examples:
   dart run craft_runner generate lib/features/auth/auth_provider.dart
   dart run craft_runner clean                       # Clean all generated files
 
-Custom Plugins:
-  1. Add craft_runner as a dev dependency
-  2. Create your plugin extending ProviderPlugin or CommandPlugin
-  3. Create tool/craft.dart:
-
-     import 'package:craft_runner/craft_runner.dart';
-     import '../lib/plugins/my_plugin.dart';
-
-     void main(List<String> args) {
-       runWithPlugins([MyPlugin()], args);
-     }
-
-  4. Run: dart run tool/craft.dart watch
+Plugins:
+  Declare them in craft_runner.yaml under `plugins:` as `<package>:<ClassName>`.
+  Each plugin implements `ProjectWideCraftPlugin` and must be a (dev_)dependency.
+  Or wire them in-process via a `tool/craft.dart` that calls
+  `runWithPlugins([MyPlugin()], args)` from `package:craft_runner/craft_runner.dart`.
 ''');
   }
 

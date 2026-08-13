@@ -1,7 +1,6 @@
 name: retrofit_aggregator
 description: End-to-end example for retrofit_craft's grouped AppApi generation.
 publish_to: "none"
-version: 0.0.0
 
 environment:
   sdk: ">=3.12.0 <4.0.0"
@@ -20,7 +19,6 @@ dev_dependencies:
     path: ../../craft_runner
   retrofit_craft_plugin:
     path: ../../retrofit_craft_plugin
-
 
 # Local monorepo dev: unify the cross-referenced toolkit packages to in-repo paths.
 dependency_overrides:

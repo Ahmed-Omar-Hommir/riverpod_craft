@@ -1,6 +1,6 @@
 name: retrofit_craft_plugin
 description: craft_runner plugin that generates a grouped, versioned retrofit API client aggregator.
-version: 0.7.1
+version: 0.8.0
 homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 issue_tracker: https://github.com/Ahmed-Omar-Hommir/riverpod_craft/issues

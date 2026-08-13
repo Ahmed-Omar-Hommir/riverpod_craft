@@ -1,118 +1,85 @@
-# riverpod_craft_cli
+# craft_runner
 
-Code generation CLI for [riverpod_craft](../riverpod_craft). Parses Dart source files with `@provider`, `@command`, and `@settable` annotations and generates type-safe provider boilerplate.
+A generic, plugin-driven code-generation runner for Dart projects. craft_runner
+knows nothing about any specific generator — it parses your source with the
+`analyzer`, drives a set of plugins you declare, and writes their output. The
+riverpod provider/command generation, the retrofit aggregator, and any other
+generator are all just plugins (`riverpod_craft_plugin`, `retrofit_craft_plugin`,
+…).
 
 ## Installation
 
-The CLI is included in the `riverpod_craft_cli` package. Add it as a dev dependency or run directly:
+Add it as a dev dependency:
 
 ```yaml
 dev_dependencies:
-  riverpod_craft_cli:
-    path: ../riverpod_craft_cli
+  craft_runner: ^0.7.0
+```
+
+## Configuration — `craft_runner.yaml`
+
+Declare the plugins to run, plus any per-plugin config blocks. Each plugin entry
+is `<package_name>:<ClassName>`; the package must be a `(dev_)dependency` and the
+class a no-arg-constructable `ProjectWideCraftPlugin`.
+
+```yaml
+plugins:
+  - riverpod_craft_plugin:RiverpodGeneratorPlugin
+  - retrofit_craft_plugin:RetrofitApiPlugin
+
+# Each plugin reads its own namespaced block:
+riverpod_craft:
+  error_mapper: lib/error_mapper.dart
+  paged_provider_mapper: lib/paged_mapper.dart
+
+retrofit_craft:
+  entry_path: lib/app/api/entries.dart
+  output: lib/app/api/app_api.craft.dart
 ```
 
 ## Commands
 
-### `watch` (default)
-
-Monitors the `lib/` directory and regenerates `.craft.dart` files on save.
-
 ```bash
-dart run riverpod_craft_cli
-# or explicitly:
-dart run riverpod_craft_cli watch
+dart run craft_runner            # watch mode (default)
+dart run craft_runner watch      # watch lib/ and test/, regenerate on save
+dart run craft_runner generate <file>   # run a single pass now
+dart run craft_runner clean      # remove all generated .craft.dart files
+dart run craft_runner help       # show help
 ```
 
-On startup, watch mode:
-1. Cleans up orphaned `.craft.dart` files (where the source file no longer has annotations)
-2. Processes all existing annotated files
-3. Watches for file changes
+Watch startup is incremental: it skips the whole build when nothing that affects
+output has changed since the last run (tracked in a manifest keyed on the plugin
+graph + source mtimes), and only re-parses files that changed.
 
-### `generate <file_path>`
+## The plugin interface — `ProjectWideCraftPlugin`
 
-Generates the `.craft.dart` file for a single source file.
+A plugin observes parsed source units and returns `{outputPath: content}`:
 
-```bash
-dart run riverpod_craft_cli generate lib/providers/my_provider.dart
+```dart
+abstract class ProjectWideCraftPlugin {
+  String get id;
+  List<String> get sourceRoots;               // e.g. ['lib'] or ['test']
+  void reset();
+  void collectFromUnit(ParseStringResult unit, String filePath);
+  Map<String, String> generate();             // {path: contents}
+}
 ```
 
-### `clean`
+craft_runner walks the union of the plugins' `sourceRoots`, feeds each parsed
+unit to the plugins that requested its root, then writes each returned entry
+(prepending a `GENERATED CODE` header unless the content already has one, and
+running `dart_style`).
 
-Removes all generated `.craft.dart` files from the project.
+## How it works
 
-```bash
-dart run riverpod_craft_cli clean
-```
-
-### `init`
-
-Sets up the project — installs Dart dependencies and VS Code extension.
-
-```bash
-dart run riverpod_craft_cli init
-```
-
-### `help`
-
-Shows available commands.
-
-```bash
-dart run riverpod_craft_cli help
-```
-
-## Generated Files
-
-- Source: `my_provider.dart`
-- Output: `my_provider.craft.dart`
-- Connected via `part 'my_provider.craft.dart';` (added automatically to source)
-
-If you remove all annotations from a source file, the CLI automatically deletes the corresponding `.craft.dart` file and removes the `part` directive.
-
-## What Gets Generated
-
-For each annotated provider, the CLI generates:
-
-| Source | Generated |
-|--------|-----------|
-| `@provider` class with `Future<T> create()` | `DataNotifier` base class, provider declaration, Ref/WidgetRef facades, extensions |
-| `@provider` class with `T create()` | `StateDataNotifier` base class, provider declaration, facades with `setState()` |
-| `@provider` function | Notifier class, provider declaration, facades, extensions |
-| `@command` methods | `CommandNotifier` subclass, command facades with `run()`/`reset()`/`retry()` |
-| Family parameters | Callable facade classes, `invalidateFamily()` |
-
-## Community plugins (yaml-driven, since 0.6.0)
-
-craft_runner ships with built-in `@provider` / `@command` plugins. To
-add **community plugins** (e.g. [retrofit_craft][] for a project-wide
-`AppApi` aggregator), list them in `riverpod_craft.yaml`:
-
-```yaml
-plugins:
-  - retrofit_craft_plugin:RetrofitApiPlugin
-```
-
-Each entry is `<package_name>:<ClassName>`. The plugin must (a) be in your
-project's `dev_dependencies` (or `dependencies`), and (b) have a no-arg
-constructor. On the next `dart run craft_runner` invocation, craft_runner
-generates `.dart_tool/craft_runner/entry.dart`, imports each plugin,
-instantiates it, and dispatches via `runWithPlugins(...)` — per-file vs
-project-wide routing happens via runtime `is RiverpodCraftPlugin` /
-`is ProjectWideCraftPlugin` checks.
-
-`dart run craft_runner watch` "just works" — no `tool/craft.dart` needed.
-If you do maintain a custom `tool/craft.dart` that already calls
-`runWithPlugins(...)` directly, that path keeps working unchanged.
-
-[retrofit_craft]: https://pub.dev/packages/retrofit_craft
-
-## How It Works
-
-1. **Parse** — Uses the Dart `analyzer` package to parse source files into AST
-2. **Collect** — Walks the AST to find annotated classes/functions and extract metadata (types, parameters, annotations)
-3. **Generate** — Builds provider code from the collected metadata
-4. **Write** — Outputs the `.craft.dart` file and ensures the `part` directive exists in the source
+1. **Load** — read `craft_runner.yaml`'s `plugins:` list.
+2. **Hand off** — generate `.dart_tool/craft_runner/entry.dart` that imports and
+   instantiates each plugin, compile it to a kernel snapshot, and run the
+   snapshot (skips the `dart run` build-hook + JIT overhead).
+3. **Parse** — parse every source file with the `analyzer` (cached by mtime).
+4. **Collect + generate** — feed units to plugins; collect their outputs.
+5. **Write** — format and write each output; delete orphaned `.craft.dart`.
 
 ## Requirements
 
-- Dart SDK: ^3.8.1
+- Dart SDK: ^3.5.0

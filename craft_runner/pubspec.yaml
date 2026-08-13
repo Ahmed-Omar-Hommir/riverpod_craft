@@ -1,6 +1,6 @@
 name: craft_runner
 description: Generic, plugin-driven code-generation runner (watch mode, single-file generation, cleanup). Defines the ProjectWideCraftPlugin interface; knows nothing about specific generators.
-version: 0.7.1
+version: 0.8.0
 homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 issue_tracker: https://github.com/Ahmed-Omar-Hommir/riverpod_craft/issues

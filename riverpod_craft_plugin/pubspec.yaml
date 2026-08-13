@@ -1,6 +1,6 @@
 name: riverpod_craft_plugin
 description: Riverpod code generator plus the plugin interface and data models for riverpod_craft code generation plugins.
-version: 0.7.0
+version: 0.8.0
 homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 
