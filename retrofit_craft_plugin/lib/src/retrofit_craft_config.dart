@@ -45,6 +45,23 @@ class RetrofitCraftConfig {
   /// Loads `retrofit_craft:` from `craft_runner.yaml` in [directory]
   /// (defaults to the current working directory). Returns a default config
   /// if the file or section is missing.
+  /// Builds the config from a builder's `options:` block in `build.yaml`.
+  static RetrofitCraftConfig fromOptions(Map<String, dynamic> options) {
+    String? str(String key) {
+      final value = options[key];
+      return value is String && value.trim().isNotEmpty ? value.trim() : null;
+    }
+
+    return RetrofitCraftConfig(
+      defaultEntry: str('default_entry'),
+      defaultVersion: str('default_version'),
+      entryPath: str('entry_path'),
+      versionPath: str('version_path'),
+      output: str('output') ?? 'lib/app/app_api.craft.dart',
+      rootClassName: str('root_class_name') ?? 'AppApi',
+    );
+  }
+
   static RetrofitCraftConfig load([Directory? directory]) {
     final dir = directory ?? Directory.current;
     final configFile = File('${dir.path}/craft_runner.yaml');

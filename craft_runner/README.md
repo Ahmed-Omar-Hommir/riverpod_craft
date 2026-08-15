@@ -13,7 +13,7 @@ Add it as a dev dependency:
 
 ```yaml
 dev_dependencies:
-  craft_runner: ^0.7.0
+  craft_runner: ^0.8.0
 ```
 
 ## Configuration — `craft_runner.yaml`

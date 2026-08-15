@@ -5,11 +5,9 @@ export 'src/plugin_interface.dart';
 export 'src/data_model.dart';
 export 'src/parameter_info.dart';
 
-// Riverpod generator: the project-wide plugin loaded as
-// `riverpod_craft_plugin:RiverpodGeneratorPlugin`, plus the data models and
-// helpers it exposes to plugin extenders.
-export 'src/riverpod_generator_plugin.dart';
-export 'src/craft_config.dart';
+// Riverpod generator internals exposed to plugin extenders.
+export 'src/riverpod_craft_options.dart';
+export 'src/riverpod_craft_builder_cli.dart';
 export 'src/plugins/provider_plugin.dart';
 export 'src/plugins/command_plugin.dart';
 export 'provider_info.dart';

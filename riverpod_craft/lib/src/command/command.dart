@@ -14,7 +14,7 @@ part 'command_notifier.dart';
 /// Manages keep-alive links for a list of [Ref]s to prevent provider disposal.
 class KeepAliveManager {
   /// Creates a [KeepAliveManager] for the given [refs].
-  KeepAliveManager({required List<Ref> refs}) : _refs = refs;
+  KeepAliveManager({required this._refs});
 
   final List<Ref> _refs;
 

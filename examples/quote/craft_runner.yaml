@@ -1,2 +1,4 @@
-plugins:
-  - riverpod_craft_plugin:RiverpodGeneratorPlugin
+roots: [lib]
+
+builders:
+  riverpod_craft_plugin:RiverpodCraftBuilder:

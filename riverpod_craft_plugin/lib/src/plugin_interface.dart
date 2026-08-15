@@ -1,5 +1,7 @@
 import 'data_model.dart';
 
+import 'riverpod_craft_options.dart';
+
 /// The interface every riverpod_craft plugin implements.
 ///
 /// A plugin defines:
@@ -21,7 +23,7 @@ abstract class RiverpodCraftPlugin<T> {
   ///
   /// Inspect the [element] (a class or function with clean metadata) and
   /// return your plugin's own data object, or `null` to skip this element.
-  T? collect(DartElementInfo element);
+  T? collect(DartElementInfo element, RiverpodCraftOptions options);
 
   /// Generate Dart code from collected data.
   ///

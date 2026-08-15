@@ -1,13 +1,13 @@
 import 'package:riverpod_craft_plugin/parameters_converter.dart';
 import 'package:riverpod_craft_plugin/provider_info.dart';
-import 'package:riverpod_craft_plugin/src/craft_config.dart';
+import 'package:riverpod_craft_plugin/src/riverpod_craft_options.dart';
 
 /// The `mapError` override emitted into generated notifiers when a global
 /// `error_mapper` is configured. Routes every caught error through the inlined
 /// (privately renamed) `errorMapper` function. Empty when no mapper is
 /// configured.
-String get mapErrorOverride => CraftConfig.hasErrorMapper
-    ? '\n  @override\n  ${CraftConfig.errorType} mapError(Object error) => ${CraftConfig.errorMapperInlineName}(error);\n'
+String mapErrorOverride(RiverpodCraftOptions options) => options.hasErrorMapper
+    ? '\n  @override\n  ${options.errorType} mapError(Object error) => ${RiverpodCraftOptions.errorMapperInlineName}(error);\n'
     : '';
 
 class ProviderCodeGenerator {
@@ -114,7 +114,7 @@ abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, ${_in
 $firstPageKeyBlock  Paged<${_info.dataType}> create($pk page${familyParams.isEmpty ? '' : ', $createParamSig'});
   @override
   $buildPagedLine
-$mapErrorOverride$noInitOverride
+${mapErrorOverride(_info.options)}$noInitOverride
 ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent()).join('\n')}
 }''';
     }
@@ -135,7 +135,7 @@ abstract class _\$${_info.name} extends $controllerType<${_info.dataType}, ${_in
   ${_info.returnName} create($createParamSig);
   @override
   ${_info.returnName} $buildMethodName() => create($dataCreateCall);
-$mapErrorOverride$noInitOverride
+${mapErrorOverride(_info.options)}$noInitOverride
 ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent()).join('\n')}
 }''';
     }
@@ -220,7 +220,7 @@ ${_info.commands.map((c) => c.builder(parent: _info).buildCommandInsideParent())
 class ${_info.notifierType} extends $controllerType<${_info.dataType}, ${_info.errorType}, $dataArgType, $pk> {
 $firstPageKeyBlock  @override
   $functionalBuildLine
-$mapErrorOverride$noInitOverride}''';
+${mapErrorOverride(_info.options)}$noInitOverride}''';
     }
 
     // For DataNotifier (Future/Stream): use isFuture getter and buildDataWithFuture()/buildDataWithStream()
@@ -238,7 +238,7 @@ class ${_info.notifierType} extends $controllerType<${_info.dataType}, ${_info.e
 
   @override
   ${_info.returnName} $buildMethodName() => $functionCall;
-$mapErrorOverride$noInitOverride}''';
+${mapErrorOverride(_info.options)}$noInitOverride}''';
     }
 
     // For StateDataNotifier (sync providers) - use same pattern as Future/Stream
@@ -350,44 +350,6 @@ class ${_refFacadeClassName()} {
 }''';
   }
 
-  String _buildWidgetRefFacadeClass() {
-    final commandsGetters = _buildCommandGettersWidgetRef();
-
-    // Add setState for sync providers only with @settable
-    final hasSetState = _info.type == ProviderType.sync && _info.isSettable;
-    final setStateMethod = hasSetState
-        ? 'void setState(${_info.dataType} value) => _ref.read(_provider.notifier).state = value;'
-        : '';
-
-    return '''
-class ${_widgetFacadeClassName()} {
-  ${_widgetFacadeClassName()}(this._ref${_info.hasArg ? ', this._arg' : ''});
-  final WidgetRef _ref;
-  ${_info.hasArg ? 'final ${_info.params.toRecordType()} _arg;' : ''}
-
-  late final _provider = _${_info.providerVarName}${_info.hasArg ? '(_arg)' : ''};
-
-  ${_info.stateType} read() => _ref.read(_provider);
-  ${_info.stateType} watch() => _ref.watch(_provider);
-
-  SelectedWidgetRefFacade<R> select<R>(R Function(${_info.stateType} state) selector) =>
-      SelectedWidgetRefFacade(_ref, _provider.select(selector));
-
-  $setStateMethod
-
-  void listen(
-    void Function(${_info.nullableStateType} previous, ${_info.stateType} next) listener, {
-    void Function(Object, StackTrace)? onError,
-    bool fireImmediately = false,
-  }) {
-    _ref.listen<${_info.stateType}>(_provider, listener, onError: onError);
-  }
-
-  $commandsGetters
-  ${_buildPublicMethods()}
-}''';
-  }
-
   String _buildExtensions() {
     if (!_info.hasArg) {
       return '''
@@ -480,9 +442,6 @@ extension ${_info.name}FacadeWidgetRefEx on WidgetRef {
         ? 'void setState(${_info.dataType} value) => _ref.read(_provider.notifier).state = value;'
         : '';
 
-    final argRecordTypeForData = _info.params.isEmpty
-        ? '()'
-        : _info.params.toRecordType();
     final implementsClause = _info.type == ProviderType.paged
         ? ' implements PagedProviderFacade<${_info.dataType}, ${_info.errorType}, ${_info.pageKeyType}>, PagedProviderValue<${_info.dataType}, ${_info.errorType}, ${_info.pageKeyType}>'
         : _info.type == ProviderType.sync

@@ -1,6 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: directives_ordering,unnecessary_import,library_private_types_in_public_api
 import 'package:dio/dio.dart';
+
 import 'api/entries.dart';
 import 'api/versions.dart';
 import '../features/auth/auth_api_v1.dart';

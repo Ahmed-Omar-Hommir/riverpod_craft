@@ -1,4 +1,4 @@
-import 'package:riverpod_craft_plugin/src/craft_config.dart';
+import 'package:riverpod_craft_plugin/src/riverpod_craft_options.dart';
 import 'package:riverpod_craft_plugin/src/provider_code_generator.dart';
 
 import 'command_info.dart';
@@ -20,6 +20,7 @@ class PublicMethod {
 
 class ProviderInfo {
   const ProviderInfo({
+    this.options = RiverpodCraftOptions.empty,
     required this.name,
     required String dataType,
     required this.isKeepAlive,
@@ -86,7 +87,10 @@ class ProviderInfo {
 
   /// The error type parameter (`F`) for generated state/notifiers: the
   /// configured `error_mapper`'s return type, or `Object` by default.
-  String get errorType => CraftConfig.errorType;
+  /// Configuration for this build, threaded in at collection time.
+  final RiverpodCraftOptions options;
+
+  String get errorType => options.errorType;
 
   String get stateType {
     if (type == ProviderType.sync) {

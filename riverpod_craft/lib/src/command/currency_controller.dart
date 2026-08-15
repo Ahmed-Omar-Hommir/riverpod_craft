@@ -8,11 +8,10 @@ import 'command.dart';
 class ConcurrentController<DataT, F, Arg extends Record>
     extends Bloc<_Fire<Arg>, ArgCommandState<DataT, F, Arg>> {
   ConcurrentController({
-    required Future<DataT> Function(Arg arg) action,
+    required this._action,
     required ActionStrategy strategy,
     F Function(Object error)? mapError,
-  }) : _action = action,
-       _mapError = mapError ?? ((Object error) => error as F),
+  }) : _mapError = mapError ?? ((Object error) => error as F),
        super(ArgCommandState<DataT, F, Arg>.init()) {
     _setupEventHandler(strategy);
   }

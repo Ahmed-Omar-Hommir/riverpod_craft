@@ -1,5 +1,5 @@
-plugins:
-  - riverpod_craft_plugin:RiverpodGeneratorPlugin
+roots: [lib]
 
-riverpod_craft:
-  paged_provider_mapper: lib/paged_mapper.dart
+builders:
+  riverpod_craft_plugin:RiverpodCraftBuilder:
+    paged_provider_mapper: lib/paged_mapper.dart

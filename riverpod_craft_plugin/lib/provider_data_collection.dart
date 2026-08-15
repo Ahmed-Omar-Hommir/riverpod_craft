@@ -15,6 +15,7 @@ class ProviderDataCollection {
     final enriched = providers
         .map(
           (p) => ProviderInfo(
+            options: p.options,
             name: p.name,
             dataType: p.dataType,
             isKeepAlive: p.isKeepAlive,

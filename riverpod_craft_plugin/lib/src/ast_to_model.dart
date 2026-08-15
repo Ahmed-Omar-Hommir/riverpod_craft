@@ -3,31 +3,39 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
 
+import 'resolved_types.dart';
+
 /// Converts a parsed Dart file (AST) into clean [DartElementInfo] objects.
 ///
 /// This bridges the raw analyzer AST and the clean data models that plugins
 /// work with. Plugins never see AST nodes — only [DartClassInfo] and
 /// [DartFunctionInfo].
-List<DartElementInfo> astToModel(ParseStringResult parsedResult) {
+List<DartElementInfo> astToModel(
+  ParseStringResult parsedResult, {
+  ResolvedReturnTypes resolved = const ResolvedReturnTypes.empty(),
+}) {
   final unit = parsedResult.unit;
   final elements = <DartElementInfo>[];
 
   for (final declaration in unit.declarations) {
     if (declaration is ClassDeclaration) {
-      elements.add(DartClassElement(_convertClass(declaration)));
+      elements.add(DartClassElement(_convertClass(declaration, resolved)));
     } else if (declaration is FunctionDeclaration) {
-      elements.add(DartFunctionElement(_convertFunction(declaration)));
+      elements.add(DartFunctionElement(_convertFunction(declaration, resolved)));
     }
   }
 
   return elements;
 }
 
-DartClassInfo _convertClass(ClassDeclaration declaration) {
+DartClassInfo _convertClass(
+  ClassDeclaration declaration,
+  ResolvedReturnTypes resolved,
+) {
   return DartClassInfo(
-    name: declaration.name.lexeme,
+    name: declaration.namePart.typeName.lexeme,
     annotations: _convertAnnotations(declaration.metadata),
-    methods: _convertMethods(declaration),
+    methods: _convertMethods(declaration, resolved),
     superclass: declaration.extendsClause?.superclass.name.lexeme,
     mixins: declaration.withClause?.mixinTypes
             .map((t) => t.name.lexeme)
@@ -40,13 +48,20 @@ DartClassInfo _convertClass(ClassDeclaration declaration) {
   );
 }
 
-List<MethodInfo> _convertMethods(ClassDeclaration declaration) {
+List<MethodInfo> _convertMethods(
+  ClassDeclaration declaration,
+  ResolvedReturnTypes resolved,
+) {
+  final className = declaration.namePart.typeName.lexeme;
   final methods = <MethodInfo>[];
-  for (final member in declaration.members) {
+  for (final member in declaration.body.members) {
     if (member is MethodDeclaration) {
       final DartType? type = member.returnType?.type;
       final returnType =
-          type?.getDisplayString() ?? member.returnType?.toSource() ?? 'void';
+          resolved.forMethod(className, member.name.lexeme) ??
+          type?.getDisplayString() ??
+          member.returnType?.toSource() ??
+          'void';
 
       methods.add(
         MethodInfo(
@@ -65,10 +80,16 @@ List<MethodInfo> _convertMethods(ClassDeclaration declaration) {
   return methods;
 }
 
-DartFunctionInfo _convertFunction(FunctionDeclaration declaration) {
+DartFunctionInfo _convertFunction(
+  FunctionDeclaration declaration,
+  ResolvedReturnTypes resolved,
+) {
   final DartType? type = declaration.returnType?.type;
   final returnType =
-      type?.getDisplayString() ?? declaration.returnType?.toSource() ?? 'void';
+      resolved.forFunction(declaration.name.lexeme) ??
+      type?.getDisplayString() ??
+      declaration.returnType?.toSource() ??
+      'void';
 
   return DartFunctionInfo(
     name: declaration.name.lexeme,
@@ -84,61 +105,13 @@ List<ParameterInfo> _convertParameters(FormalParameterList? parameters) {
   }
 
   return parameters.parameters.map((param) {
-    String type = 'dynamic';
-    String? defaultValue;
-    bool isPositional = param.isPositional;
-    bool isRequired =
-        param.isRequired ||
-        (param is DefaultFormalParameter && param.requiredKeyword != null);
-    String name = param.name?.lexeme ?? '';
-    bool isFamily = false;
-
-    if (param is DefaultFormalParameter) {
-      final inner = param.parameter;
-
-      if (inner is SimpleFormalParameter) {
-        type = inner.type?.toSource() ?? 'dynamic';
-        name = inner.name?.lexeme ?? name;
-      } else if (inner is FieldFormalParameter) {
-        type = inner.type?.toSource() ?? 'dynamic';
-        name = inner.name.lexeme;
-      }
-
-      defaultValue = param.defaultValue?.toSource();
-      isPositional = param.isPositional;
-    } else if (param is SimpleFormalParameter) {
-      type = param.type?.toSource() ?? 'dynamic';
-      name = param.name?.lexeme ?? name;
-      isPositional = param.isPositional;
-    } else if (param is FieldFormalParameter) {
-      type = param.type?.toSource() ?? 'dynamic';
-      name = param.name.lexeme;
-      isPositional = param.isPositional;
-    }
-
-    // Detect @family annotation on parameter
-    final metadata = (param is DefaultFormalParameter)
-        ? ((param.parameter is SimpleFormalParameter)
-              ? (param.parameter as SimpleFormalParameter).metadata
-              : (param.parameter is FieldFormalParameter)
-              ? (param.parameter as FieldFormalParameter).metadata
-              : null)
-        : (param is SimpleFormalParameter)
-        ? param.metadata
-        : (param is FieldFormalParameter)
-        ? param.metadata
-        : null;
-    if (metadata != null && metadata.any((a) => a.name.name == 'family')) {
-      isFamily = true;
-    }
-
     return ParameterInfo(
-      name: name,
-      type: type,
-      isRequired: isRequired,
-      defaultValue: defaultValue,
-      isPositional: isPositional,
-      isFamily: isFamily,
+      name: param.name?.lexeme ?? '',
+      type: param.type?.toSource() ?? 'dynamic',
+      isRequired: param.isRequired,
+      defaultValue: param.defaultClause?.value.toSource(),
+      isPositional: param.isPositional,
+      isFamily: param.metadata.any((a) => a.name.name == 'family'),
     );
   }).toList();
 }
@@ -149,8 +122,8 @@ List<AnnotationInfo> _convertAnnotations(NodeList<Annotation> metadata) {
     final arguments = annotation.arguments;
     if (arguments != null) {
       for (final arg in arguments.arguments) {
-        if (arg is NamedExpression) {
-          args[arg.name.label.name] = arg.expression.toSource();
+        if (arg is NamedArgument) {
+          args[arg.name.lexeme] = arg.argumentExpression.toSource();
         }
       }
     }

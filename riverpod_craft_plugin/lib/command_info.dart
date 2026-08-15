@@ -1,6 +1,6 @@
 import 'package:riverpod_craft_plugin/parameters_converter.dart';
 import 'package:riverpod_craft_plugin/provider_info.dart';
-import 'package:riverpod_craft_plugin/src/craft_config.dart';
+import 'package:riverpod_craft_plugin/src/riverpod_craft_options.dart';
 import 'package:riverpod_craft_plugin/src/provider_code_generator.dart';
 
 import 'concurrency_type.dart';
@@ -8,6 +8,7 @@ import 'parameter_info.dart';
 
 class Command {
   const Command({
+    this.options = RiverpodCraftOptions.empty,
     required this.name,
     required this.params,
     required this.concurrency,
@@ -18,6 +19,9 @@ class Command {
   final List<ParameterInfo> params;
   final ConcurrencyType concurrency;
   final String dataType;
+
+  /// Configuration for this build, threaded in at collection time.
+  final RiverpodCraftOptions options;
   final bool isKeepAlive;
 
   /// Params marked with @family annotation - used as provider family key
@@ -40,7 +44,7 @@ class Command {
     final argRecordType = nonFamilyParams.isEmpty
         ? '()'
         : nonFamilyParams.toRecordType();
-    return 'CommandNotifier<$dataType, ${CraftConfig.errorType}, $argRecordType>';
+    return 'CommandNotifier<$dataType, ${options.errorType}, $argRecordType>';
   }
 
   /// State type is always ArgCommandState with the appropriate arg record type
@@ -49,7 +53,7 @@ class Command {
     final argRecordType = nonFamilyParams.isEmpty
         ? '()'
         : nonFamilyParams.toRecordType();
-    return 'ArgCommandState<$dataType, ${CraftConfig.errorType}, $argRecordType>';
+    return 'ArgCommandState<$dataType, ${options.errorType}, $argRecordType>';
   }
 
   /// Returns the nullable version of stateType.
@@ -145,7 +149,7 @@ class Command {
   isAutoDispose: $isAutoDispose,
 );
 
-class $_generatedClassName extends CommandNotifier<$dataType, ${CraftConfig.errorType}, $argRecordType> {
+class $_generatedClassName extends CommandNotifier<$dataType, ${options.errorType}, $argRecordType> {
   $_generatedClassName(this._familyArg);
   final $familyRecordType _familyArg;
 
@@ -157,7 +161,7 @@ class $_generatedClassName extends CommandNotifier<$dataType, ${CraftConfig.erro
 
   @override
   ActionStrategy get strategy => $strategyType;
-$mapErrorOverride}''';
+${mapErrorOverride(options)}}''';
     }
 
     return '''final _\$${name}Command = NotifierProvider<$notifierType, $stateType>(
@@ -165,7 +169,7 @@ $mapErrorOverride}''';
   isAutoDispose: $isAutoDispose,
 );
 
-class $_generatedClassName extends CommandNotifier<$dataType, ${CraftConfig.errorType}, $argRecordType> {
+class $_generatedClassName extends CommandNotifier<$dataType, ${options.errorType}, $argRecordType> {
   @override
   Future<$dataType> action(Ref ref, $argRecordType arg) => ${_buildActionCall()};
 
@@ -174,7 +178,7 @@ class $_generatedClassName extends CommandNotifier<$dataType, ${CraftConfig.erro
 
   @override
   ActionStrategy get strategy => $strategyType;
-$mapErrorOverride}''';
+${mapErrorOverride(options)}}''';
   }
 
   String build() {
@@ -377,7 +381,7 @@ class $facadeCommandClassNameRef {
         : '()';
 
     return '''
-class $facadeCommandClassNameWidgetRef implements CommandProviderFacade<${command.dataType}, ${CraftConfig.errorType}, ${command.nonFamilyParams.isEmpty ? '()' : command.nonFamilyParams.toRecordType()}>, CommandProviderValue<${command.dataType}, ${CraftConfig.errorType}, ${command.nonFamilyParams.isEmpty ? '()' : command.nonFamilyParams.toRecordType()}> {
+class $facadeCommandClassNameWidgetRef implements CommandProviderFacade<${command.dataType}, ${command.options.errorType}, ${command.nonFamilyParams.isEmpty ? '()' : command.nonFamilyParams.toRecordType()}>, CommandProviderValue<${command.dataType}, ${command.options.errorType}, ${command.nonFamilyParams.isEmpty ? '()' : command.nonFamilyParams.toRecordType()}> {
   $facadeCommandClassNameWidgetRef$constructorParams;
   $instanceField
   $familyField
@@ -410,7 +414,7 @@ class $facadeCommandClassNameWidgetRef implements CommandProviderFacade<${comman
   }
 
   @override
-  CommandProviderFacade<${command.dataType}, ${CraftConfig.errorType}, ${command.nonFamilyParams.isEmpty ? '()' : command.nonFamilyParams.toRecordType()}> of(WidgetRef ref) => $facadeCommandClassNameWidgetRef(ref${_hasParent ? ', _instance' : ''}${hasFamily ? ', _familyArg' : ''});
+  CommandProviderFacade<${command.dataType}, ${command.options.errorType}, ${command.nonFamilyParams.isEmpty ? '()' : command.nonFamilyParams.toRecordType()}> of(WidgetRef ref) => $facadeCommandClassNameWidgetRef(ref${_hasParent ? ', _instance' : ''}${hasFamily ? ', _familyArg' : ''});
 }''';
   }
 
@@ -521,7 +525,7 @@ class $facadeCommandClassNameWidgetRef implements CommandProviderFacade<${comman
     if (_hasFamily) {
       final familyRecordType = _familyParams.toRecordType();
       return '''
-class $_parentCommandClassName extends CommandNotifier<${command.dataType}, ${CraftConfig.errorType}, $argRecordType> {
+class $_parentCommandClassName extends CommandNotifier<${command.dataType}, ${command.options.errorType}, $argRecordType> {
   $_parentCommandClassName(this._instance, this._familyArg);
   final ${parent!.name} _instance;
   final $familyRecordType _familyArg;
@@ -534,11 +538,11 @@ class $_parentCommandClassName extends CommandNotifier<${command.dataType}, ${Cr
 
   @override
   ActionStrategy get strategy => ${command.strategyType};
-$mapErrorOverride}''';
+${mapErrorOverride(command.options)}}''';
     }
 
     return '''
-class $_parentCommandClassName extends CommandNotifier<${command.dataType}, ${CraftConfig.errorType}, $argRecordType> {
+class $_parentCommandClassName extends CommandNotifier<${command.dataType}, ${command.options.errorType}, $argRecordType> {
   $_parentCommandClassName(this._instance);
   final ${parent!.name} _instance;
 
@@ -550,6 +554,6 @@ class $_parentCommandClassName extends CommandNotifier<${command.dataType}, ${Cr
 
   @override
   ActionStrategy get strategy => ${command.strategyType};
-$mapErrorOverride}''';
+${mapErrorOverride(command.options)}}''';
   }
 }

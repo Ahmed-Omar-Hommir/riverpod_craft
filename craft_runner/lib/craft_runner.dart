@@ -1,22 +1,40 @@
-/// craft_runner — a generic, build_runner-style orchestrator for AST-based
-/// project-wide code generation plugins.
-///
-/// It knows nothing about any specific generator. Register generators (each a
-/// [ProjectWideCraftPlugin]) via `craft_runner.yaml`'s `plugins:` list, or
-/// programmatically with [runWithPlugins] from a custom `tool/craft.dart`.
+/// Resident, incremental code-generation watcher.
 ///
 /// ```dart
-/// import 'package:craft_runner/craft_runner.dart';
-/// import 'package:my_generator/my_generator.dart';
+/// // tool/craft.dart
+/// class MyBuilder extends CraftBuilderSingleFile {
+///   @override
+///   List<String> get scope => ['lib'];
 ///
-/// Future<void> main(List<String> args) =>
-///     runWithPlugins([MyGeneratorPlugin()], args);
+///   @override
+///   void build(String path, ParseStringResult result) {}
+/// }
+///
+/// void main() => craft(builders: [MyBuilder()]);
 /// ```
 library;
 
-// The single plugin interface craft_runner drives.
-export 'src/project_wide_plugin.dart';
+import 'src/craft_builder.dart';
+import 'src/runner.dart';
 
-// CLI entry points.
-export 'file_processor.dart' show FileProcessor;
-export 'src/run_with_plugins.dart';
+export 'src/craft_builder.dart';
+export 'src/version.dart';
+export 'src/runner.dart' show CraftRunner;
+
+/// [args] selects the mode: `watch` stays resident, anything else builds once.
+Future<void> craft({
+  required List<CraftBuilder> builders,
+  List<String> args = const [],
+  List<String> roots = const ['lib', 'test'],
+  List<String> exclude = const ['.craft.dart', '.g.dart', '.freezed.dart'],
+  String? rootDir,
+}) async {
+  final runner = CraftRunner(
+    builders: builders,
+    roots: roots,
+    exclude: exclude,
+    rootDir: rootDir,
+  );
+  if (args.contains('watch')) return runner.run();
+  runner.start();
+}

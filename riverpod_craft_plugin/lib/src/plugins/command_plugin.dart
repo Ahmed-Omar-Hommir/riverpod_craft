@@ -1,7 +1,5 @@
 import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
 
-import 'package:riverpod_craft_plugin/command_info.dart';
-import 'package:riverpod_craft_plugin/concurrency_type.dart';
 
 /// Built-in plugin that handles top-level `@command` functions.
 ///
@@ -16,7 +14,7 @@ class CommandPlugin extends RiverpodCraftPlugin<List<Command>> {
       ['command', 'droppable', 'restartable', 'concurrent', 'sequential'];
 
   @override
-  List<Command>? collect(DartElementInfo element) {
+  List<Command>? collect(DartElementInfo element, RiverpodCraftOptions options) {
     // Only handle top-level functions, not classes.
     // Class-level @command methods are handled by ProviderPlugin.
     if (element is! DartFunctionElement) return null;
@@ -41,6 +39,7 @@ class CommandPlugin extends RiverpodCraftPlugin<List<Command>> {
 
     return [
       Command(
+        options: options,
         name: functionInfo.name,
         params: params,
         concurrency: getConcurrencyType(functionInfo.annotations),

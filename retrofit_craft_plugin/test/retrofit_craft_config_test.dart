@@ -25,7 +25,7 @@ void main() {
   });
 
   test('returns defaults when retrofit_craft section is missing', () {
-    File('${tmp.path}/riverpod_craft.yaml').writeAsStringSync('''
+    File('${tmp.path}/craft_runner.yaml').writeAsStringSync('''
 plugins:
   - some_plugin
 ''');
@@ -35,7 +35,7 @@ plugins:
   });
 
   test('parses all fields from the retrofit_craft section', () {
-    File('${tmp.path}/riverpod_craft.yaml').writeAsStringSync('''
+    File('${tmp.path}/craft_runner.yaml').writeAsStringSync('''
 retrofit_craft:
   default_entry: Identity
   default_version: V1
@@ -54,7 +54,7 @@ retrofit_craft:
   });
 
   test('returns defaults on malformed YAML rather than throwing', () {
-    File('${tmp.path}/riverpod_craft.yaml').writeAsStringSync(
+    File('${tmp.path}/craft_runner.yaml').writeAsStringSync(
       'retrofit_craft:\n  default_entry: [unbalanced\n',
     );
     final config = RetrofitCraftConfig.load(tmp);

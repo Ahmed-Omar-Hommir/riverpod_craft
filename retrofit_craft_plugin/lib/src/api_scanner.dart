@@ -37,11 +37,11 @@ class ApiScanner {
     for (final decl in unit.unit.declarations) {
       // 1. Enum declarations -> potential Entry/Version registries.
       if (decl is EnumDeclaration) {
-        final name = decl.name.lexeme;
+        final name = decl.namePart.typeName.lexeme;
         final values = [
-          for (final c in decl.constants) c.name.lexeme,
+          for (final c in decl.body.constants) c.name.lexeme,
         ];
-        final hasPathField = _hasStringPathField(decl.members);
+        final hasPathField = _hasStringPathField(decl.body.members);
         final registry = EnumRegistry(
           name: name,
           filePath: filePath,
@@ -67,15 +67,15 @@ class ApiScanner {
       if (scanEntries || scanVersions) {
         final staticConsts = _staticConstFieldNames(decl);
         if (staticConsts.isNotEmpty) {
-          final hasPathField = _hasStringPathField(decl.members);
+          final hasPathField = _hasStringPathField(decl.body.members);
           final registry = EnumRegistry(
-            name: decl.name.lexeme,
+            name: decl.namePart.typeName.lexeme,
             filePath: filePath,
             values: staticConsts,
             hasPathField: hasPathField,
           );
-          if (scanEntries) entries[decl.name.lexeme] = registry;
-          if (scanVersions) versions[decl.name.lexeme] = registry;
+          if (scanEntries) entries[decl.namePart.typeName.lexeme] = registry;
+          if (scanVersions) versions[decl.namePart.typeName.lexeme] = registry;
         }
       }
 
@@ -105,7 +105,7 @@ class ApiScanner {
 
   List<String> _staticConstFieldNames(ClassDeclaration decl) {
     final out = <String>[];
-    for (final member in decl.members) {
+    for (final member in decl.body.members) {
       if (member is! FieldDeclaration) continue;
       if (!member.isStatic) continue;
       final keyword = member.fields.keyword?.lexeme;
@@ -130,15 +130,15 @@ class ApiScanner {
     final args = apiAnno.arguments?.arguments;
     if (args != null) {
       for (final arg in args) {
-        if (arg is! NamedExpression) continue;
-        final name = arg.name.label.name;
-        final ref = _propertyAccess(arg.expression);
+        if (arg is! NamedArgument) continue;
+        final name = arg.name.lexeme;
+        final ref = _propertyAccess(arg.argumentExpression);
         if (ref == null) {
           print(
             'retrofit_craft: @Api(...) $name argument should be a property '
             'access like `Entry.identity` or a dot-shorthand `.identity` '
-            '(got "${arg.expression.toSource()}") in '
-            '${decl.name.lexeme} ($filePath).',
+            '(got "${arg.argumentExpression.toSource()}") in '
+            '${decl.namePart.typeName.lexeme} ($filePath).',
           );
           continue;
         }
@@ -148,7 +148,7 @@ class ApiScanner {
     }
 
     return ApiClassSpec(
-      className: decl.name.lexeme,
+      className: decl.namePart.typeName.lexeme,
       filePath: filePath,
       entry: entryRef,
       version: versionRef,

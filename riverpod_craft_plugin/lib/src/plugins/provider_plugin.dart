@@ -1,9 +1,5 @@
 import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
 
-import 'package:riverpod_craft_plugin/command_info.dart';
-import 'package:riverpod_craft_plugin/concurrency_type.dart';
-import 'package:riverpod_craft_plugin/provider_info.dart';
-import 'package:riverpod_craft_plugin/src/craft_config.dart';
 
 /// Built-in plugin that handles `@provider` annotations.
 ///
@@ -18,11 +14,11 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
   List<String> get annotations => ['provider'];
 
   @override
-  ProviderInfo? collect(DartElementInfo element) {
+  ProviderInfo? collect(DartElementInfo element, RiverpodCraftOptions options) {
     if (element is DartClassElement) {
-      return collectClass(element.classInfo);
+      return collectClass(element.classInfo, options);
     } else if (element is DartFunctionElement) {
-      return collectFunction(element.functionInfo);
+      return collectFunction(element.functionInfo, options);
     }
     return null;
   }
@@ -36,7 +32,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
 
   /// Collects metadata from a class-based `@provider`.
   /// Override to customize class-based provider collection.
-  ProviderInfo? collectClass(DartClassInfo classInfo) {
+  ProviderInfo? collectClass(DartClassInfo classInfo, RiverpodCraftOptions options) {
     if (!classInfo.hasAnnotation('provider')) return null;
 
     final createMethod = classInfo.findMethod('create');
@@ -46,7 +42,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
         .where((p) => p.isPositional && p.name == 'page')
         .firstOrNull;
     final hasPageParam = pageParam != null;
-    final providerType = getProviderType(createMethod.returnType, hasPageParam: hasPageParam);
+    final providerType = getProviderType(createMethod.returnType, options, hasPageParam: hasPageParam);
     final dataType = extractGenericType(createMethod.returnType, isPaged: providerType == ProviderType.paged);
     final pageKeyType = pageParam?.type ?? 'int';
 
@@ -72,11 +68,12 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
           .toList();
     }
 
-    final commands = extractCommands(classInfo);
+    final commands = extractCommands(classInfo, options);
     final publicMethods = extractPublicMethods(classInfo);
 
     // @settable is ignored on class-based providers
     return ProviderInfo(
+      options: options,
       name: classInfo.name,
       dataType: dataType,
       isKeepAlive: classInfo.hasAnnotation('keepAlive'),
@@ -85,7 +82,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
       params: familyParams,
       commands: commands,
       publicMethods: publicMethods,
-      hasPagedMapper: providerType == ProviderType.paged && CraftConfig.hasPagedMapper,
+      hasPagedMapper: providerType == ProviderType.paged && options.hasPagedMapper,
       pageKeyType: pageKeyType,
     );
   }
@@ -96,7 +93,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
 
   /// Collects metadata from a functional `@provider`.
   /// Override to customize functional provider collection.
-  ProviderInfo? collectFunction(DartFunctionInfo functionInfo) {
+  ProviderInfo? collectFunction(DartFunctionInfo functionInfo, RiverpodCraftOptions options) {
     if (!functionInfo.hasAnnotation('provider')) return null;
 
     var params = List<ParameterInfo>.from(functionInfo.params);
@@ -115,7 +112,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
         .where((p) => p.isPositional && p.name == 'page')
         .firstOrNull;
     final hasPageParam = pageParam != null;
-    final providerType = getProviderType(functionInfo.returnType, hasPageParam: hasPageParam);
+    final providerType = getProviderType(functionInfo.returnType, options, hasPageParam: hasPageParam);
     final dataType = extractGenericType(functionInfo.returnType, isPaged: providerType == ProviderType.paged);
     final pageKeyType = pageParam?.type ?? 'int';
 
@@ -127,6 +124,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
     final functionName = functionInfo.name;
 
     return ProviderInfo(
+      options: options,
       name: functionName[0].toUpperCase() + functionName.substring(1),
       dataType: dataType,
       isKeepAlive: functionInfo.hasAnnotation('keepAlive'),
@@ -138,7 +136,7 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
       requiresRef: requiresRef,
       isSettable: functionInfo.hasAnnotation('settable'),
       isNoInit: functionInfo.hasAnnotation('noInit'),
-      hasPagedMapper: providerType == ProviderType.paged && CraftConfig.hasPagedMapper,
+      hasPagedMapper: providerType == ProviderType.paged && options.hasPagedMapper,
       publicMethods: const <PublicMethod>[],
       pageKeyType: pageKeyType,
     );
@@ -181,14 +179,18 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
   ///
   /// When [hasPageParam] is true and mapper is configured,
   /// `Future<Wrapper<T>>` with `int page` first param → paged.
-  ProviderType getProviderType(String returnType, {bool hasPageParam = false}) {
+  ProviderType getProviderType(
+    String returnType,
+    RiverpodCraftOptions options, {
+    bool hasPageParam = false,
+  }) {
     // Paged<T> or Future<PaginatedResponse<T>> → paged
     if (returnType.startsWith('Paged<') ||
         returnType.contains('PaginatedResponse<')) {
       return ProviderType.paged;
     }
     // With paged mapper: Future<Wrapper<T>> + int page param → paged
-    if (hasPageParam && CraftConfig.hasPagedMapper && returnType.startsWith('Future<')) {
+    if (hasPageParam && options.hasPagedMapper && returnType.startsWith('Future<')) {
       return ProviderType.paged;
     }
     if (returnType.startsWith('Future<')) return ProviderType.future;
@@ -215,13 +217,14 @@ class ProviderPlugin extends RiverpodCraftPlugin<ProviderInfo> {
 
   /// Extracts `@command`-annotated methods from a class.
   /// Override to customize command extraction behavior.
-  List<Command> extractCommands(DartClassInfo classInfo) {
+  List<Command> extractCommands(DartClassInfo classInfo, RiverpodCraftOptions options) {
     final commands = <Command>[];
     for (final method in classInfo.methodsWithAnnotation('command')) {
       if (!method.returnType.startsWith('Future<')) continue;
 
       commands.add(
         Command(
+          options: options,
           name: method.name,
           params: method.params,
           concurrency: getConcurrencyType(method.annotations),

@@ -1,8 +1,8 @@
 import 'package:analyzer/dart/analysis/results.dart' show ParseStringResult;
 import 'package:riverpod_craft_plugin/riverpod_craft_plugin.dart';
-import 'package:riverpod_craft_plugin/provider_info.dart';
 
 import 'ast_to_model.dart';
+import 'resolved_types.dart';
 
 /// Orchestrates the plugin pipeline:
 /// 1. Convert AST -> clean data model
@@ -24,8 +24,12 @@ class PluginRunner {
   /// Run the full pipeline on a parsed file.
   ///
   /// Returns the generated code string, or `null` if nothing was generated.
-  String? run(ParseStringResult parsedResult) {
-    final elements = astToModel(parsedResult);
+  String? run(
+    ParseStringResult parsedResult, {
+    ResolvedReturnTypes resolved = const ResolvedReturnTypes.empty(),
+    RiverpodCraftOptions options = RiverpodCraftOptions.empty,
+  }) {
+    final elements = astToModel(parsedResult, resolved: resolved);
 
     final results = <PluginCollectionResult>[];
 
@@ -36,7 +40,7 @@ class PluginRunner {
         );
         if (!hasMatch) continue;
 
-        final data = plugin.collect(element);
+        final data = plugin.collect(element, options);
         if (data != null) {
           results.add(PluginCollectionResult(plugin: plugin, data: data));
         }
@@ -71,6 +75,7 @@ class PluginRunner {
     for (final idx in providerResults) {
       final info = results[idx].data as ProviderInfo;
       final enriched = ProviderInfo(
+        options: info.options,
         name: info.name,
         dataType: info.dataType,
         isKeepAlive: info.isKeepAlive,

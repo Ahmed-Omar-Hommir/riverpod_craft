@@ -46,7 +46,7 @@ class CraftPagedListView<T, F, PageKey> extends ConsumerStatefulWidget {
     super.key,
     required this.providerValue,
     required this.itemBuilder,
-    required Widget Function(BuildContext context, int index) separatorBuilder,
+    required this._separatorBuilder,
     this.emptyBuilder,
     this.firstPageLoadingBuilder,
     this.firstPageErrorBuilder,
@@ -61,7 +61,7 @@ class CraftPagedListView<T, F, PageKey> extends ConsumerStatefulWidget {
     this.shrinkWrap = false,
     this.cacheExtent,
     this.dragStartBehavior = DragStartBehavior.start,
-  }) : _separatorBuilder = separatorBuilder;
+  });
 
   /// The paginated provider value.
   ///
@@ -195,13 +195,13 @@ class CraftPagedSliverListView<T, F, PageKey> extends ConsumerStatefulWidget {
     super.key,
     required this.providerValue,
     required this.itemBuilder,
-    required Widget Function(BuildContext context, int index) separatorBuilder,
+    required this._separatorBuilder,
     this.emptyBuilder,
     this.firstPageLoadingBuilder,
     this.firstPageErrorBuilder,
     this.newPageLoadingBuilder,
     this.newPageErrorBuilder,
-  }) : _separatorBuilder = separatorBuilder;
+  });
 
   /// The paginated provider value.
   final PagedProviderValue<T, F, PageKey> providerValue;
