@@ -1,3 +1,21 @@
+## 0.10.0
+
+### Breaking
+
+- **Now a craft_runner builder.** `RetrofitCraftBuilder` (a
+  `CraftBuilderMultiFile`) replaces `RetrofitApiPlugin`, and the
+  `tool/craft.dart` + `runWithPlugins(...)` bootstrap is gone.
+- **Configuration moves** from the `retrofit_craft:` block in
+  `riverpod_craft.yaml` to nested keys under
+  `retrofit_craft_plugin:RetrofitCraftBuilder` in `craft_runner.yaml`. The keys
+  themselves (`entry_path`, `version_path`, `output`, `root_class_name`,
+  `default_entry`, `default_version`) are unchanged.
+- Requires analyzer `>=13.3.0 <15.0.0`.
+
+### Fixed
+
+- The package description said "build_runner generator", which it never was.
+
 ## 0.7.1
 
 - Fix: widen the `riverpod_craft_plugin` (and dev `craft_runner`) dependencies

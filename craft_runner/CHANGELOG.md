@@ -1,3 +1,45 @@
+## 0.10.0
+
+Complete rewrite. craft_runner is now a standalone CLI that parses your project
+once, keeps the parse in memory, and drives plain-Dart builders. It knows
+nothing about any particular generator — riverpod, retrofit and your own
+builders are all loaded from `craft_runner.yaml`.
+
+0.8.0 and 0.9.0 were never published; this release covers everything since
+0.7.1.
+
+### Breaking
+
+- **New builder API.** `ProjectWideCraftPlugin` and in-process plugin
+  registration are gone. A builder extends `CraftBuilderSingleFile` (called per
+  file with the path and its `ParseStringResult`) or `CraftBuilderMultiFile`
+  (called with every in-scope file at once), declares a `scope` of source roots,
+  and exposes a `fromConfig(Map<String, Object?>)` factory.
+- **Config lives in `craft_runner.yaml`**, replacing `riverpod_craft.yaml`. The
+  `plugins:` list and its per-plugin namespaced blocks become a `builders:` map
+  keyed `<package>:<ClassName>`, with each builder's options nested under its
+  own key.
+- **Commands changed** to `craft_runner craft` (build once) and
+  `craft_runner watch`. `generate <file>`, `clean`, `init` and `help` are gone;
+  use `--help` and `--version`.
+- **Parsing is syntactic only.** Sources go through `parseString(...)` and are
+  never resolved, so builders see syntax, not types — a typedef or an inherited
+  member cannot be looked up. This is the trade that makes the runner fast.
+- `runWithPlugins(...)` is removed along with the `tool/craft.dart` bootstrap it
+  required. Delete that file.
+
+### Added
+
+- Installs as an executable: `dart pub global activate craft_runner`. The
+  project still needs `craft_runner` as a dependency, since the builder entry
+  compiles against its package config.
+- Builders are AOT-compiled to a native binary on first run and reused until the
+  config or any builder package changes.
+- `writeIfChanged(path, content)` skips byte-identical writes, so a builder's own
+  output never wakes the watcher.
+- One watcher per project, enforced by a file lock — a second `watch` exits
+  rather than double-building every change.
+
 ## 0.7.1
 
 - Fix: widen the `riverpod_craft_plugin` dependency to `^0.7.0` so craft_runner

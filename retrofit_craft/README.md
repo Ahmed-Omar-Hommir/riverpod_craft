@@ -134,15 +134,16 @@ class _IdentityAuthVersions {
 }
 ```
 
-## Optional config (`riverpod_craft.yaml`)
+## Optional config (`craft_runner.yaml`)
 
 ```yaml
-retrofit_craft:
-  default_entry: Entry.identity        # used when @Api() omits entry
-  default_version: Version.v1          # used when @Api() omits version
-  entry_path: lib/app/api/entries.dart
-  version_path: lib/app/api/versions.dart
-  output: lib/app/app_api.craft.dart   # output (must end .craft.dart)
+builders:
+  retrofit_craft_plugin:RetrofitCraftBuilder:
+    default_entry: Entry.identity        # used when @Api() omits entry
+    default_version: Version.v1          # used when @Api() omits version
+    entry_path: lib/app/api/entries.dart
+    version_path: lib/app/api/versions.dart
+    output: lib/app/app_api.craft.dart   # output (must end .craft.dart)
 ```
 
 See [`examples/retrofit_aggregator`](../examples/retrofit_aggregator) for a
@@ -150,4 +151,4 @@ complete, working setup.
 
 ## Status
 
-Alpha (0.2.0), part of the `riverpod_craft` ecosystem.
+Alpha, part of the `riverpod_craft` ecosystem.

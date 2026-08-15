@@ -1,3 +1,30 @@
+## 0.10.0
+
+### Breaking
+
+- **Key-based pagination.** `PaginatedResponse<T>` becomes
+  `PaginatedResponse<T, PageKey>` and is now built from `nextPageKey` +
+  `results` (+ optional `meta`) instead of `currentPage` / `total` /
+  `lastPage` / `pageSize`. The contract is `nextPageKey == null` ⟺ no more
+  pages, which lets the same notifier drive offset, page-number and cursor
+  APIs. Per-page metadata moves to `MetaInfo`.
+- `awaitValue` is removed from notifier callbacks; use the `.future` accessor
+  below.
+
+### Added
+
+- **`.future` accessor** — `ref.xProvider.future` awaits a data provider's
+  resolved value with a *selective* rebuild dependency, via `DataWatchHandle`.
+  It rebuilds the watcher only when a new load starts or the selected value
+  changes, survives the source being invalidated mid-load, and takes an
+  optional `forceRefetch`.
+- **Global provider-init hook** — `RiverpodCraft.providerInit` runs once per
+  notifier instance and is awaited before that notifier's first fetch, for
+  cross-cutting concerns like refetch-on-language-change. A provider opts out
+  with the new `@noInit` annotation.
+- Paged `retry()` re-attempts the page that actually failed instead of
+  restarting pagination.
+
 ## 0.7.0
 
 - **Generic error type** (breaking): `DataState`, command states and notifiers

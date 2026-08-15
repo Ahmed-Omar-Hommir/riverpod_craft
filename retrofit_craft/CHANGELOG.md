@@ -1,3 +1,9 @@
+## 0.10.0
+
+- Synchronized release across the `riverpod_craft` ecosystem. The annotations
+  are unchanged; the generator that consumes them now runs under craft_runner
+  (see `retrofit_craft_plugin`).
+
 ## 0.7.0
 
 - Synchronized release across the `riverpod_craft` ecosystem. No functional
