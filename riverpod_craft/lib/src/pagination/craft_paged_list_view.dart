@@ -39,14 +39,14 @@ class CraftPagedListView<T, F, PageKey> extends ConsumerStatefulWidget {
     this.shrinkWrap = false,
     this.cacheExtent,
     this.dragStartBehavior = DragStartBehavior.start,
-  }) : _separatorBuilder = null;
+  }) : separatorBuilder = null;
 
   /// Creates a [CraftPagedListView] with separators between items.
   const CraftPagedListView.separated({
     super.key,
     required this.providerValue,
     required this.itemBuilder,
-    required this._separatorBuilder,
+    required this.separatorBuilder,
     this.emptyBuilder,
     this.firstPageLoadingBuilder,
     this.firstPageErrorBuilder,
@@ -71,7 +71,9 @@ class CraftPagedListView<T, F, PageKey> extends ConsumerStatefulWidget {
 
   /// Builds each item in the list.
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
-  final Widget Function(BuildContext context, int index)? _separatorBuilder;
+
+  /// Builds the separator between adjacent items.
+  final Widget Function(BuildContext context, int index)? separatorBuilder;
 
   /// Widget shown when the list has no items.
   final Widget Function(BuildContext context)? emptyBuilder;
@@ -141,12 +143,12 @@ class _CraftPagedListViewState<T, F, PageKey>
           : null,
     );
 
-    if (widget._separatorBuilder != null) {
+    if (widget.separatorBuilder != null) {
       return PagedListView<PageKey, T>.separated(
         state: state.pagingState,
         fetchNextPage: provider.fetchNextPage,
         builderDelegate: delegate,
-        separatorBuilder: widget._separatorBuilder!,
+        separatorBuilder: widget.separatorBuilder!,
         padding: widget.padding,
         scrollController: widget.scrollController,
         scrollDirection: widget.scrollDirection,
@@ -188,14 +190,14 @@ class CraftPagedSliverListView<T, F, PageKey> extends ConsumerStatefulWidget {
     this.firstPageErrorBuilder,
     this.newPageLoadingBuilder,
     this.newPageErrorBuilder,
-  }) : _separatorBuilder = null;
+  }) : separatorBuilder = null;
 
   /// Creates a [CraftPagedSliverListView] with separators between items.
   const CraftPagedSliverListView.separated({
     super.key,
     required this.providerValue,
     required this.itemBuilder,
-    required this._separatorBuilder,
+    required this.separatorBuilder,
     this.emptyBuilder,
     this.firstPageLoadingBuilder,
     this.firstPageErrorBuilder,
@@ -208,7 +210,9 @@ class CraftPagedSliverListView<T, F, PageKey> extends ConsumerStatefulWidget {
 
   /// Builds each item in the list.
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
-  final Widget Function(BuildContext context, int index)? _separatorBuilder;
+
+  /// Builds the separator between adjacent items.
+  final Widget Function(BuildContext context, int index)? separatorBuilder;
 
   /// Widget shown when the list has no items.
   final Widget Function(BuildContext context)? emptyBuilder;
@@ -251,12 +255,12 @@ class _CraftPagedSliverListViewState<T, F, PageKey>
           : null,
     );
 
-    if (widget._separatorBuilder != null) {
+    if (widget.separatorBuilder != null) {
       return PagedSliverList<PageKey, T>.separated(
         state: state.pagingState,
         fetchNextPage: provider.fetchNextPage,
         builderDelegate: delegate,
-        separatorBuilder: widget._separatorBuilder!,
+        separatorBuilder: widget.separatorBuilder!,
       );
     }
 

@@ -1,3 +1,10 @@
+## 0.10.1
+
+### Fixed
+
+- Expose `separatorBuilder` as a public parameter on the separated paginated
+  list and sliver-list constructors.
+
 ## 0.10.0
 
 ### Breaking
