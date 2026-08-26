@@ -1,1 +1,1 @@
-const craftRunnerVersion = '0.10.0';
+const craftRunnerVersion = '0.11.0';

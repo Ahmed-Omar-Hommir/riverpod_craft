@@ -23,7 +23,7 @@ against your package config:
 
 ```yaml
 dev_dependencies:
-  craft_runner: ^0.10.0
+  craft_runner: ^0.11.0
 ```
 
 Put it under `dependencies:` instead if your own builders live in `lib/`.
@@ -57,7 +57,7 @@ an empty block.
 ## Commands
 
 ```bash
-craft_runner craft        # build once and exit
+craft_runner build        # build once and exit
 craft_runner watch        # build, then rebuild on every save
 craft_runner --version
 craft_runner --help

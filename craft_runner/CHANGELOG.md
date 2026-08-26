@@ -1,3 +1,15 @@
+## 0.11.0
+
+### Breaking
+
+- Rename the one-shot `craft_runner craft` command to `craft_runner build`.
+
+### Changed
+
+- Keep the globally activated `craft_runner` executable as a lightweight
+  launcher that delegates commands to the project's package version through
+  `dart run craft_runner`.
+
 ## 0.10.0
 
 Complete rewrite. craft_runner is now a standalone CLI that parses your project
