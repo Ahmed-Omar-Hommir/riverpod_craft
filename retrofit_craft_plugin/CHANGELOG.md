@@ -1,3 +1,10 @@
+## 0.10.1
+
+### Fixed
+
+- Allow `craft_runner` 0.11.x, whose CLI rename does not change the builder
+  API used by this package.
+
 ## 0.10.0
 
 ### Breaking

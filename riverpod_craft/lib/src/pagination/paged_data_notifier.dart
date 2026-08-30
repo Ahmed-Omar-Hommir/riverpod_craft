@@ -37,6 +37,7 @@ abstract class PagedDataNotifier<T, F, Arg extends Record, PageKey>
 
     Future.microtask(() async {
       await init();
+      if (!ref.mounted) return;
       await fetchNextPage();
     });
     return PagedDataState<T, F, PageKey>(PagingState());
@@ -59,6 +60,7 @@ abstract class PagedDataNotifier<T, F, Arg extends Record, PageKey>
 
     try {
       final response = await buildPagedData(pageKey as PageKey);
+      if (!ref.mounted) return;
 
       _nextPageKey = response.nextPageKey;
 
@@ -71,6 +73,7 @@ abstract class PagedDataNotifier<T, F, Arg extends Record, PageKey>
         ),
       );
     } catch (error) {
+      if (!ref.mounted) return;
       state = PagedDataState<T, F, PageKey>(
         s.copyWith(error: mapError(error), isLoading: false),
       );

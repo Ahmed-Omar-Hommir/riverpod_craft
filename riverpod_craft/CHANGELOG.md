@@ -1,3 +1,12 @@
+## 0.10.2
+
+### Fixed
+
+- Prevent data and paged-data notifiers from updating state after their
+  provider has been disposed.
+- Complete pending data loads when a provider is disposed during initialization
+  or stream delivery.
+
 ## 0.10.1
 
 ### Fixed

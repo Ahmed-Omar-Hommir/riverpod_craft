@@ -1,0 +1,7 @@
+roots: [test]
+exclude: [.craft.dart, .g.dart, .freezed.dart]
+
+builders:
+  http_cases_generator:HttpCasesBuilder:
+    scope: [test/http_cases]
+    output: test/http_cases/http_cases.craft.dart

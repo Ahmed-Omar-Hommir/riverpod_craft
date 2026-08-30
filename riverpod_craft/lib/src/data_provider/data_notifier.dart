@@ -93,6 +93,11 @@ abstract class DataNotifier<T, F, Arg extends Record>
     try {
       _subscription = _buildData(arg).listen(
         (result) {
+          if (!ref.mounted) {
+            if (!completer.isCompleted) completer.complete();
+            return;
+          }
+
           switch (result) {
             case Ok<T>(value: final value):
               state = DataSuccess<T, F>(value);
@@ -105,6 +110,11 @@ abstract class DataNotifier<T, F, Arg extends Record>
           }
         },
         onError: (e) {
+          if (!ref.mounted) {
+            if (!completer.isCompleted) completer.complete();
+            return;
+          }
+
           if (!silent) state = DataError<T, F>(mapError(e));
 
           if (!completer.isCompleted) {
@@ -113,8 +123,16 @@ abstract class DataNotifier<T, F, Arg extends Record>
         },
       );
 
-      ref.onDispose(() => _subscription?.cancel());
+      ref.onDispose(() {
+        _subscription?.cancel();
+        if (!completer.isCompleted) completer.complete();
+      });
     } catch (e) {
+      if (!ref.mounted) {
+        if (!completer.isCompleted) completer.complete();
+        return completer.future;
+      }
+
       if (!silent) state = DataError<T, F>(mapError(e));
       if (!completer.isCompleted) {
         completer.completeError(e);
@@ -142,6 +160,7 @@ abstract class DataNotifier<T, F, Arg extends Record>
 
   Future<void> _bootstrap() async {
     await init();
+    if (!ref.mounted) return;
     await _getData(arg);
   }
 

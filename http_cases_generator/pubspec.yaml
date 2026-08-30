@@ -1,6 +1,6 @@
-name: retrofit_craft_plugin
-description: craft_runner builder that generates a grouped, versioned retrofit API client aggregator.
-version: 0.10.1
+name: http_cases_generator
+description: Craft Runner generator for strongly typed, grouped HTTP test-case catalogs.
+version: 0.1.0
 homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
 issue_tracker: https://github.com/Ahmed-Omar-Hommir/riverpod_craft/issues
@@ -10,12 +10,13 @@ environment:
 
 dependencies:
   analyzer: ">=13.3.0 <15.0.0"
-  craft_runner: ">=0.10.0 <0.12.0"
+  craft_runner: ^0.11.0
   dart_style: ^3.1.11
   path: ^1.9.1
-  yaml: ^3.1.3
 
 dev_dependencies:
+  http_cases:
+    path: ../http_cases
   lints: ^5.0.0
   test: ^1.24.0
 

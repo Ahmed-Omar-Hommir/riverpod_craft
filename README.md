@@ -14,6 +14,8 @@ Currently in alpha — features and API may change.
 |---------|-------------|
 | [`riverpod_craft`](https://pub.dev/packages/riverpod_craft) | Runtime library — annotations, notifiers, state types |
 | [`craft_runner`](https://pub.dev/packages/craft_runner) | Code generation runner |
+| [`http_cases`](http_cases/) | Dependency-free annotations for grouped HTTP test cases |
+| [`http_cases_generator`](http_cases_generator/) | Craft Runner plugin that generates HTTP case catalogs |
 
 ## License
 

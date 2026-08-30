@@ -1,0 +1,13 @@
+name: http_cases
+description: Dependency-free annotations for organizing user-written HTTP test cases.
+version: 0.1.0
+homepage: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
+repository: https://github.com/Ahmed-Omar-Hommir/riverpod_craft
+issue_tracker: https://github.com/Ahmed-Omar-Hommir/riverpod_craft/issues
+
+environment:
+  sdk: ^3.5.0
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.24.0
